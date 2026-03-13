@@ -17,7 +17,7 @@ type rateLimiter struct {
 
 var limiter = &rateLimiter{
 	requests: make(map[string][]time.Time),
-	limit:    2000, // 每分钟最多 2000 次请求
+	limit:    2000, // Maximum 2000 requests per minute
 	window:   time.Minute,
 }
 
@@ -39,7 +39,7 @@ func RateLimitMiddleware() gin.HandlerFunc {
 		}
 
 		if len(validRequests) >= limiter.limit {
-			response.Error(c, 429, "RATE_LIMIT_EXCEEDED", "请求过于频繁，请稍后再试")
+			response.Error(c, 429, "RATE_LIMIT_EXCEEDED", "Too many requests, please try again later")
 			c.Abort()
 			return
 		}

@@ -70,7 +70,7 @@ type SceneCompositionInfo struct {
 }
 
 func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]SceneCompositionInfo, error) {
-	// 验证权限
+	// Verify permissions
 	var episode models.Episode
 	err := s.db.Preload("Drama").Where("id = ?", episodeID).First(&episode).Error
 	if err != nil {
@@ -82,7 +82,7 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]
 		"episode_id", episodeID,
 		"drama_id", episode.DramaID)
 
-	// 获取分镜列表
+	// Get storyboard list
 	var storyboards []models.Storyboard
 	if err := s.db.Where("episode_id = ?", episodeID).
 		Preload("Characters").
@@ -91,19 +91,19 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]
 		return nil, fmt.Errorf("failed to load storyboards: %w", err)
 	}
 
-	// 获取所有角色（用于匹配角色信息）
+	// Get all characters (for matching character info)
 	var characters []models.Character
 	if err := s.db.Where("drama_id = ?", episode.DramaID).Find(&characters).Error; err != nil {
 		s.log.Warnw("Failed to load characters", "error", err)
 	}
 
-	// 创建角色ID到角色信息的映射
+	// Create character ID to character info mapping
 	charIDToInfo := make(map[uint]*models.Character)
 	for i := range characters {
 		charIDToInfo[characters[i].ID] = &characters[i]
 	}
 
-	// 获取所有场景ID
+	// Get all scene IDs
 	var sceneIDs []uint
 	for _, storyboard := range storyboards {
 		if storyboard.SceneID != nil {
@@ -111,7 +111,7 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]
 		}
 	}
 
-	// 批量获取场景信息
+	// Batch fetch scene information
 	var scenes []models.Scene
 	sceneMap := make(map[uint]*models.Scene)
 	if len(sceneIDs) > 0 {
@@ -122,7 +122,7 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]
 		}
 	}
 
-	// 获取分镜的合成图片（从 image_generations 表）
+	// Get composed images for storyboards (from image_generations table)
 	storyboardIDs := make([]uint, len(storyboards))
 	for i, storyboard := range storyboards {
 		storyboardIDs[i] = storyboard.ID
@@ -132,11 +132,11 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]
 	imageGenTaskMap := make(map[uint]*models.ImageGeneration) // storyboard_id -> processing task
 	if len(storyboardIDs) > 0 {
 		var imageGens []models.ImageGeneration
-		// 查询已完成的图片生成记录，每个镜头只取最新的一条
+		// Query completed image generation records, keep only the latest one per shot
 		if err := s.db.Where("storyboard_id IN ? AND status = ?", storyboardIDs, models.ImageStatusCompleted).
 			Order("created_at DESC").
 			Find(&imageGens).Error; err == nil {
-			// 为每个镜头保留最新的一条记录
+			// Keep the latest record for each shot
 			for _, ig := range imageGens {
 				if ig.StoryboardID != nil {
 					if _, exists := imageGenMap[*ig.StoryboardID]; !exists {
@@ -148,7 +148,7 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]
 			}
 		}
 
-		// 查询进行中的图片生成任务
+		// Query in-progress image generation tasks
 		var processingImageGens []models.ImageGeneration
 		if err := s.db.Where("storyboard_id IN ? AND status = ?", storyboardIDs, models.ImageStatusProcessing).
 			Order("created_at DESC").
@@ -164,7 +164,7 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]
 		}
 	}
 
-	// 批量查询进行中的视频生成任务
+	// Batch query in-progress video generation tasks
 	videoGenTaskMap := make(map[uint]*models.VideoGeneration) // storyboard_id -> processing task
 	if len(storyboardIDs) > 0 {
 		var processingVideoGens []models.VideoGeneration
@@ -182,7 +182,7 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]
 		}
 	}
 
-	// 构建返回结果
+	// Build return result
 	var result []SceneCompositionInfo
 	for _, storyboard := range storyboards {
 		storyboardInfo := SceneCompositionInfo{
@@ -207,7 +207,7 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]
 			SceneID:          storyboard.SceneID,
 		}
 
-		// 直接使用关联的角色信息
+		// Directly use associated character info
 		if len(storyboard.Characters) > 0 {
 			for _, char := range storyboard.Characters {
 				storyboardChar := SceneCharacterInfo{
@@ -220,7 +220,7 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]
 			}
 		}
 
-		// 添加场景信息
+		// Add scene information
 		if storyboard.SceneID != nil {
 			if scene, ok := sceneMap[*storyboard.SceneID]; ok {
 				storyboardInfo.Background = &SceneBackgroundInfo{
@@ -234,24 +234,24 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]
 			}
 		}
 
-		// 添加合成图片
+		// Add composed image
 		if imageURL, ok := imageGenMap[storyboard.ID]; ok {
 			storyboardInfo.ComposedImage = &imageURL
 		}
 
-		// 添加视频URL
+		// Add video URL
 		if storyboard.VideoURL != nil {
 			storyboardInfo.VideoURL = storyboard.VideoURL
 		}
 
-		// 添加进行中的图片生成任务信息
+		// Add in-progress image generation task info
 		if imageTask, ok := imageGenTaskMap[storyboard.ID]; ok {
 			storyboardInfo.ImageGenerationID = &imageTask.ID
 			statusStr := string(imageTask.Status)
 			storyboardInfo.ImageGenerationStatus = &statusStr
 		}
 
-		// 添加进行中的视频生成任务信息
+		// Add in-progress video generation task info
 		if videoTask, ok := videoGenTaskMap[storyboard.ID]; ok {
 			storyboardInfo.VideoGenerationID = &videoTask.ID
 			statusStr := string(videoTask.Status)
@@ -266,7 +266,7 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]
 
 type UpdateSceneRequest struct {
 	SceneID     *uint   `json:"scene_id"`
-	Characters  []uint  `json:"characters"` // 改为存储角色ID数组
+	Characters  []uint  `json:"characters"` // Store character ID array
 	Location    *string `json:"location"`
 	Time        *string `json:"time"`
 	Action      *string `json:"action"`
@@ -280,22 +280,22 @@ type UpdateSceneRequest struct {
 }
 
 func (s *StoryboardCompositionService) UpdateScene(sceneID string, req *UpdateSceneRequest) error {
-	// 获取分镜并验证权限
+	// Get storyboard and verify permissions
 	var storyboard models.Storyboard
 	err := s.db.Preload("Episode.Drama").Where("id = ?", sceneID).First(&storyboard).Error
 	if err != nil {
 		return fmt.Errorf("scene not found")
 	}
 
-	// 构建更新数据
+	// Build update data
 	updates := make(map[string]interface{})
 
-	// 更新背景ID
+	// Update background ID
 	if req.SceneID != nil {
 		updates["scene_id"] = req.SceneID
 	}
 
-	// 更新角色列表（直接存储ID数组）
+	// Update character list (store ID array directly)
 	if req.Characters != nil {
 		charactersJSON, err := json.Marshal(req.Characters)
 		if err != nil {
@@ -304,7 +304,7 @@ func (s *StoryboardCompositionService) UpdateScene(sceneID string, req *UpdateSc
 		updates["characters"] = charactersJSON
 	}
 
-	// 更新场景信息字段
+	// Update scene info fields
 	if req.Location != nil {
 		updates["location"] = req.Location
 	}
@@ -336,7 +336,7 @@ func (s *StoryboardCompositionService) UpdateScene(sceneID string, req *UpdateSc
 		updates["video_prompt"] = req.VideoPrompt
 	}
 
-	// 执行更新
+	// Execute update
 	if len(updates) > 0 {
 		if err := s.db.Model(&models.Storyboard{}).Where("id = ?", sceneID).Updates(updates).Error; err != nil {
 			return fmt.Errorf("failed to update scene: %w", err)
@@ -354,23 +354,23 @@ type GenerateSceneImageRequest struct {
 }
 
 func (s *StoryboardCompositionService) GenerateSceneImage(req *GenerateSceneImageRequest) (*models.ImageGeneration, error) {
-	// 获取场景并验证权限
+	// Get scene and verify permissions
 	var scene models.Scene
 	err := s.db.Where("id = ?", req.SceneID).First(&scene).Error
 	if err != nil {
 		return nil, fmt.Errorf("scene not found")
 	}
 
-	// 验证权限：通过DramaID查询Drama
+	// Verify permissions: query Drama by DramaID
 	var drama models.Drama
 	if err := s.db.Where("id = ? ", scene.DramaID).First(&drama).Error; err != nil {
 		return nil, fmt.Errorf("unauthorized")
 	}
 
-	// 构建场景图片生成提示词
+	// Build scene image generation prompt
 	prompt := req.Prompt
 	if prompt == "" {
-		// 使用场景的Prompt字段
+		// Use the scene Prompt field
 		prompt = scene.Prompt
 		if prompt == "" {
 			prompt = fmt.Sprintf("%s scene, %s", scene.Location, scene.Time)
@@ -378,15 +378,15 @@ func (s *StoryboardCompositionService) GenerateSceneImage(req *GenerateSceneImag
 		s.log.Infow("Using scene prompt", "scene_id", req.SceneID, "prompt", prompt)
 	}
 
-	// 使用imageGen服务直接生成
+	// Generate directly using imageGen service
 	if s.imageGen != nil {
 		genReq := &GenerateImageRequest{
 			SceneID:   &req.SceneID,
 			DramaID:   fmt.Sprintf("%d", scene.DramaID),
 			ImageType: string(models.ImageTypeScene),
 			Prompt:    prompt,
-			Model:     req.Model,   // 使用用户指定的模型
-			Size:      "2560x1440", // 3,686,400像素，满足doubao模型最低要求（16:9比例）
+			Model:     req.Model,   // Use user-specified model
+			Size:      "2560x1440", // 3,686,400 pixels, meets doubao model minimum requirement (16:9 ratio)
 			Quality:   "standard",
 		}
 		imageGen, err := s.imageGen.GenerateImage(genReq)
@@ -394,7 +394,7 @@ func (s *StoryboardCompositionService) GenerateSceneImage(req *GenerateSceneImag
 			return nil, fmt.Errorf("failed to generate image: %w", err)
 		}
 
-		// 更新场景的image_url
+		// Update scene image_url
 		if imageGen.ImageURL != nil {
 			scene.ImageURL = imageGen.ImageURL
 			scene.Status = "generated"
@@ -489,7 +489,7 @@ func (s *StoryboardCompositionService) DeleteScene(sceneID string) error {
 		return fmt.Errorf("failed to find scene: %w", err)
 	}
 
-	// 删除场景
+	// Delete scene
 	if err := s.db.Delete(&scene).Error; err != nil {
 		return fmt.Errorf("failed to delete scene: %w", err)
 	}
@@ -507,7 +507,7 @@ func getStringValue(s *string) string {
 
 type CreateSceneRequest struct {
 	DramaID     uint   `json:"drama_id"`
-	EpisodeID   *uint  `json:"episode_id"` // 添加章节ID字段
+	EpisodeID   *uint  `json:"episode_id"` // Episode ID field
 	Location    string `json:"location"`
 	Time        string `json:"time"`
 	Prompt      string `json:"prompt"`
@@ -519,7 +519,7 @@ type CreateSceneRequest struct {
 func (s *StoryboardCompositionService) CreateScene(req *CreateSceneRequest) (*models.Scene, error) {
 	scene := &models.Scene{
 		DramaID:   req.DramaID,
-		EpisodeID: req.EpisodeID, // 设置章节ID
+		EpisodeID: req.EpisodeID, // Set episode ID
 		Location:  req.Location,
 		Time:      req.Time,
 		Prompt:    req.Prompt,

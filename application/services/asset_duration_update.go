@@ -7,7 +7,7 @@ import (
 	"github.com/drama-generator/backend/infrastructure/storage"
 )
 
-// UpdateAssetDurationFromFile 从本地文件探测并更新视频Asset的时长
+// UpdateAssetDurationFromFile probes and updates video asset duration from a local file
 func (s *AssetService) UpdateAssetDurationFromFile(assetID uint, localFilePath string) error {
 	var asset models.Asset
 	if err := s.db.Where("id = ?", assetID).First(&asset).Error; err != nil {
@@ -40,7 +40,7 @@ func (s *AssetService) UpdateAssetDurationFromFile(assetID uint, localFilePath s
 	return nil
 }
 
-// UpdateAssetDurationFromURL 下载视频并探测时长
+// UpdateAssetDurationFromURL downloads video and probes its duration
 func (s *AssetService) UpdateAssetDurationFromURL(assetID uint, localStorage *storage.LocalStorage) error {
 	var asset models.Asset
 	if err := s.db.Where("id = ?", assetID).First(&asset).Error; err != nil {
@@ -55,12 +55,12 @@ func (s *AssetService) UpdateAssetDurationFromURL(assetID uint, localStorage *st
 		return fmt.Errorf("local storage not available")
 	}
 
-	// 下载视频到本地
+	// Download video to local storage
 	localPath, err := localStorage.DownloadFromURL(asset.URL, "videos")
 	if err != nil {
 		return fmt.Errorf("failed to download video: %w", err)
 	}
 
-	// 探测时长
+	// Probe duration
 	return s.UpdateAssetDurationFromFile(assetID, localPath)
 }

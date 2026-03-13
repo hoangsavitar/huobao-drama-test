@@ -30,23 +30,23 @@ type ExtractAudioResponse struct {
 	Duration float64 `json:"duration"`
 }
 
-// ExtractAudio 从视频URL提取音频并返回音频文件URL
+// ExtractAudio extracts audio from a video URL and returns the audio file URL
 func (s *AudioExtractionService) ExtractAudio(videoURL string, dataDir string) (*ExtractAudioResponse, error) {
 	s.log.Infow("Starting audio extraction", "video_url", videoURL)
 
-	// 生成输出文件名
+	// Generate output filename
 	timestamp := time.Now().Unix()
 	audioFileName := fmt.Sprintf("audio_%d.aac", timestamp)
 	audioOutputPath := filepath.Join(dataDir, "audios", audioFileName)
 
-	// 提取音频
+	// Extract audio
 	extractedPath, err := s.ffmpeg.ExtractAudio(videoURL, audioOutputPath)
 	if err != nil {
 		s.log.Errorw("Failed to extract audio", "error", err, "video_url", videoURL)
 		return nil, fmt.Errorf("failed to extract audio: %w", err)
 	}
 
-	// 获取音频时长（使用提取后的本地文件路径）
+	// Get audio duration (using the extracted local file path)
 	duration, err := s.ffmpeg.GetVideoDuration(extractedPath)
 	if err != nil {
 		s.log.Errorw("Failed to get audio duration", "error", err, "path", extractedPath)
@@ -58,7 +58,7 @@ func (s *AudioExtractionService) ExtractAudio(videoURL string, dataDir string) (
 		return nil, fmt.Errorf("invalid audio duration: %.2f", duration)
 	}
 
-	// 构建音频URL（相对于data目录）
+	// Build audio URL (relative to data directory)
 	audioURL := fmt.Sprintf("/data/audios/%s", audioFileName)
 
 	s.log.Infow("Audio extraction completed",
@@ -73,7 +73,7 @@ func (s *AudioExtractionService) ExtractAudio(videoURL string, dataDir string) (
 	}, nil
 }
 
-// BatchExtractAudio 批量提取音频
+// BatchExtractAudio batch extracts audio
 func (s *AudioExtractionService) BatchExtractAudio(videoURLs []string, dataDir string) ([]*ExtractAudioResponse, error) {
 	s.log.Infow("Starting batch audio extraction", "count", len(videoURLs))
 
@@ -85,7 +85,7 @@ func (s *AudioExtractionService) BatchExtractAudio(videoURLs []string, dataDir s
 		result, err := s.ExtractAudio(videoURL, dataDir)
 		if err != nil {
 			s.log.Errorw("Failed to extract audio in batch", "index", i, "video_url", videoURL, "error", err)
-			// 继续处理其他视频，但记录错误
+			// Continue processing other videos, but log the error
 			return nil, fmt.Errorf("failed to extract audio at index %d: %w", i, err)
 		}
 

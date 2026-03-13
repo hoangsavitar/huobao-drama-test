@@ -1,238 +1,244 @@
 package handlers
 
 import (
-	"strconv"
+"strconv"
 
-	"github.com/drama-generator/backend/application/services"
-	"github.com/drama-generator/backend/domain/models"
-	"github.com/drama-generator/backend/infrastructure/storage"
-	"github.com/drama-generator/backend/pkg/config"
-	"github.com/drama-generator/backend/pkg/logger"
-	"github.com/drama-generator/backend/pkg/response"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
+"github.com/drama-generator/backend/application/services"
+"github.com/drama-generator/backend/domain/models"
+"github.com/drama-generator/backend/infrastructure/storage"
+"github.com/drama-generator/backend/pkg/config"
+"github.com/drama-generator/backend/pkg/logger"
+"github.com/drama-generator/backend/pkg/response"
+"github.com/gin-gonic/gin"
+"gorm.io/gorm"
 )
 
 type ImageGenerationHandler struct {
-	imageService *services.ImageGenerationService
-	taskService  *services.TaskService
-	log          *logger.Logger
-	config       *config.Config
-	db           *gorm.DB
+imageService *services.ImageGenerationService
+taskService  *services.TaskService
+log          *logger.Logger
+config       *config.Config
+db           *gorm.DB
 }
 
 func NewImageGenerationHandler(db *gorm.DB, cfg *config.Config, log *logger.Logger, transferService *services.ResourceTransferService, localStorage *storage.LocalStorage) *ImageGenerationHandler {
-	return &ImageGenerationHandler{
-		imageService: services.NewImageGenerationService(db, cfg, transferService, localStorage, log),
-		taskService:  services.NewTaskService(db, log),
-		log:          log,
-		config:       cfg,
-		db:           db,
-	}
+return &ImageGenerationHandler{
+imageService: services.NewImageGenerationService(db, cfg, transferService, localStorage, log),
+taskService:  services.NewTaskService(db, log),
+log:          log,
+config:       cfg,
+db:           db,
+}
 }
 
 func (h *ImageGenerationHandler) GenerateImage(c *gin.Context) {
 
-	var req services.GenerateImageRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.BadRequest(c, err.Error())
-		return
-	}
+var req services.GenerateImageRequest
+if err := c.ShouldBindJSON(&req); err != nil {
+response.BadRequest(c, err.Error())
+return
+}
 
-	imageGen, err := h.imageService.GenerateImage(&req)
-	if err != nil {
-		h.log.Errorw("Failed to generate image", "error", err)
-		response.InternalError(c, err.Error())
-		return
-	}
+imageGen, err := h.imageService.GenerateImage(&req)
+if err != nil {
+h.log.Errorw("Failed to generate image", "error", err)
+response.InternalError(c, err.Error())
+return
+}
 
-	response.Success(c, imageGen)
+response.Success(c, imageGen)
 }
 
 func (h *ImageGenerationHandler) GenerateImagesForScene(c *gin.Context) {
 
-	sceneID := c.Param("scene_id")
+sceneID := c.Param("scene_id")
 
-	images, err := h.imageService.GenerateImagesForScene(sceneID)
-	if err != nil {
-		h.log.Errorw("Failed to generate images for scene", "error", err)
-		response.InternalError(c, err.Error())
-		return
-	}
+images, err := h.imageService.GenerateImagesForScene(sceneID)
+if err != nil {
+h.log.Errorw("Failed to generate images for scene", "error", err)
+response.InternalError(c, err.Error())
+return
+}
 
-	response.Success(c, images)
+response.Success(c, images)
 }
 
 func (h *ImageGenerationHandler) GetBackgroundsForEpisode(c *gin.Context) {
 
-	episodeID := c.Param("episode_id")
+episodeID := c.Param("episode_id")
 
-	backgrounds, err := h.imageService.GetScencesForEpisode(episodeID)
-	if err != nil {
-		h.log.Errorw("Failed to get backgrounds", "error", err)
-		response.InternalError(c, err.Error())
-		return
-	}
+backgrounds, err := h.imageService.GetScencesForEpisode(episodeID)
+if err != nil {
+h.log.Errorw("Failed to get backgrounds", "error", err)
+response.InternalError(c, err.Error())
+return
+}
 
-	response.Success(c, backgrounds)
+response.Success(c, backgrounds)
 }
 
 func (h *ImageGenerationHandler) ExtractBackgroundsForEpisode(c *gin.Context) {
-	episodeID := c.Param("episode_id")
+episodeID := c.Param("episode_id")
 
-	var req struct {
-		Model string `json:"model"`
-		Style string `json:"style"`
-	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		req.Model = ""
-		req.Style = ""
-	}
-	if req.Style == "" {
-		var episode models.Episode
-		if err := h.db.Preload("Drama").First(&episode, episodeID).Error; err == nil {
-			req.Style = episode.Drama.Style
-		}
-	}
+// Receive optional model and style parameters
+var req struct {
+Model string `json:"model"`
+Style string `json:"style"`
+}
+if err := c.ShouldBindJSON(&req); err != nil {
+// If no body provided or parsing fails, use empty strings (default model and style)
+req.Model = ""
+req.Style = ""
+}
+// If style is empty, get style from the episode's drama
+if req.Style == "" {
+var episode models.Episode
+if err := h.db.Preload("Drama").First(&episode, episodeID).Error; err == nil {
+req.Style = episode.Drama.Style
+}
+}
 
-	taskID, err := h.imageService.ExtractBackgroundsForEpisode(episodeID, req.Model, req.Style)
-	if err != nil {
-		h.log.Errorw("Failed to extract backgrounds", "error", err, "episode_id", episodeID)
-		response.InternalError(c, err.Error())
-		return
-	}
+// Directly call the async service method, which creates a task and returns a task ID
+taskID, err := h.imageService.ExtractBackgroundsForEpisode(episodeID, req.Model, req.Style)
+if err != nil {
+h.log.Errorw("Failed to extract backgrounds", "error", err, "episode_id", episodeID)
+response.InternalError(c, err.Error())
+return
+}
 
-	response.Success(c, gin.H{
-		"task_id": taskID,
-		"status":  "pending",
-		"message": "Scene extraction task created and processing in background...",
-	})
+// Return task ID immediately
+response.Success(c, gin.H{
+"task_id": taskID,
+"status":  "pending",
+"message": "Scene extraction task created, processing in background...",
+})
 }
 
 func (h *ImageGenerationHandler) BatchGenerateForEpisode(c *gin.Context) {
 
-	episodeID := c.Param("episode_id")
+episodeID := c.Param("episode_id")
 
-	images, err := h.imageService.BatchGenerateImagesForEpisode(episodeID)
-	if err != nil {
-		h.log.Errorw("Failed to batch generate images", "error", err)
-		response.InternalError(c, err.Error())
-		return
-	}
+images, err := h.imageService.BatchGenerateImagesForEpisode(episodeID)
+if err != nil {
+h.log.Errorw("Failed to batch generate images", "error", err)
+response.InternalError(c, err.Error())
+return
+}
 
-	response.Success(c, images)
+response.Success(c, images)
 }
 
 func (h *ImageGenerationHandler) GetImageGeneration(c *gin.Context) {
 
-	imageGenID, err := strconv.ParseUint(c.Param("id"), 10, 32)
-	if err != nil {
-		response.BadRequest(c, "Invalid ID")
-		return
-	}
+imageGenID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+if err != nil {
+response.BadRequest(c, "Invalid ID")
+return
+}
 
-	imageGen, err := h.imageService.GetImageGeneration(uint(imageGenID))
-	if err != nil {
-		response.NotFound(c, "Image generation record not found")
-		return
-	}
+imageGen, err := h.imageService.GetImageGeneration(uint(imageGenID))
+if err != nil {
+response.NotFound(c, "Image generation record not found")
+return
+}
 
-	response.Success(c, imageGen)
+response.Success(c, imageGen)
 }
 
 func (h *ImageGenerationHandler) ListImageGenerations(c *gin.Context) {
-	var sceneID *uint
-	if sceneIDStr := c.Query("scene_id"); sceneIDStr != "" {
-		id, err := strconv.ParseUint(sceneIDStr, 10, 32)
-		if err == nil {
-			uid := uint(id)
-			sceneID = &uid
-		}
-	}
+var sceneID *uint
+if sceneIDStr := c.Query("scene_id"); sceneIDStr != "" {
+id, err := strconv.ParseUint(sceneIDStr, 10, 32)
+if err == nil {
+uid := uint(id)
+sceneID = &uid
+}
+}
 
-	var storyboardID *uint
-	if storyboardIDStr := c.Query("storyboard_id"); storyboardIDStr != "" {
-		id, err := strconv.ParseUint(storyboardIDStr, 10, 32)
-		if err == nil {
-			uid := uint(id)
-			storyboardID = &uid
-		}
-	}
+var storyboardID *uint
+if storyboardIDStr := c.Query("storyboard_id"); storyboardIDStr != "" {
+id, err := strconv.ParseUint(storyboardIDStr, 10, 32)
+if err == nil {
+uid := uint(id)
+storyboardID = &uid
+}
+}
 
-	frameType := c.Query("frame_type")
-	status := c.Query("status")
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "20"))
+frameType := c.Query("frame_type")
+status := c.Query("status")
+page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "20"))
 
-	if page < 1 {
-		page = 1
-	}
-	if pageSize < 1 || pageSize > 100 {
-		pageSize = 20
-	}
+if page < 1 {
+page = 1
+}
+if pageSize < 1 || pageSize > 100 {
+pageSize = 20
+}
 
-	var dramaIDUint *uint
-	if dramaIDStr := c.Query("drama_id"); dramaIDStr != "" {
-		did, _ := strconv.ParseUint(dramaIDStr, 10, 32)
-		didUint := uint(did)
-		dramaIDUint = &didUint
-	}
+var dramaIDUint *uint
+if dramaIDStr := c.Query("drama_id"); dramaIDStr != "" {
+did, _ := strconv.ParseUint(dramaIDStr, 10, 32)
+didUint := uint(did)
+dramaIDUint = &didUint
+}
 
-	images, total, err := h.imageService.ListImageGenerations(dramaIDUint, sceneID, storyboardID, frameType, status, page, pageSize)
+images, total, err := h.imageService.ListImageGenerations(dramaIDUint, sceneID, storyboardID, frameType, status, page, pageSize)
 
-	if err != nil {
-		h.log.Errorw("Failed to list images", "error", err)
-		response.InternalError(c, err.Error())
-		return
-	}
+if err != nil {
+h.log.Errorw("Failed to list images", "error", err)
+response.InternalError(c, err.Error())
+return
+}
 
-	response.SuccessWithPagination(c, images, total, page, pageSize)
+response.SuccessWithPagination(c, images, total, page, pageSize)
 }
 
 func (h *ImageGenerationHandler) DeleteImageGeneration(c *gin.Context) {
 
-	imageGenID, err := strconv.ParseUint(c.Param("id"), 10, 32)
-	if err != nil {
-		response.BadRequest(c, "Invalid ID")
-		return
-	}
-
-	if err := h.imageService.DeleteImageGeneration(uint(imageGenID)); err != nil {
-		h.log.Errorw("Failed to delete image", "error", err)
-		response.InternalError(c, err.Error())
-		return
-	}
-
-	response.Success(c, nil)
+imageGenID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+if err != nil {
+response.BadRequest(c, "Invalid ID")
+return
 }
 
+if err := h.imageService.DeleteImageGeneration(uint(imageGenID)); err != nil {
+h.log.Errorw("Failed to delete image", "error", err)
+response.InternalError(c, err.Error())
+return
+}
+
+response.Success(c, nil)
+}
+
+// UploadImage uploads an image and creates an image generation record
 func (h *ImageGenerationHandler) UploadImage(c *gin.Context) {
-	var req struct {
-		StoryboardID uint   `json:"storyboard_id" binding:"required"`
-		DramaID      uint   `json:"drama_id" binding:"required"`
-		FrameType    string `json:"frame_type" binding:"required"`
-		ImageURL     string `json:"image_url" binding:"required"`
-		Prompt       string `json:"prompt"`
-	}
+var req struct {
+StoryboardID uint   `json:"storyboard_id" binding:"required"`
+DramaID      uint   `json:"drama_id" binding:"required"`
+FrameType    string `json:"frame_type" binding:"required"`
+ImageURL     string `json:"image_url" binding:"required"`
+Prompt       string `json:"prompt"`
+}
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.BadRequest(c, err.Error())
-		return
-	}
+if err := c.ShouldBindJSON(&req); err != nil {
+response.BadRequest(c, err.Error())
+return
+}
 
-	imageGen, err := h.imageService.CreateImageFromUpload(&services.UploadImageRequest{
-		StoryboardID: req.StoryboardID,
-		DramaID:      req.DramaID,
-		FrameType:    req.FrameType,
-		ImageURL:     req.ImageURL,
-		Prompt:       req.Prompt,
-	})
+imageGen, err := h.imageService.CreateImageFromUpload(&services.UploadImageRequest{
+StoryboardID: req.StoryboardID,
+DramaID:      req.DramaID,
+FrameType:    req.FrameType,
+ImageURL:     req.ImageURL,
+Prompt:       req.Prompt,
+})
 
-	if err != nil {
-		h.log.Errorw("Failed to create image from upload", "error", err)
-		response.InternalError(c, err.Error())
-		return
-	}
+if err != nil {
+h.log.Errorw("Failed to create image from upload", "error", err)
+response.InternalError(c, err.Error())
+return
+}
 
-	response.Success(c, imageGen)
+response.Success(c, imageGen)
 }

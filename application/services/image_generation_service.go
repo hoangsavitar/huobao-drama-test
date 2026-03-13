@@ -31,18 +31,18 @@ type ImageGenerationService struct {
 	taskService     *TaskService
 }
 
-// truncateImageURL 截断图片 URL，避免 base64 格式的 URL 占满日志
+// truncateImageURL truncates image URLs to prevent base64-encoded URLs from flooding the logs
 func truncateImageURL(url string) string {
 	if url == "" {
 		return ""
 	}
-	// 如果是 data URI 格式（base64），只显示前缀
+	// If it's a data URI format (base64), only show the prefix
 	if strings.HasPrefix(url, "data:") {
 		if len(url) > 50 {
 			return url[:50] + "...[base64 data]"
 		}
 	}
-	// 普通 URL 如果过长也截断
+	// Truncate regular URLs if they are too long
 	if len(url) > 100 {
 		return url[:100] + "..."
 	}
@@ -62,7 +62,7 @@ func NewImageGenerationService(db *gorm.DB, cfg *config.Config, transferService 
 	}
 }
 
-// GetDB 获取数据库连接
+// GetDB returns the database connection
 func (s *ImageGenerationService) GetDB() *gorm.DB {
 	return s.db
 }
@@ -87,8 +87,8 @@ type GenerateImageRequest struct {
 	Seed            *int64   `json:"seed"`
 	Width           *int     `json:"width"`
 	Height          *int     `json:"height"`
-	ImageLocalPath  *string  `json:"image_local_path"` // 本地图片路径，用于图生图
-	ReferenceImages []string `json:"reference_images"` // 参考图片URL列表
+	ImageLocalPath  *string  `json:"image_local_path"` // Local image path, used for image-to-image generation
+	ReferenceImages []string `json:"reference_images"` // List of reference image URLs
 }
 
 func (s *ImageGenerationService) GenerateImage(request *GenerateImageRequest) (*models.ImageGeneration, error) {
@@ -96,26 +96,26 @@ func (s *ImageGenerationService) GenerateImage(request *GenerateImageRequest) (*
 	if err := s.db.Where("id = ? ", request.DramaID).First(&drama).Error; err != nil {
 		return nil, fmt.Errorf("drama not found")
 	}
-	// 注意：SceneID可能指向Scene或Storyboard表，调用方已经做过权限验证，这里不再重复验证
+	// Note: SceneID may refer to the Scene or Storyboard table; the caller has already performed permission verification, so we skip it here
 
 	provider := request.Provider
 	if provider == "" {
 		provider = "openai"
 	}
 
-	// 序列化参考图片
+	// Serialize reference images
 	var referenceImagesJSON []byte
 	if len(request.ReferenceImages) > 0 {
 		referenceImagesJSON, _ = json.Marshal(request.ReferenceImages)
 	}
 
-	// 转换DramaID
+	// Convert DramaID
 	dramaIDParsed, err := strconv.ParseUint(request.DramaID, 10, 32)
 	if err != nil {
 		return nil, fmt.Errorf("invalid drama ID")
 	}
 
-	// 设置默认图片类型
+	// Set default image type
 	imageType := request.ImageType
 	if imageType == "" {
 		imageType = string(models.ImageTypeStoryboard)
@@ -163,7 +163,7 @@ func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 		return
 	}
 
-	// 获取drama的style信息
+	// Get the drama's style information
 	var drama models.Drama
 	if err := s.db.First(&drama, imageGen.DramaID).Error; err != nil {
 		s.log.Warnw("Failed to load drama for style", "error", err, "drama_id", imageGen.DramaID)
@@ -171,7 +171,7 @@ func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 
 	s.db.Model(&imageGen).Update("status", models.ImageStatusProcessing)
 
-	// 如果关联了background，同步更新background为generating状态
+	// If associated with a background, synchronously update background status to generating
 	if imageGen.StoryboardID != nil {
 		if err := s.db.Model(&models.Scene{}).Where("id = ?", *imageGen.StoryboardID).Update("status", "generating").Error; err != nil {
 			s.log.Warnw("Failed to update background status to generating", "scene_id", *imageGen.StoryboardID, "error", err)
@@ -187,7 +187,7 @@ func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 		return
 	}
 
-	// 解析参考图片
+	// Parse reference images
 	var referenceImagePaths []string
 	if len(imageGen.ReferenceImages) > 0 {
 		if err := json.Unmarshal(imageGen.ReferenceImages, &referenceImagePaths); err == nil {
@@ -198,20 +198,20 @@ func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 		}
 	}
 
-	// 如果有 local_path，添加到参考图片列表的开头
+	// If local_path exists, prepend it to the reference images list
 	if imageGen.LocalPath != nil && *imageGen.LocalPath != "" {
 		referenceImagePaths = append([]string{*imageGen.LocalPath}, referenceImagePaths...)
 	}
 
-	// 将所有参考图片路径转换为 base64（如果是本地路径）或保持原样（如果是 URL）
+	// Convert all reference image paths to base64 (if local paths) or keep as-is (if URLs)
 	var referenceImages []string
 	for _, imgPath := range referenceImagePaths {
-		// 判断是否为 HTTP/HTTPS URL
+		// Check if it's an HTTP/HTTPS URL
 		if strings.HasPrefix(imgPath, "http://") || strings.HasPrefix(imgPath, "https://") {
-			// 保持 URL 原样
+			// Keep the URL as-is
 			referenceImages = append(referenceImages, imgPath)
 		} else {
-			// 视为本地路径，转换为 base64
+			// Treat as local path, convert to base64
 			base64Image, err := s.loadImageAsBase64(imgPath)
 			if err != nil {
 				s.log.Warnw("Failed to load local image as base64",
@@ -257,19 +257,19 @@ func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 	if imageGen.Width != nil && imageGen.Height != nil {
 		opts = append(opts, image.WithDimensions(*imageGen.Width, *imageGen.Height))
 	}
-	// 添加参考图片
+	// Add reference images
 	if len(referenceImages) > 0 {
 		opts = append(opts, image.WithReferenceImages(referenceImages))
 	}
 
-	// 构建完整的提示词：风格提示词 + 用户提示词
+	// Build the full prompt: style prompt + user prompt
 	prompt := imageGen.Prompt
 
-	// 如果drama有风格设置，添加风格提示词
+	// If the drama has a style setting, add the style prompt
 	if drama.Style != "" && drama.Style != "realistic" {
 		stylePrompt := s.promptI18n.GetStylePrompt(drama.Style)
 		if stylePrompt != "" {
-			// 将风格提示词作为系统级约束添加到提示词前面
+			// Prepend the style prompt as a system-level constraint
 			prompt = stylePrompt + "\n\n" + prompt
 			s.log.Infow("Added style prompt to image generation",
 				"id", imageGenID,
@@ -280,7 +280,7 @@ func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 
 	prompt += ", imageRatio:" + imageRatio
 
-	// 如果有参考图，在提示词末尾添加参考图一致性说明
+	// If there are reference images, append a consistency instruction to the prompt
 	if len(referenceImages) > 0 {
 		prompt += "\n\nImportant: strictly follow reference image elements and keep scene/character consistency."
 		s.log.Infow("Added reference image consistency instruction to prompt",
@@ -338,7 +338,7 @@ func (s *ImageGenerationService) pollTaskStatus(imageGenID uint, client image.Im
 func (s *ImageGenerationService) completeImageGeneration(imageGenID uint, result *image.ImageResult) {
 	now := time.Now()
 
-	// 下载图片到本地存储并保存相对路径到数据库
+	// Download image to local storage and save the relative path to the database
 	var localPath *string
 	if s.localStorage != nil && result.ImageURL != "" &&
 		(strings.HasPrefix(result.ImageURL, "http://") || strings.HasPrefix(result.ImageURL, "https://")) {
@@ -361,7 +361,7 @@ func (s *ImageGenerationService) completeImageGeneration(imageGenID uint, result
 		}
 	}
 
-	// 数据库中保存原始URL和本地路径
+	// Save the original URL and local path in the database
 	updates := map[string]interface{}{
 		"status":       models.ImageStatusCompleted,
 		"image_url":    result.ImageURL,
@@ -376,27 +376,27 @@ func (s *ImageGenerationService) completeImageGeneration(imageGenID uint, result
 		updates["height"] = result.Height
 	}
 
-	// 更新image_generation记录
+	// Update the image_generation record
 	var imageGen models.ImageGeneration
 	if err := s.db.Where("id = ?", imageGenID).First(&imageGen).Error; err != nil {
 		s.log.Errorw("Failed to load image generation", "error", err, "id", imageGenID)
 		return
 	}
 
-	// 使用 Updates 更新基本字段
+	// Use Updates to update basic fields
 	if err := s.db.Model(&models.ImageGeneration{}).Where("id = ?", imageGenID).Updates(updates).Error; err != nil {
 		s.log.Errorw("Failed to update image generation", "error", err, "id", imageGenID)
 		return
 	}
 
-	// 单独更新 local_path 字段（即使为 nil 也要更新）
+	// Update the local_path field separately (even if it's nil)
 	if err := s.db.Model(&models.ImageGeneration{}).Where("id = ?", imageGenID).Update("local_path", localPath).Error; err != nil {
 		s.log.Errorw("Failed to update local_path", "error", err, "id", imageGenID)
 	}
 
 	s.log.Infow("Image generation completed", "id", imageGenID)
 
-	// 如果关联了storyboard，同步更新storyboard的composed_image
+	// If associated with a storyboard, synchronously update the storyboard's composed_image
 	if imageGen.StoryboardID != nil {
 		if err := s.db.Model(&models.Storyboard{}).Where("id = ?", *imageGen.StoryboardID).Update("composed_image", result.ImageURL).Error; err != nil {
 			s.log.Errorw("Failed to update storyboard composed_image", "error", err, "storyboard_id", *imageGen.StoryboardID)
@@ -407,7 +407,7 @@ func (s *ImageGenerationService) completeImageGeneration(imageGenID uint, result
 		}
 	}
 
-	// 如果关联了scene，同步更新scene的image_url、local_path和status（仅当ImageType是scene时）
+	// If associated with a scene, synchronously update the scene's image_url, local_path, and status (only when ImageType is scene)
 	if imageGen.SceneID != nil && imageGen.ImageType == string(models.ImageTypeScene) {
 		sceneUpdates := map[string]interface{}{
 			"status":    "generated",
@@ -426,7 +426,7 @@ func (s *ImageGenerationService) completeImageGeneration(imageGenID uint, result
 		}
 	}
 
-	// 如果关联了角色，同步更新角色的image_url和local_path
+	// If associated with a character, synchronously update the character's image_url and local_path
 	if imageGen.CharacterID != nil {
 		characterUpdates := map[string]interface{}{
 			"image_url": result.ImageURL,
@@ -444,7 +444,7 @@ func (s *ImageGenerationService) completeImageGeneration(imageGenID uint, result
 		}
 	}
 
-	// 如果关联了道具，同步更新道具的image_url和local_path
+	// If associated with a prop, synchronously update the prop's image_url and local_path
 	if imageGen.PropID != nil {
 		propUpdates := map[string]interface{}{
 			"image_url": result.ImageURL,
@@ -464,21 +464,21 @@ func (s *ImageGenerationService) completeImageGeneration(imageGenID uint, result
 }
 
 func (s *ImageGenerationService) updateImageGenError(imageGenID uint, errorMsg string) {
-	// 先获取image_generation记录
+	// First, load the image_generation record
 	var imageGen models.ImageGeneration
 	if err := s.db.Where("id = ?", imageGenID).First(&imageGen).Error; err != nil {
 		s.log.Errorw("Failed to load image generation", "error", err, "id", imageGenID)
 		return
 	}
 
-	// 更新image_generation状态
+	// Update the image_generation status
 	s.db.Model(&models.ImageGeneration{}).Where("id = ?", imageGenID).Updates(map[string]interface{}{
 		"status":    models.ImageStatusFailed,
 		"error_msg": errorMsg,
 	})
 	s.log.Errorw("Image generation failed", "id", imageGenID, "error", errorMsg)
 
-	// 如果关联了scene，同步更新scene为失败状态
+	// If associated with a scene, synchronously update the scene to failed status
 	if imageGen.SceneID != nil {
 		s.db.Model(&models.Scene{}).Where("id = ?", *imageGen.SceneID).Update("status", "failed")
 		s.log.Warnw("Scene marked as failed", "scene_id", *imageGen.SceneID)
@@ -491,19 +491,19 @@ func (s *ImageGenerationService) getImageClient(provider string) (image.ImageCli
 		return nil, fmt.Errorf("no image AI config found: %w", err)
 	}
 
-	// 使用第一个模型
+	// Use the first model
 	model := ""
 	if len(config.Model) > 0 {
 		model = config.Model[0]
 	}
 
-	// 使用配置中的 provider，如果没有则使用传入的 provider
+	// Use the provider from config; if not set, use the provided provider
 	actualProvider := config.Provider
 	if actualProvider == "" {
 		actualProvider = provider
 	}
 
-	// 根据 provider 自动设置默认端点
+	// Automatically set the default endpoint based on provider
 	var endpoint string
 	var queryEndpoint string
 
@@ -527,12 +527,12 @@ func (s *ImageGenerationService) getImageClient(provider string) (image.ImageCli
 	}
 }
 
-// getImageClientWithModel 根据模型名称获取图片客户端
+// getImageClientWithModel gets the image client based on the model name
 func (s *ImageGenerationService) getImageClientWithModel(provider string, modelName string) (image.ImageClient, error) {
 	var config *models.AIServiceConfig
 	var err error
 
-	// 如果指定了模型，尝试获取对应的配置
+	// If a model is specified, try to get the corresponding config
 	if modelName != "" {
 		config, err = s.aiService.GetConfigForModel("image", modelName)
 		if err != nil {
@@ -549,19 +549,19 @@ func (s *ImageGenerationService) getImageClientWithModel(provider string, modelN
 		}
 	}
 
-	// 使用指定的模型或配置中的第一个模型
+	// Use the specified model or the first model from config
 	model := modelName
 	if model == "" && len(config.Model) > 0 {
 		model = config.Model[0]
 	}
 
-	// 使用配置中的 provider，如果没有则使用传入的 provider
+	// Use the provider from config; if not set, use the provided provider
 	actualProvider := config.Provider
 	if actualProvider == "" {
 		actualProvider = provider
 	}
 
-	// 根据 provider 自动设置默认端点
+	// Automatically set the default endpoint based on provider
 	var endpoint string
 	var queryEndpoint string
 
@@ -641,7 +641,7 @@ func (s *ImageGenerationService) DeleteImageGeneration(imageGenID uint) error {
 	return nil
 }
 
-// UploadImageRequest 上传图片请求
+// UploadImageRequest represents an image upload request
 type UploadImageRequest struct {
 	StoryboardID uint   `json:"storyboard_id"`
 	DramaID      uint   `json:"drama_id"`
@@ -650,15 +650,15 @@ type UploadImageRequest struct {
 	Prompt       string `json:"prompt"`
 }
 
-// CreateImageFromUpload 从上传的图片URL创建图片生成记录
+// CreateImageFromUpload creates an image generation record from an uploaded image URL
 func (s *ImageGenerationService) CreateImageFromUpload(req *UploadImageRequest) (*models.ImageGeneration, error) {
-	// 验证storyboard存在
+	// Verify that the storyboard exists
 	var storyboard models.Storyboard
 	if err := s.db.First(&storyboard, req.StoryboardID).Error; err != nil {
 		return nil, fmt.Errorf("storyboard not found")
 	}
 
-	// 验证drama存在
+	// Verify that the drama exists
 	var drama models.Drama
 	if err := s.db.First(&drama, req.DramaID).Error; err != nil {
 		return nil, fmt.Errorf("drama not found")
@@ -696,7 +696,7 @@ func (s *ImageGenerationService) CreateImageFromUpload(req *UploadImageRequest) 
 }
 
 func (s *ImageGenerationService) GenerateImagesForScene(sceneID string) ([]*models.ImageGeneration, error) {
-	// 转换sceneID
+	// Convert sceneID
 	sid, err := strconv.ParseUint(sceneID, 10, 32)
 	if err != nil {
 		return nil, fmt.Errorf("invalid scene ID")
@@ -708,10 +708,10 @@ func (s *ImageGenerationService) GenerateImagesForScene(sceneID string) ([]*mode
 		return nil, fmt.Errorf("scene not found")
 	}
 
-	// 构建场景图片生成提示词
+	// Build the scene image generation prompt
 	prompt := scene.Prompt
 	if prompt == "" {
-		// 如果Prompt为空，使用Location和Time构建
+		// If Prompt is empty, build one using Location and Time
 		prompt = fmt.Sprintf("%s scene, %s", scene.Location, scene.Time)
 	}
 
@@ -730,7 +730,7 @@ func (s *ImageGenerationService) GenerateImagesForScene(sceneID string) ([]*mode
 	return []*models.ImageGeneration{imageGen}, nil
 }
 
-// BackgroundInfo 背景信息结构
+// BackgroundInfo represents the background information structure
 type BackgroundInfo struct {
 	Location          string `json:"location"`
 	Time              string `json:"time"`
@@ -746,7 +746,7 @@ func (s *ImageGenerationService) BatchGenerateImagesForEpisode(episodeID string)
 	if err := s.db.Preload("Drama").Where("id = ?", episodeID).First(&ep).Error; err != nil {
 		return nil, fmt.Errorf("episode not found")
 	}
-	// 从数据库读取已保存的场景
+	// Read saved scenes from the database
 	var scenes []models.Storyboard
 	if err := s.db.Where("episode_id = ?", episodeID).Find(&scenes).Error; err != nil {
 		return nil, fmt.Errorf("failed to get scenes: %w", err)
@@ -757,7 +757,7 @@ func (s *ImageGenerationService) BatchGenerateImagesForEpisode(episodeID string)
 		"episode_id", episodeID,
 		"background_count", len(backgrounds))
 
-	// 为每个背景生成图片
+	// Generate images for each background
 	var results []*models.ImageGeneration
 	for _, bg := range scenes {
 		if bg.ImagePrompt == nil || *bg.ImagePrompt == "" {
@@ -765,7 +765,7 @@ func (s *ImageGenerationService) BatchGenerateImagesForEpisode(episodeID string)
 			continue
 		}
 
-		// 更新背景状态为处理中
+		// Update background status to processing
 		s.db.Model(bg).Update("status", "generating")
 
 		req := &GenerateImageRequest{
@@ -796,14 +796,14 @@ func (s *ImageGenerationService) BatchGenerateImagesForEpisode(episodeID string)
 	return results, nil
 }
 
-// GetScencesForEpisode 获取项目的场景列表（项目级）
+// GetScencesForEpisode gets the scene list for the project (project-level)
 func (s *ImageGenerationService) GetScencesForEpisode(episodeID string) ([]*models.Scene, error) {
 	var episode models.Episode
 	if err := s.db.Preload("Drama").Where("id = ?", episodeID).First(&episode).Error; err != nil {
 		return nil, fmt.Errorf("episode not found")
 	}
 
-	// 场景是项目级的，通过drama_id查询
+	// Scenes are project-level, queried by drama_id
 	var scenes []*models.Scene
 	if err := s.db.Where("drama_id = ?", episode.DramaID).Order("location ASC, time ASC").Find(&scenes).Error; err != nil {
 		return nil, fmt.Errorf("failed to load scenes: %w", err)
@@ -812,35 +812,35 @@ func (s *ImageGenerationService) GetScencesForEpisode(episodeID string) ([]*mode
 	return scenes, nil
 }
 
-// ExtractBackgroundsForEpisode 从剧本内容中提取场景并保存到项目级别数据库
+// ExtractBackgroundsForEpisode extracts scenes from script content and saves them to the project-level database
 func (s *ImageGenerationService) ExtractBackgroundsForEpisode(episodeID string, model string, style string) (string, error) {
 	var episode models.Episode
 	if err := s.db.Preload("Storyboards").First(&episode, episodeID).Error; err != nil {
 		return "", fmt.Errorf("episode not found")
 	}
 
-	// 如果没有剧本内容，无法提取场景
+	// Cannot extract scenes without script content
 	if episode.ScriptContent == nil || *episode.ScriptContent == "" {
 		return "", fmt.Errorf("episode has no script content")
 	}
 
-	// 创建任务
+	// Create task
 	task, err := s.taskService.CreateTask("background_extraction", episodeID)
 	if err != nil {
 		s.log.Errorw("Failed to create background extraction task", "error", err, "episode_id", episodeID)
 		return "", fmt.Errorf("failed to create task: %w", err)
 	}
 
-	// 异步处理场景提取
+	// Process scene extraction asynchronously
 	go s.processBackgroundExtraction(task.ID, episodeID, model, style)
 
 	s.log.Infow("Background extraction task created", "task_id", task.ID, "episode_id", episodeID)
 	return task.ID, nil
 }
 
-// processBackgroundExtraction 异步处理场景提取
+// processBackgroundExtraction processes scene extraction asynchronously
 func (s *ImageGenerationService) processBackgroundExtraction(taskID string, episodeID string, model string, style string) {
-	// 更新任务状态为处理中
+	// Update task status to processing
 	s.taskService.UpdateTaskStatus(taskID, "processing", 0, "Extracting scene information...")
 
 	var episode models.Episode
@@ -859,7 +859,7 @@ func (s *ImageGenerationService) processBackgroundExtraction(taskID string, epis
 	s.log.Infow("Extracting backgrounds from script", "episode_id", episodeID, "model", model, "task_id", taskID)
 	dramaID := episode.DramaID
 
-	// 使用AI从剧本内容中提取场景
+	// Use AI to extract scenes from the script content
 	backgroundsInfo, err := s.extractBackgroundsFromScript(*episode.ScriptContent, dramaID, model, style)
 	if err != nil {
 		s.log.Errorw("Failed to extract backgrounds from script", "error", err, "task_id", taskID)
@@ -867,19 +867,19 @@ func (s *ImageGenerationService) processBackgroundExtraction(taskID string, epis
 		return
 	}
 
-	// 保存到数据库（不涉及Storyboard关联，因为此时还没有生成分镜）
+	// Save to database (no Storyboard association, as storyboards haven't been generated yet)
 	var scenes []*models.Scene
 	err = s.db.Transaction(func(tx *gorm.DB) error {
-		// 先删除该章节的所有场景（实现重新提取覆盖功能）
+		// First delete all scenes for this episode (to support re-extraction override)
 		if err := tx.Where("episode_id = ?", episode.ID).Delete(&models.Scene{}).Error; err != nil {
 			s.log.Errorw("Failed to delete old scenes", "error", err, "task_id", taskID)
 			return err
 		}
 		s.log.Infow("Deleted old scenes for re-extraction", "episode_id", episode.ID, "task_id", taskID)
 
-		// 创建新提取的场景
+		// Create newly extracted scenes
 		for _, bgInfo := range backgroundsInfo {
-			// 保存新场景到数据库（章节级）
+			// Save new scene to database (episode-level)
 			episodeIDVal := episode.ID
 			scene := &models.Scene{
 				DramaID:         dramaID,
@@ -887,7 +887,7 @@ func (s *ImageGenerationService) processBackgroundExtraction(taskID string, epis
 				Location:        bgInfo.Location,
 				Time:            bgInfo.Time,
 				Prompt:          bgInfo.Prompt,
-				StoryboardCount: 1, // 默认为1
+				StoryboardCount: 1, // Default is 1
 				Status:          "pending",
 			}
 			if err := tx.Create(scene).Error; err != nil {
@@ -911,7 +911,7 @@ func (s *ImageGenerationService) processBackgroundExtraction(taskID string, epis
 		return
 	}
 
-	// 更新任务状态为完成
+	// Update task status to completed
 	resultData := map[string]interface{}{
 		"scenes":     scenes,
 		"count":      len(scenes),
@@ -927,13 +927,13 @@ func (s *ImageGenerationService) processBackgroundExtraction(taskID string, epis
 		"unique_scenes", len(scenes))
 }
 
-// extractBackgroundsFromScript 从剧本内容中使用AI提取场景信息
+// extractBackgroundsFromScript uses AI to extract scene information from script content
 func (s *ImageGenerationService) extractBackgroundsFromScript(scriptContent string, dramaID uint, model string, style string) ([]BackgroundInfo, error) {
 	if scriptContent == "" {
 		return []BackgroundInfo{}, nil
 	}
 
-	// 获取AI客户端（如果指定了模型则使用指定的模型）
+	// Get the AI client (use the specified model if one is provided)
 	var client ai.AIClient
 	var err error
 	if model != "" {
@@ -950,12 +950,14 @@ func (s *ImageGenerationService) extractBackgroundsFromScript(scriptContent stri
 		return nil, fmt.Errorf("failed to get AI client: %w", err)
 	}
 
-	// 使用国际化提示词
+	// Use internationalized prompts
 	systemPrompt := s.promptI18n.GetSceneExtractionPrompt(style)
 	contentLabel := s.promptI18n.FormatUserPrompt("script_content_label")
 
+	// Build different format instructions based on language
 	var formatInstructions string
-	formatInstructions = `[Output JSON Format]
+	if s.promptI18n.IsEnglish() {
+		formatInstructions = `[Output JSON Format]
 {
   "backgrounds": [
     {
@@ -992,6 +994,45 @@ Correct example (note: no characters):
 ❌ "Character moving in the room" - contains character
 
 Please strictly follow the JSON format and ensure all fields use English.`
+	} else {
+		formatInstructions = `[Output JSON Format]
+{
+  "backgrounds": [
+    {
+      "location": "Location name",
+      "time": "Time description",
+      "atmosphere": "Atmosphere description",
+      "prompt": "A cinematic anime-style pure background scene depicting [location description] at [time]. The scene shows [environment details, architecture, objects, lighting, no characters]. Style: rich details, high quality, atmospheric lighting. Mood: [environment mood description]."
+    }
+  ]
+}
+
+[Example]
+Correct example (note: no characters):
+{
+  "backgrounds": [
+    {
+      "location": "Repair Shop Interior",
+      "time": "Late Night",
+      "atmosphere": "Dim, lonely, industrial",
+      "prompt": "A cinematic anime-style pure background scene depicting a messy repair shop interior at late night. Under dim fluorescent lights, the workbench is scattered with various wrenches, screwdrivers and mechanical parts, oil-stained tool boards and faded posters hang on walls, oil stains on the floor, used tires piled in corners. Style: rich details, high quality, dim atmosphere. Mood: lonely, industrial."
+    },
+    {
+      "location": "City Street",
+      "time": "Dusk",
+      "atmosphere": "Warm, busy, lively",
+      "prompt": "A cinematic anime-style pure background scene depicting a bustling city street at dusk. Sunset afterglow shines on the asphalt road, neon lights of shops on both sides begin to light up, bicycle racks and bus stops on the street, high-rise buildings in the distance, sky showing orange-red gradient. Style: rich details, high quality, warm atmosphere. Mood: lively, busy."
+    }
+  ]
+}
+
+[Wrong Examples (containing characters, forbidden)]:
+❌ "Depicting protagonist standing on the street" - contains character
+❌ "People hurrying by" - contains characters
+❌ "Character moving in the room" - contains character
+
+Please strictly follow the JSON format and ensure all fields use English.`
+	}
 
 	prompt := fmt.Sprintf(`%s
 
@@ -1000,7 +1041,7 @@ Please strictly follow the JSON format and ensure all fields use English.`
 
 %s`, systemPrompt, contentLabel, scriptContent, formatInstructions)
 
-	// 打印完整提示词用于调试
+	// Print the full prompt for debugging
 	s.log.Infow("=== AI Prompt for Background Extraction (extractBackgroundsFromScript) ===",
 		"language", s.promptI18n.GetLanguage(),
 		"prompt_length", len(prompt),
@@ -1012,19 +1053,19 @@ Please strictly follow the JSON format and ensure all fields use English.`
 		return nil, fmt.Errorf("AI scene extraction failed: %w", err)
 	}
 
-	// 打印AI返回的原始响应
+	// Print the raw AI response
 	s.log.Infow("=== AI Response for Background Extraction (extractBackgroundsFromScript) ===",
 		"response_length", len(response),
 		"raw_response", response)
 
-	// 解析AI返回的JSON
+	// Parse the JSON returned by AI
 	var backgrounds []BackgroundInfo
 
-	// 先尝试解析为数组格式
+	// First try to parse as array format
 	if err := utils.SafeParseAIJSON(response, &backgrounds); err == nil {
 		s.log.Infow("Parsed backgrounds as array format", "count", len(backgrounds))
 	} else {
-		// 尝试解析为对象格式
+		// Try to parse as object format
 		var result struct {
 			Backgrounds []BackgroundInfo `json:"backgrounds"`
 		}
@@ -1043,13 +1084,13 @@ Please strictly follow the JSON format and ensure all fields use English.`
 	return backgrounds, nil
 }
 
-// extractBackgroundsWithAI 使用AI智能分析场景并提取唯一背景
+// extractBackgroundsWithAI uses AI to intelligently analyze scenes and extract unique backgrounds
 func (s *ImageGenerationService) extractBackgroundsWithAI(storyboards []models.Storyboard, style string) ([]BackgroundInfo, error) {
 	if len(storyboards) == 0 {
 		return []BackgroundInfo{}, nil
 	}
 
-	// 构建场景列表文本，使用SceneNumber而不是索引
+	// Build scene list text, using SceneNumber instead of index
 	var scenesText string
 	for _, storyboard := range storyboards {
 		location := ""
@@ -1073,12 +1114,14 @@ func (s *ImageGenerationService) extractBackgroundsWithAI(storyboards []models.S
 			storyboard.StoryboardNumber, location, time, action, description)
 	}
 
-	// 使用国际化提示词
+	// Use internationalized prompts
 	systemPrompt := s.promptI18n.GetSceneExtractionPrompt(style)
 	storyboardLabel := s.promptI18n.FormatUserPrompt("storyboard_list_label")
 
+	// Build different prompts based on language
 	var formatInstructions string
-	formatInstructions = `[Output JSON Format]
+	if s.promptI18n.IsEnglish() {
+		formatInstructions = `[Output JSON Format]
 {
   "backgrounds": [
     {
@@ -1113,6 +1156,43 @@ Please strictly follow the JSON format and ensure:
 1. prompt field uses English
 2. scene_numbers includes all scene numbers using this background
 3. All scenes are assigned to a background`
+	} else {
+		formatInstructions = `[Output JSON Format]
+{
+  "backgrounds": [
+    {
+      "location": "Location name",
+      "time": "Time description",
+      "prompt": "A cinematic anime-style background depicting [location description] at [time]. The scene shows [detail description]. Style: rich details, high quality, atmospheric lighting. Mood: [mood description].",
+      "scene_numbers": [1, 2, 3]
+    }
+  ]
+}
+
+[Example]
+Correct example:
+{
+  "backgrounds": [
+    {
+      "location": "Repair Shop",
+      "time": "Late Night",
+      "prompt": "A cinematic anime-style background depicting a messy repair shop interior at late night. Under dim lighting, the workbench is scattered with various tools and parts, with greasy posters hanging on the walls. Style: rich details, high quality, dim atmosphere. Mood: lonely, industrial.",
+      "scene_numbers": [1, 5, 6, 10, 15]
+    },
+    {
+      "location": "City Panorama",
+      "time": "Late Night with Acid Rain",
+      "prompt": "A cinematic anime-style background depicting a coastal city panorama in late night acid rain. Neon lights blur in the rain, skyscrapers shrouded in gray-green rain curtain, streets reflecting colorful lights. Style: rich details, high quality, cyberpunk atmosphere. Mood: oppressive, sci-fi, apocalyptic.",
+      "scene_numbers": [2, 7]
+    }
+  ]
+}
+
+Please strictly follow the JSON format and ensure:
+1. prompt field uses English
+2. scene_numbers includes all scene numbers using this background
+3. All scenes are assigned to a background`
+	}
 
 	prompt := fmt.Sprintf(`%s
 
@@ -1121,24 +1201,24 @@ Please strictly follow the JSON format and ensure:
 
 %s`, systemPrompt, storyboardLabel, scenesText, formatInstructions)
 
-	// 打印完整提示词用于调试
+	// Print the full prompt for debugging
 	s.log.Infow("=== AI Prompt for Background Extraction (extractBackgroundsWithAI) ===",
 		"language", s.promptI18n.GetLanguage(),
 		"prompt_length", len(prompt),
 		"full_prompt", prompt)
 
-	// 调用AI服务
+	// Call the AI service
 	text, err := s.aiService.GenerateText(prompt, "")
 	if err != nil {
 		return nil, fmt.Errorf("AI analysis failed: %w", err)
 	}
 
-	// 打印AI返回的原始响应
+	// Print the raw AI response
 	s.log.Infow("=== AI Response for Background Extraction ===",
 		"response_length", len(text),
 		"raw_response", text)
 
-	// 解析AI返回的JSON
+	// Parse the JSON returned by AI
 	var result struct {
 		Scenes []struct {
 			Location         string `json:"location"`
@@ -1152,16 +1232,16 @@ Please strictly follow the JSON format and ensure:
 		return nil, fmt.Errorf("failed to parse AI response: %w", err)
 	}
 
-	// 构建场景编号到场景ID的映射
+	// Build a mapping from scene numbers to scene IDs
 	storyboardNumberToID := make(map[int]uint)
 	for _, scene := range storyboards {
 		storyboardNumberToID[scene.StoryboardNumber] = scene.ID
 	}
 
-	// 转换为BackgroundInfo
+	// Convert to BackgroundInfo
 	var backgrounds []BackgroundInfo
 	for _, bg := range result.Scenes {
-		// 将场景编号转换为场景ID
+		// Convert scene numbers to scene IDs
 		var sceneIDs []uint
 		for _, storyboardNum := range bg.StoryboardNumber {
 			if storyboardID, ok := storyboardNumberToID[storyboardNum]; ok {
@@ -1186,7 +1266,7 @@ Please strictly follow the JSON format and ensure:
 	return backgrounds, nil
 }
 
-// extractUniqueBackgrounds 从分镜头中提取唯一背景（代码逻辑，作为AI提取的备份）
+// extractUniqueBackgrounds extracts unique backgrounds from storyboards (code logic, as a backup for AI extraction)
 func (s *ImageGenerationService) extractUniqueBackgrounds(scenes []models.Storyboard) []BackgroundInfo {
 	backgroundMap := make(map[string]*BackgroundInfo)
 
@@ -1195,15 +1275,15 @@ func (s *ImageGenerationService) extractUniqueBackgrounds(scenes []models.Storyb
 			continue
 		}
 
-		// 使用 location + time 作为唯一标识
+		// Use location + time as the unique identifier
 		key := *scene.Location + "|" + *scene.Time
 
 		if bg, exists := backgroundMap[key]; exists {
-			// 背景已存在，添加scene ID
+			// Background already exists, add the scene ID
 			bg.SceneIDs = append(bg.SceneIDs, scene.ID)
 			bg.StoryboardCount++
 		} else {
-			// 新背景 - 使用ImagePrompt构建背景提示词
+			// New background - build background prompt using ImagePrompt
 			prompt := ""
 			if scene.ImagePrompt != nil {
 				prompt = *scene.ImagePrompt
@@ -1218,7 +1298,7 @@ func (s *ImageGenerationService) extractUniqueBackgrounds(scenes []models.Storyb
 		}
 	}
 
-	// 转换为切片
+	// Convert to slice
 	var backgrounds []BackgroundInfo
 	for _, bg := range backgroundMap {
 		backgrounds = append(backgrounds, *bg)
@@ -1227,14 +1307,14 @@ func (s *ImageGenerationService) extractUniqueBackgrounds(scenes []models.Storyb
 	return backgrounds
 }
 
-// loadImageAsBase64 读取本地图片文件并转换为 base64 格式的 data URI
+// loadImageAsBase64 reads a local image file and converts it to a base64-encoded data URI
 func (s *ImageGenerationService) loadImageAsBase64(localPath string) (string, error) {
-	// 构建完整的文件路径
+	// Build the full file path
 	var fullPath string
 	if filepath.IsAbs(localPath) {
 		fullPath = localPath
 	} else {
-		// 如果是相对路径，拼接存储根目录
+		// If it's a relative path, join with the storage root directory
 		if s.localStorage != nil {
 			fullPath = s.localStorage.GetAbsolutePath(localPath)
 		} else {
@@ -1242,15 +1322,15 @@ func (s *ImageGenerationService) loadImageAsBase64(localPath string) (string, er
 		}
 	}
 
-	// 读取文件
+	// Read the file
 	fileData, err := os.ReadFile(fullPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read image file: %w", err)
 	}
 
-	// 根据文件扩展名确定 MIME 类型
+	// Determine the MIME type based on file extension
 	ext := strings.ToLower(filepath.Ext(fullPath))
-	mimeType := "image/jpeg" // 默认
+	mimeType := "image/jpeg" // Default
 	switch ext {
 	case ".png":
 		mimeType = "image/png"
@@ -1262,10 +1342,10 @@ func (s *ImageGenerationService) loadImageAsBase64(localPath string) (string, er
 		mimeType = "image/webp"
 	}
 
-	// 转换为 base64
+	// Convert to base64
 	base64Data := base64.StdEncoding.EncodeToString(fileData)
 
-	// 构建 data URI
+	// Build the data URI
 	dataURI := fmt.Sprintf("data:%s;base64,%s", mimeType, base64Data)
 
 	return dataURI, nil

@@ -47,20 +47,20 @@ type GenerateVideoRequest struct {
 	DramaID      string `json:"drama_id" binding:"required"`
 	ImageGenID   *uint  `json:"image_gen_id"`
 
-	// 参考图模式：single, first_last, multiple, none
+	// Reference image mode: single, first_last, multiple, none
 	ReferenceMode string `json:"reference_mode"`
 
-	// 单图模式
+	// Single image mode
 	ImageURL       string  `json:"image_url"`
-	ImageLocalPath *string `json:"image_local_path"` // 单图模式的本地路径
+	ImageLocalPath *string `json:"image_local_path"` // Single image mode local path
 
-	// 首尾帧模式
+	// First-last frame mode
 	FirstFrameURL       *string `json:"first_frame_url"`
-	FirstFrameLocalPath *string `json:"first_frame_local_path"` // 首帧本地路径
+	FirstFrameLocalPath *string `json:"first_frame_local_path"` // First frame local path
 	LastFrameURL        *string `json:"last_frame_url"`
-	LastFrameLocalPath  *string `json:"last_frame_local_path"` // 尾帧本地路径
+	LastFrameLocalPath  *string `json:"last_frame_local_path"` // Last frame local path
 
-	// 多图模式
+	// Multiple image mode
 	ReferenceImageURLs []string `json:"reference_image_urls"`
 
 	Prompt       string  `json:"prompt" binding:"required,min=5,max=2000"`
@@ -117,21 +117,21 @@ func (s *VideoGenerationService) GenerateVideo(request *GenerateVideoRequest) (*
 		Status:       models.VideoStatusPending,
 	}
 
-	// 根据参考图模式处理不同的参数
+	// Handle different parameters based on reference image mode
 	if request.ReferenceMode != "" {
 		videoGen.ReferenceMode = &request.ReferenceMode
 	}
 
 	switch request.ReferenceMode {
 	case "single":
-		// 单图模式 - 优先使用 local_path
+		// Single image mode - prefer local_path
 		if request.ImageLocalPath != nil && *request.ImageLocalPath != "" {
 			videoGen.ImageURL = request.ImageLocalPath
 		} else if request.ImageURL != "" {
 			videoGen.ImageURL = &request.ImageURL
 		}
 	case "first_last":
-		// 首尾帧模式 - 优先使用 local_path
+		// First-last frame mode - prefer local_path
 		if request.FirstFrameLocalPath != nil && *request.FirstFrameLocalPath != "" {
 			videoGen.FirstFrameURL = request.FirstFrameLocalPath
 		} else if request.FirstFrameURL != nil {
@@ -143,7 +143,7 @@ func (s *VideoGenerationService) GenerateVideo(request *GenerateVideoRequest) (*
 			videoGen.LastFrameURL = request.LastFrameURL
 		}
 	case "multiple":
-		// 多图模式
+		// Multiple image mode
 		if len(request.ReferenceImageURLs) > 0 {
 			referenceImagesJSON, err := json.Marshal(request.ReferenceImageURLs)
 			if err == nil {
@@ -152,9 +152,9 @@ func (s *VideoGenerationService) GenerateVideo(request *GenerateVideoRequest) (*
 			}
 		}
 	case "none":
-		// 无参考图，纯文本生成
+		// No reference image, pure text generation
 	default:
-		// 向后兼容：如果没有指定模式，根据提供的参数自动判断
+		// Backward compatible: auto-detect mode from provided parameters
 		if request.ImageURL != "" {
 			videoGen.ImageURL = &request.ImageURL
 			mode := "single"
@@ -194,7 +194,7 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 		return
 	}
 
-	// 获取drama的style信息
+	// Get drama style information
 	var drama models.Drama
 	if err := s.db.First(&drama, videoGen.DramaID).Error; err != nil {
 		s.log.Warnw("Failed to load drama for style", "error", err, "drama_id", videoGen.DramaID)
@@ -237,11 +237,11 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 		opts = append(opts, video.WithSeed(*videoGen.Seed))
 	}
 
-	// 根据参考图模式添加相应的选项，并将本地图片转换为base64
+	// Add options based on reference image mode, converting local images to base64
 	if videoGen.ReferenceMode != nil {
 		switch *videoGen.ReferenceMode {
 		case "first_last":
-			// 首尾帧模式 - 转换本地图片为base64
+			// First-last frame mode - convert local images to base64
 			if videoGen.FirstFrameURL != nil {
 				firstFrameBase64, err := s.convertImageToBase64(*videoGen.FirstFrameURL)
 				if err != nil {
@@ -261,7 +261,7 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 				}
 			}
 		case "multiple":
-			// 多图模式 - 转换本地图片为base64
+			// Multiple image mode - convert local images to base64
 			if videoGen.ReferenceImageURLs != nil {
 				var imageURLs []string
 				if err := json.Unmarshal([]byte(*videoGen.ReferenceImageURLs), &imageURLs); err == nil {
@@ -281,8 +281,8 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 		}
 	}
 
-	// 构造imageURL参数（单图模式使用，其他模式传空字符串）
-	// 如果是本地图片，转换为base64
+	// Build imageURL parameter (used for single image mode, empty for others)
+	// If local image, convert to base64
 	imageURL := ""
 	if videoGen.ImageURL != nil {
 		base64Image, err := s.convertImageToBase64(*videoGen.ImageURL)
@@ -294,21 +294,21 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 		}
 	}
 
-	// 构建完整的提示词：风格提示词 + 约束提示词 + 用户提示词
+	// Build complete prompt: style prompt + constraint prompt + user prompt
 	prompt := videoGen.Prompt
 
-	// 2. 添加视频约束提示词
-	// 根据参考图模式选择对应的约束提示词
-	referenceMode := "single" // 默认单图模式
+	// 2. Add video constraint prompt
+	// Select constraint prompt based on reference image mode
+	referenceMode := "single" // Default single image mode
 	if videoGen.ReferenceMode != nil {
 		referenceMode = *videoGen.ReferenceMode
 	}
 
-	// 如果是单图模式，需要检查图片是否为动作序列图
+	// For single image mode, check if the image is an action sequence
 	if referenceMode == "single" && videoGen.ImageGenID != nil {
 		var imageGen models.ImageGeneration
 		if err := s.db.First(&imageGen, *videoGen.ImageGenID).Error; err == nil {
-			// 如果图片的frame_type是action，使用动作序列约束提示词
+			// If image frame_type is action, use action sequence constraint prompt
 			if imageGen.FrameType != nil && *imageGen.FrameType == "action" {
 				referenceMode = "action_sequence"
 				s.log.Infow("Detected action sequence image in single mode",
@@ -328,7 +328,7 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 			"constraint_prompt_length", len(constraintPrompt))
 	}
 
-	// 打印完整的提示词信息
+	// Log complete prompt information
 	s.log.Infow("Video generation prompts",
 		"id", videoGenID,
 		"user_prompt", videoGen.Prompt,
@@ -449,7 +449,7 @@ func (s *VideoGenerationService) pollTaskStatus(videoGenID uint, taskID string, 
 func (s *VideoGenerationService) completeVideoGeneration(videoGenID uint, videoURL string, duration *int, width *int, height *int, firstFrameURL *string) {
 	var localVideoPath *string
 
-	// 下载视频到本地存储并保存相对路径到数据库
+	// Download video to local storage and save relative path to database
 	if s.localStorage != nil && videoURL != "" {
 		downloadResult, err := s.localStorage.DownloadFromURLWithPath(videoURL, "videos")
 		if err != nil {
@@ -466,13 +466,13 @@ func (s *VideoGenerationService) completeVideoGeneration(videoGenID uint, videoU
 		}
 	}
 
-	// 如果视频已下载到本地，探测真实时长
-	// 特别是当 AI 服务返回的 duration 为 0 或 nil 时，必须探测
+	// If video downloaded locally, probe actual duration
+	// Especially when AI service returns duration of 0 or nil, probing is required
 	shouldProbe := localVideoPath != nil && s.ffmpeg != nil && (duration == nil || *duration == 0)
 	if shouldProbe {
 		absPath := s.localStorage.GetAbsolutePath(*localVideoPath)
 		if probedDuration, err := s.ffmpeg.GetVideoDuration(absPath); err == nil {
-			// 转换为整数秒（向上取整）
+			// Convert to integer seconds (round up)
 			durationInt := int(probedDuration + 0.5)
 			duration = &durationInt
 			s.log.Infow("Probed video duration (was 0 or nil)",
@@ -486,7 +486,7 @@ func (s *VideoGenerationService) completeVideoGeneration(videoGenID uint, videoU
 				"local_path", *localVideoPath)
 		}
 	} else if localVideoPath != nil && s.ffmpeg != nil && duration != nil && *duration > 0 {
-		// 即使有 duration，也验证一下（可选）
+		// Even with duration, validate it (optional)
 		absPath := s.localStorage.GetAbsolutePath(*localVideoPath)
 		if probedDuration, err := s.ffmpeg.GetVideoDuration(absPath); err == nil {
 			durationInt := int(probedDuration + 0.5)
@@ -495,13 +495,13 @@ func (s *VideoGenerationService) completeVideoGeneration(videoGenID uint, videoU
 					"id", videoGenID,
 					"provided", *duration,
 					"probed", durationInt)
-				// 使用探测到的时长（更准确）
+				// Use probed duration (more accurate)
 				duration = &durationInt
 			}
 		}
 	}
 
-	// 下载首帧图片到本地存储（仅用于缓存，不更新数据库）
+	// Download first frame to local storage (for caching only, no DB update)
 	if firstFrameURL != nil && *firstFrameURL != "" && s.localStorage != nil {
 		_, err := s.localStorage.DownloadFromURL(*firstFrameURL, "video_frames")
 		if err != nil {
@@ -516,13 +516,13 @@ func (s *VideoGenerationService) completeVideoGeneration(videoGenID uint, videoU
 		}
 	}
 
-	// 数据库中保存原始URL和本地路径
+	// Save original URL and local path in database
 	updates := map[string]interface{}{
 		"status":     models.VideoStatusCompleted,
 		"video_url":  videoURL,
 		"local_path": localVideoPath,
 	}
-	// 只有当 duration 大于 0 时才保存，避免保存无效的 0 值
+	// Only save duration when > 0 to avoid invalid zero values
 	if duration != nil && *duration > 0 {
 		updates["duration"] = *duration
 	}
@@ -544,11 +544,11 @@ func (s *VideoGenerationService) completeVideoGeneration(videoGenID uint, videoU
 	var videoGen models.VideoGeneration
 	if err := s.db.First(&videoGen, videoGenID).Error; err == nil {
 		if videoGen.StoryboardID != nil {
-			// 更新 Storyboard 的 video_url 和 duration
+			// Update Storyboard video_url and duration
 			storyboardUpdates := map[string]interface{}{
 				"video_url": videoURL,
 			}
-			// 只有当 duration 大于 0 时才更新，避免用无效的 0 值覆盖
+			// Only update duration when > 0 to avoid overwriting with invalid zero
 			if duration != nil && *duration > 0 {
 				storyboardUpdates["duration"] = *duration
 			}
@@ -573,7 +573,7 @@ func (s *VideoGenerationService) updateVideoGenError(videoGenID uint, errorMsg s
 }
 
 func (s *VideoGenerationService) getVideoClient(provider string, modelName string) (video.VideoClient, error) {
-	// 根据模型名称获取AI配置
+	// Get AI config by model name
 	var config *models.AIServiceConfig
 	var err error
 
@@ -593,7 +593,7 @@ func (s *VideoGenerationService) getVideoClient(provider string, modelName strin
 		}
 	}
 
-	// 使用配置中的信息创建客户端
+	// Create client using config information
 	baseURL := config.BaseURL
 	apiKey := config.APIKey
 	model := modelName
@@ -601,7 +601,7 @@ func (s *VideoGenerationService) getVideoClient(provider string, modelName strin
 		model = config.Model[0]
 	}
 
-	// 根据配置中的 provider 创建对应的客户端
+	// Create corresponding client based on config provider
 	var endpoint string
 	var queryEndpoint string
 
@@ -615,7 +615,7 @@ func (s *VideoGenerationService) getVideoClient(provider string, modelName strin
 		queryEndpoint = "/contents/generations/tasks/{taskId}"
 		return video.NewVolcesArkClient(baseURL, apiKey, model, endpoint, queryEndpoint), nil
 	case "openai":
-		// OpenAI Sora 使用 /v1/videos 端点
+		// OpenAI Sora uses /v1/videos endpoint
 		return video.NewOpenAISoraClient(baseURL, apiKey, model), nil
 	case "runway":
 		return video.NewRunwayClient(baseURL, apiKey, model), nil
@@ -699,7 +699,7 @@ func (s *VideoGenerationService) GenerateVideoFromImage(imageGenID uint) (*model
 		return nil, fmt.Errorf("image is not ready")
 	}
 
-	// 获取关联的Storyboard以获取时长
+	// Get associated Storyboard for duration
 	var duration *int
 	if imageGen.StoryboardID != nil {
 		var storyboard models.Storyboard
@@ -759,34 +759,34 @@ func (s *VideoGenerationService) DeleteVideoGeneration(id uint) error {
 	return s.db.Delete(&models.VideoGeneration{}, id).Error
 }
 
-// convertImageToBase64 将图片转换为base64格式
-// 优先使用本地存储的图片，如果没有则使用URL
+// convertImageToBase64 converts an image to base64 format
+// Prefers locally stored images, falls back to URL
 func (s *VideoGenerationService) convertImageToBase64(imageURL string) (string, error) {
-	// 如果已经是base64格式，直接返回
+	// If already base64 format, return directly
 	if strings.HasPrefix(imageURL, "data:") {
 		return imageURL, nil
 	}
 
-	// 尝试从本地存储读取
+	// Try reading from local storage
 	if s.localStorage != nil {
 		var relativePath string
 
-		// 1. 检查是否是本地URL（包含 /static/）
+		// 1. Check if it is a local URL (contains /static/)
 		if strings.Contains(imageURL, "/static/") {
 			parts := strings.Split(imageURL, "/static/")
 			if len(parts) == 2 {
 				relativePath = parts[1]
 			}
 		} else if !strings.HasPrefix(imageURL, "http://") && !strings.HasPrefix(imageURL, "https://") {
-			// 2. 如果不是 HTTP/HTTPS URL，视为相对路径（如 "images/xxx.jpg"）
+			// 2. If not HTTP/HTTPS URL, treat as relative path (e.g. "images/xxx.jpg")
 			relativePath = imageURL
 		}
 
-		// 如果识别出相对路径，尝试读取本地文件
+		// If relative path identified, try reading local file
 		if relativePath != "" {
 			absPath := s.localStorage.GetAbsolutePath(relativePath)
 
-			// 使用工具函数转换为base64
+			// Use utility function to convert to base64
 			base64Str, err := utils.ImageToBase64(absPath)
 			if err == nil {
 				s.log.Infow("Converted local image to base64", "path", relativePath)
@@ -796,7 +796,7 @@ func (s *VideoGenerationService) convertImageToBase64(imageURL string) (string, 
 		}
 	}
 
-	// 如果本地读取失败或不是本地路径，尝试从URL下载并转换
+	// If local read failed or not a local path, try downloading from URL and converting
 	base64Str, err := utils.ImageToBase64(imageURL)
 	if err != nil {
 		return "", fmt.Errorf("failed to convert image to base64: %w", err)

@@ -56,7 +56,7 @@ func (s *DramaService) CreateDrama(req *CreateDramaRequest) (*models.Drama, erro
 	drama := &models.Drama{
 		Title:  req.Title,
 		Status: "draft",
-		Style:  "ghibli", // 默认风格
+		Style:  "ghibli", // default style
 	}
 
 	if req.Description != "" {
@@ -81,15 +81,15 @@ func (s *DramaService) CreateDrama(req *CreateDramaRequest) (*models.Drama, erro
 func (s *DramaService) GetDrama(dramaID string) (*models.Drama, error) {
 	var drama models.Drama
 	err := s.db.Where("id = ? ", dramaID).
-		Preload("Characters").          // 加载Drama级别的角色
-		Preload("Scenes").              // 加载Drama级别的场景
-		Preload("Props").               // 加载Drama级别的道具
-		Preload("Episodes.Characters"). // 加载每个章节关联的角色
-		Preload("Episodes.Scenes").     // 加载每个章节关联的场景
+		Preload("Characters").          // Load Drama-level characters
+		Preload("Scenes").              // Load Drama-level scenes
+		Preload("Props").               // Load Drama-level props
+		Preload("Episodes.Characters"). // Load characters associated with each episode
+		Preload("Episodes.Scenes").     // Load scenes associated with each episode
 		Preload("Episodes.Storyboards", func(db *gorm.DB) *gorm.DB {
 			return db.Order("storyboards.storyboard_number ASC")
 		}).
-		Preload("Episodes.Storyboards.Props"). // 加载分镜关联的道具
+		Preload("Episodes.Storyboards.Props"). // Load props associated with storyboards
 		First(&drama).Error
 
 	if err != nil {
@@ -100,39 +100,39 @@ func (s *DramaService) GetDrama(dramaID string) (*models.Drama, error) {
 		return nil, err
 	}
 
-	// 统计每个剧集的时长（基于场景时长之和）
+	// Calculate each episode's duration (based on sum of scene durations)
 	for i := range drama.Episodes {
 		totalDuration := 0
 		for _, scene := range drama.Episodes[i].Storyboards {
 			totalDuration += scene.Duration
 		}
-		// 更新剧集时长（秒转分钟，向上取整）
+		// Update episode duration (seconds to minutes, rounded up)
 		durationMinutes := (totalDuration + 59) / 60
 		drama.Episodes[i].Duration = durationMinutes
 
-		// 如果数据库中的时长与计算的不一致，更新数据库
+		// If database duration differs from calculated, update database
 		if drama.Episodes[i].Duration != durationMinutes {
 			s.db.Model(&models.Episode{}).Where("id = ?", drama.Episodes[i].ID).Update("duration", durationMinutes)
 		}
 
-		// 查询角色的图片生成状态
+		// Query character image generation status
 		for j := range drama.Episodes[i].Characters {
 			var imageGen models.ImageGeneration
-			// 查询进行中或失败的任务状态
+			// Query in-progress or failed task status
 			err := s.db.Where("character_id = ? AND (status = ? OR status = ?)",
 				drama.Episodes[i].Characters[j].ID, "pending", "processing").
 				Order("created_at DESC").
 				First(&imageGen).Error
 
 			if err == nil {
-				// 找到生成中的记录，设置状态
+				// Found in-progress record, set status
 				statusStr := string(imageGen.Status)
 				drama.Episodes[i].Characters[j].ImageGenerationStatus = &statusStr
 				if imageGen.ErrorMsg != nil {
 					drama.Episodes[i].Characters[j].ImageGenerationError = imageGen.ErrorMsg
 				}
 			} else if errors.Is(err, gorm.ErrRecordNotFound) {
-				// 检查是否有失败的记录
+				// Check for failed records
 				err := s.db.Where("character_id = ? AND status = ?",
 					drama.Episodes[i].Characters[j].ID, "failed").
 					Order("created_at DESC").
@@ -148,24 +148,24 @@ func (s *DramaService) GetDrama(dramaID string) (*models.Drama, error) {
 			}
 		}
 
-		// 查询场景的图片生成状态
+		// Query scene image generation status
 		for j := range drama.Episodes[i].Scenes {
 			var imageGen models.ImageGeneration
-			// 查询进行中或失败的任务状态
+			// Query in-progress or failed task status
 			err := s.db.Where("scene_id = ? AND (status = ? OR status = ?)",
 				drama.Episodes[i].Scenes[j].ID, "pending", "processing").
 				Order("created_at DESC").
 				First(&imageGen).Error
 
 			if err == nil {
-				// 找到生成中的记录，设置状态
+				// Found in-progress record, set status
 				statusStr := string(imageGen.Status)
 				drama.Episodes[i].Scenes[j].ImageGenerationStatus = &statusStr
 				if imageGen.ErrorMsg != nil {
 					drama.Episodes[i].Scenes[j].ImageGenerationError = imageGen.ErrorMsg
 				}
 			} else if errors.Is(err, gorm.ErrRecordNotFound) {
-				// 检查是否有失败的记录
+				// Check for failed records
 				err := s.db.Where("scene_id = ? AND status = ?",
 					drama.Episodes[i].Scenes[j].ID, "failed").
 					Order("created_at DESC").
@@ -182,8 +182,8 @@ func (s *DramaService) GetDrama(dramaID string) (*models.Drama, error) {
 		}
 	}
 
-	// 整合所有剧集的场景到Drama级别的Scenes字段
-	sceneMap := make(map[uint]*models.Scene) // 用于去重
+	// Consolidate all episode scenes into Drama-level Scenes field
+	sceneMap := make(map[uint]*models.Scene) // for deduplication
 	for i := range drama.Episodes {
 		for j := range drama.Episodes[i].Scenes {
 			scene := &drama.Episodes[i].Scenes[j]
@@ -191,13 +191,13 @@ func (s *DramaService) GetDrama(dramaID string) (*models.Drama, error) {
 		}
 	}
 
-	// 将整合的场景添加到drama.Scenes
+	// Add consolidated scenes to drama.Scenes
 	drama.Scenes = make([]models.Scene, 0, len(sceneMap))
 	for _, scene := range sceneMap {
 		drama.Scenes = append(drama.Scenes, *scene)
 	}
 
-	// 为所有场景的 local_path 添加 base_url 前缀
+	// Add base_url prefix to all scene local_paths
 	// s.addBaseURLToScenes(&drama)
 
 	return &drama, nil
@@ -240,14 +240,14 @@ func (s *DramaService) ListDramas(query *DramaListQuery) ([]models.Drama, int64,
 		return nil, 0, err
 	}
 
-	// 统计每个剧本的每个剧集的时长（基于场景时长之和）
+	// Calculate each episode's duration for each drama (based on sum of scene durations)
 	for i := range dramas {
 		for j := range dramas[i].Episodes {
 			totalDuration := 0
 			for _, scene := range dramas[i].Episodes[j].Storyboards {
 				totalDuration += scene.Duration
 			}
-			// 更新剧集时长（秒转分钟，向上取整）
+			// Update episode duration (seconds to minutes, rounded up)
 			durationMinutes := (totalDuration + 59) / 60
 			dramas[i].Episodes[j].Duration = durationMinutes
 		}
@@ -348,7 +348,7 @@ type SaveOutlineRequest struct {
 
 type SaveCharactersRequest struct {
 	Characters []models.Character `json:"characters" binding:"required"`
-	EpisodeID  *uint              `json:"episode_id"` // 可选：如果提供则关联到指定章节
+	EpisodeID  *uint              `json:"episode_id"` // Optional: associate with specified episode if provided
 }
 
 type SaveProgressRequest struct {
@@ -408,7 +408,7 @@ func (s *DramaService) GetCharacters(dramaID string, episodeID *string) ([]model
 
 	var characters []models.Character
 
-	// 如果指定了episodeID，只获取该章节关联的角色
+	// If episodeID is specified, only get characters associated with that episode
 	if episodeID != nil {
 		var episode models.Episode
 		if err := s.db.Preload("Characters").Where("id = ? AND drama_id = ?", *episodeID, dramaID).First(&episode).Error; err != nil {
@@ -419,23 +419,23 @@ func (s *DramaService) GetCharacters(dramaID string, episodeID *string) ([]model
 		}
 		characters = episode.Characters
 	} else {
-		// 如果没有指定episodeID，获取项目的所有角色
+		// If episodeID is not specified, get all characters for the project
 		if err := s.db.Where("drama_id = ?", dramaID).Find(&characters).Error; err != nil {
 			s.log.Errorw("Failed to get characters", "error", err)
 			return nil, err
 		}
 	}
 
-	// 查询每个角色的图片生成任务状态
+	// Query each character's image generation task status
 	for i := range characters {
-		// 查询该角色最新的图片生成任务
+		// Query the character's latest image generation task
 		var imageGen models.ImageGeneration
 		err := s.db.Where("character_id = ?", characters[i].ID).
 			Order("created_at DESC").
 			First(&imageGen).Error
 
 		if err == nil {
-			// 如果有进行中的任务，填充状态信息
+			// If there's an in-progress task, populate status info
 			if imageGen.Status == models.ImageStatusPending || imageGen.Status == models.ImageStatusProcessing {
 				statusStr := string(imageGen.Status)
 				characters[i].ImageGenerationStatus = &statusStr
@@ -453,7 +453,7 @@ func (s *DramaService) GetCharacters(dramaID string, episodeID *string) ([]model
 }
 
 func (s *DramaService) SaveCharacters(dramaID string, req *SaveCharactersRequest) error {
-	// 转换dramaID
+	// Convert dramaID
 	id, err := strconv.ParseUint(dramaID, 10, 32)
 	if err != nil {
 		return fmt.Errorf("invalid drama ID")
@@ -468,7 +468,7 @@ func (s *DramaService) SaveCharacters(dramaID string, req *SaveCharactersRequest
 		return err
 	}
 
-	// 如果指定了EpisodeID，验证章节存在性
+	// If EpisodeID is specified, verify episode existence
 	if req.EpisodeID != nil {
 		var episode models.Episode
 		if err := s.db.Where("id = ? AND drama_id = ?", *req.EpisodeID, dramaIDUint).First(&episode).Error; err != nil {
@@ -479,29 +479,29 @@ func (s *DramaService) SaveCharacters(dramaID string, req *SaveCharactersRequest
 		}
 	}
 
-	// 获取该项目已存在的所有角色
+	// Get all existing characters for the project
 	var existingCharacters []models.Character
 	if err := s.db.Where("drama_id = ?", dramaIDUint).Find(&existingCharacters).Error; err != nil {
 		s.log.Errorw("Failed to get existing characters", "error", err)
 		return err
 	}
 
-	// 创建角色名称到角色的映射
+	// Create character name to character mapping
 	existingCharMap := make(map[string]*models.Character)
 	for i := range existingCharacters {
 		existingCharMap[existingCharacters[i].Name] = &existingCharacters[i]
 	}
 
-	// 收集需要关联到章节的角色ID
+	// Collect character IDs to associate with episode
 	var characterIDs []uint
 
-	// 创建新角色或复用/更新已有角色
+	// Create new characters or reuse/update existing ones
 	for _, char := range req.Characters {
-		// 1. 如果提供了ID，尝试更新已有角色
+		// 1. If ID is provided, try to update existing character
 		if char.ID > 0 {
 			var existing models.Character
 			if err := s.db.Where("id = ? AND drama_id = ?", char.ID, dramaIDUint).First(&existing).Error; err == nil {
-				// 更新角色信息
+				// Update character info
 				updates := map[string]interface{}{
 					"name":        char.Name,
 					"role":        char.Role,
@@ -518,14 +518,14 @@ func (s *DramaService) SaveCharacters(dramaID string, req *SaveCharactersRequest
 			}
 		}
 
-		// 2. 如果没有ID但名字已存在，直接复用（可选：也可以选择更新）
+		// 2. If no ID but name exists, reuse directly (optional: could also update)
 		if existingChar, exists := existingCharMap[char.Name]; exists {
 			s.log.Infow("Character already exists, reusing", "name", char.Name, "character_id", existingChar.ID)
 			characterIDs = append(characterIDs, existingChar.ID)
 			continue
 		}
 
-		// 3. 角色不存在，创建新角色
+		// 3. Character does not exist, create new character
 		character := models.Character{
 			DramaID:     dramaIDUint,
 			Name:        char.Name,
@@ -545,21 +545,21 @@ func (s *DramaService) SaveCharacters(dramaID string, req *SaveCharactersRequest
 		characterIDs = append(characterIDs, character.ID)
 	}
 
-	// 如果指定了EpisodeID，建立角色与章节的关联
+	// If EpisodeID is specified, establish character-episode association
 	if req.EpisodeID != nil && len(characterIDs) > 0 {
 		var episode models.Episode
 		if err := s.db.First(&episode, *req.EpisodeID).Error; err != nil {
 			return err
 		}
 
-		// 获取角色对象
+		// Get character objects
 		var characters []models.Character
 		if err := s.db.Where("id IN ?", characterIDs).Find(&characters).Error; err != nil {
 			s.log.Errorw("Failed to get characters", "error", err)
 			return err
 		}
 
-		// 使用GORM的Association API建立多对多关系（会自动去重）
+		// Use GORM Association API to establish many-to-many relationship (auto-deduplicates)
 		if err := s.db.Model(&episode).Association("Characters").Append(&characters); err != nil {
 			s.log.Errorw("Failed to associate characters with episode", "error", err)
 			return err
@@ -577,7 +577,7 @@ func (s *DramaService) SaveCharacters(dramaID string, req *SaveCharactersRequest
 }
 
 func (s *DramaService) SaveEpisodes(dramaID string, req *SaveEpisodesRequest) error {
-	// 转换dramaID
+	// Convert dramaID
 	id, err := strconv.ParseUint(dramaID, 10, 32)
 	if err != nil {
 		return fmt.Errorf("invalid drama ID")
@@ -592,13 +592,13 @@ func (s *DramaService) SaveEpisodes(dramaID string, req *SaveEpisodesRequest) er
 		return err
 	}
 
-	// 删除旧剧集
+	// Delete old episodes
 	if err := s.db.Where("drama_id = ?", dramaIDUint).Delete(&models.Episode{}).Error; err != nil {
 		s.log.Errorw("Failed to delete old episodes", "error", err)
 		return err
 	}
 
-	// 创建新剧集（不包含场景，场景由后续步骤生成）
+	// Create new episodes (excluding scenes, which are generated in subsequent steps)
 	for _, ep := range req.Episodes {
 		episode := models.Episode{
 			DramaID:       dramaIDUint,
@@ -633,23 +633,23 @@ func (s *DramaService) SaveProgress(dramaID string, req *SaveProgressRequest) er
 		return err
 	}
 
-	// 构建metadata对象
+	// Build metadata object
 	metadata := make(map[string]interface{})
 
-	// 保留现有metadata
+	// Preserve existing metadata
 	if drama.Metadata != nil {
 		if err := json.Unmarshal(drama.Metadata, &metadata); err != nil {
 			s.log.Warnw("Failed to unmarshal existing metadata", "error", err)
 		}
 	}
 
-	// 更新progress信息
+	// Update progress info
 	metadata["current_step"] = req.CurrentStep
 	if req.StepData != nil {
 		metadata["step_data"] = req.StepData
 	}
 
-	// 序列化metadata
+	// Serialize metadata
 	metadataJSON, err := json.Marshal(metadata)
 	if err != nil {
 		s.log.Errorw("Failed to marshal metadata", "error", err)
@@ -670,9 +670,9 @@ func (s *DramaService) SaveProgress(dramaID string, req *SaveProgressRequest) er
 	return nil
 }
 
-// addBaseURLToScenes 为剧本中所有场景的 local_path 添加 base_url 前缀
+// addBaseURLToScenes adds base_url prefix to local_path for all scenes in the drama
 func (s *DramaService) addBaseURLToScenes(drama *models.Drama) {
-	// 处理 drama.Scenes
+	// Process drama.Scenes
 	for i := range drama.Scenes {
 		if drama.Scenes[i].LocalPath != nil && *drama.Scenes[i].LocalPath != "" {
 			fullPath := fmt.Sprintf("%s/%s", s.baseURL, *drama.Scenes[i].LocalPath)
@@ -680,7 +680,7 @@ func (s *DramaService) addBaseURLToScenes(drama *models.Drama) {
 		}
 	}
 
-	// 处理 drama.Episodes[].Scenes
+	// Process drama.Episodes[].Scenes
 	for i := range drama.Episodes {
 		for j := range drama.Episodes[i].Scenes {
 			if drama.Episodes[i].Scenes[j].LocalPath != nil && *drama.Episodes[i].Scenes[j].LocalPath != "" {
