@@ -1,62 +1,67 @@
 package handlers
 
 import (
-	"github.com/drama-generator/backend/pkg/config"
-	"github.com/drama-generator/backend/pkg/logger"
-	"github.com/drama-generator/backend/pkg/response"
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
+"github.com/drama-generator/backend/pkg/config"
+"github.com/drama-generator/backend/pkg/logger"
+"github.com/drama-generator/backend/pkg/response"
+"github.com/gin-gonic/gin"
+"github.com/spf13/viper"
 )
 
 type SettingsHandler struct {
-	config *config.Config
-	log    *logger.Logger
+config *config.Config
+log    *logger.Logger
 }
 
 func NewSettingsHandler(cfg *config.Config, log *logger.Logger) *SettingsHandler {
-	return &SettingsHandler{
-		config: cfg,
-		log:    log,
-	}
+return &SettingsHandler{
+config: cfg,
+log:    log,
+}
 }
 
+// GetLanguage 获取当前系统语言
 func (h *SettingsHandler) GetLanguage(c *gin.Context) {
-	language := h.config.App.Language
-	if language == "" {
-		language = "en"
-	}
-
-	response.Success(c, gin.H{
-		"language": language,
-	})
+language := h.config.App.Language
+if language == "" {
+language = "zh" // 默认中文
 }
 
+response.Success(c, gin.H{
+"language": language,
+})
+}
+
+// UpdateLanguage 更新系统语言
 func (h *SettingsHandler) UpdateLanguage(c *gin.Context) {
-	var req struct {
-		Language string `json:"language" binding:"required,oneof=zh en"`
-	}
+var req struct {
+Language string `json:"language" binding:"required,oneof=zh en"`
+}
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.BadRequest(c, "Invalid language parameter, only zh or en is allowed")
-		return
-	}
+if err := c.ShouldBindJSON(&req); err != nil {
+response.BadRequest(c, "语言参数错误，只支持 zh 或 en")
+return
+}
 
-	h.config.App.Language = req.Language
+// 更新内存中的配置
+h.config.App.Language = req.Language
 
-	viper.Set("app.language", req.Language)
-	if err := viper.WriteConfig(); err != nil {
-		h.log.Warnw("Failed to write config file", "error", err)
-	}
+// 更新配置文件
+viper.Set("app.language", req.Language)
+if err := viper.WriteConfig(); err != nil {
+h.log.Warnw("Failed to write config file", "error", err)
+// 即使写入文件失败，内存配置也已更新，仍然可用
+}
 
-	h.log.Infow("System language updated", "language", req.Language)
+h.log.Infow("System language updated", "language", req.Language)
 
-	message := "Language switched to Chinese"
-	if req.Language == "en" {
-		message = "Language switched to English"
-	}
+message := "语言已切换为中文"
+if req.Language == "en" {
+message = "Language switched to English"
+}
 
-	response.Success(c, gin.H{
-		"message":  message,
-		"language": req.Language,
-	})
+response.Success(c, gin.H{
+"message":  message,
+"language": req.Language,
+})
 }
