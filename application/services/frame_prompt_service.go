@@ -10,7 +10,7 @@ import (
 "gorm.io/gorm"
 )
 
-// FramePromptService 处理帧提示词生成
+// FramePromptService handles frame prompt generation
 type FramePromptService struct {
 db          *gorm.DB
 aiService   *AIService
@@ -20,7 +20,7 @@ promptI18n  *PromptI18n
 taskService *TaskService
 }
 
-// NewFramePromptService 创建帧提示词服务
+// NewFramePromptService creates a frame prompt service
 func NewFramePromptService(db *gorm.DB, cfg *config.Config, log *logger.Logger) *FramePromptService {
 return &FramePromptService{
 db:          db,
@@ -32,45 +32,45 @@ taskService: NewTaskService(db, log),
 }
 }
 
-// FrameType 帧类型
+// FrameType represents a frame type
 type FrameType string
 
 const (
-FrameTypeFirst  FrameType = "first"  // 首帧
-FrameTypeKey    FrameType = "key"    // 关键帧
-FrameTypeLast   FrameType = "last"   // 尾帧
-FrameTypePanel  FrameType = "panel"  // 分镜板（3格组合）
-FrameTypeAction FrameType = "action" // 动作序列（5格）
+FrameTypeFirst  FrameType = "first"  // First frame
+FrameTypeKey    FrameType = "key"    // Key frame
+FrameTypeLast   FrameType = "last"   // Last frame
+FrameTypePanel  FrameType = "panel"  // Panel board (3-grid combo)
+FrameTypeAction FrameType = "action" // Action sequence (5-grid)
 )
 
-// GenerateFramePromptRequest 生成帧提示词请求
+// GenerateFramePromptRequest represents a request to generate frame prompts
 type GenerateFramePromptRequest struct {
 StoryboardID string    `json:"storyboard_id"`
 FrameType    FrameType `json:"frame_type"`
-// 可选参数
-PanelCount int `json:"panel_count,omitempty"` // 分镜板格数，默认3
+// Optional parameters
+PanelCount int `json:"panel_count,omitempty"` // Panel grid count, default 3
 }
 
-// FramePromptResponse 帧提示词响应
+// FramePromptResponse represents a frame prompt response
 type FramePromptResponse struct {
 FrameType   FrameType          `json:"frame_type"`
-SingleFrame *SingleFramePrompt `json:"single_frame,omitempty"` // 单帧提示词
-MultiFrame  *MultiFramePrompt  `json:"multi_frame,omitempty"`  // 多帧提示词
+SingleFrame *SingleFramePrompt `json:"single_frame,omitempty"` // Single frame prompt
+MultiFrame  *MultiFramePrompt  `json:"multi_frame,omitempty"`  // Multi frame prompt
 }
 
-// SingleFramePrompt 单帧提示词
+// SingleFramePrompt represents a single frame prompt
 type SingleFramePrompt struct {
 Prompt      string `json:"prompt"`
 Description string `json:"description"`
 }
 
-// MultiFramePrompt 多帧提示词
+// MultiFramePrompt represents a multi-frame prompt
 type MultiFramePrompt struct {
-Layout string              `json:"layout"` // horizontal_3, grid_2x2 等
+Layout string              `json:"layout"` // horizontal_3, grid_2x2 etc
 Frames []SingleFramePrompt `json:"frames"`
 }
 
-// GenerateFramePrompt 生成指定类型的帧提示词并保存到frame_prompts表
+// GenerateFramePrompt generates a frame prompt of the specified type and saves it to the frame_prompts table
 func (s *FramePromptService) GenerateFramePrompt(req GenerateFramePromptRequest, model string) (string, error) {
 // 查询分镜信息
 var storyboard models.Storyboard
@@ -92,7 +92,7 @@ s.log.Infow("Frame prompt generation task created", "task_id", task.ID, "storybo
 return task.ID, nil
 }
 
-// processFramePromptGeneration 异步处理帧提示词生成
+// processFramePromptGeneration asynchronously processes frame prompt generation
 func (s *FramePromptService) processFramePromptGeneration(taskID string, req GenerateFramePromptRequest, model string) {
 // 更新任务状态为处理中
 s.taskService.UpdateTaskStatus(taskID, "processing", 0, "正在生成帧提示词...")
@@ -175,7 +175,7 @@ s.taskService.UpdateTaskResult(taskID, map[string]interface{}{
 s.log.Infow("Frame prompt generation completed", "task_id", taskID, "storyboard_id", req.StoryboardID, "frame_type", req.FrameType)
 }
 
-// saveFramePrompt 保存帧提示词到数据库
+// saveFramePrompt saves a frame prompt to the database
 func (s *FramePromptService) saveFramePrompt(storyboardID, frameType, prompt, description, layout string) {
 framePrompt := models.FramePrompt{
 StoryboardID: uint(mustParseUint(storyboardID)),
@@ -199,14 +199,14 @@ s.log.Warnw("Failed to save frame prompt", "error", err, "storyboard_id", storyb
 }
 }
 
-// mustParseUint 辅助函数
+// mustParseUint helper function
 func mustParseUint(s string) uint64 {
 var result uint64
 fmt.Sscanf(s, "%d", &result)
 return result
 }
 
-// generateFirstFrame 生成首帧提示词
+// generateFirstFrame generates first frame prompt
 func (s *FramePromptService) generateFirstFrame(sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) *SingleFramePrompt {
 // 构建上下文信息
 contextInfo := s.buildStoryboardContext(sb, scene)
@@ -254,7 +254,7 @@ Description: "镜头开始的静态画面，展示初始状态",
 return result
 }
 
-// generateKeyFrame 生成关键帧提示词
+// generateKeyFrame generates key frame prompt
 func (s *FramePromptService) generateKeyFrame(sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) *SingleFramePrompt {
 // 构建上下文信息
 contextInfo := s.buildStoryboardContext(sb, scene)
