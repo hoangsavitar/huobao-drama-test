@@ -23,7 +23,7 @@ log: log,
 }
 }
 
-// CreateTask 创建新任务
+// CreateTask creates a new task
 func (s *TaskService) CreateTask(taskType, resourceID string) (*models.AsyncTask, error) {
 task := &models.AsyncTask{
 ID:         uuid.New().String(),
@@ -40,7 +40,7 @@ return nil, fmt.Errorf("failed to create task: %w", err)
 return task, nil
 }
 
-// UpdateTaskStatus 更新任务状态
+// UpdateTaskStatus updates task status
 func (s *TaskService) UpdateTaskStatus(taskID, status string, progress int, message string) error {
 updates := map[string]interface{}{
 "status":     status,
@@ -59,7 +59,7 @@ Where("id = ?", taskID).
 Updates(updates).Error
 }
 
-// UpdateTaskError 更新任务错误
+// UpdateTaskError updates task error
 func (s *TaskService) UpdateTaskError(taskID string, err error) error {
 now := time.Now()
 return s.db.Model(&models.AsyncTask{}).
@@ -73,7 +73,7 @@ Updates(map[string]interface{}{
 }).Error
 }
 
-// UpdateTaskResult 更新任务结果
+// UpdateTaskResult updates task result
 func (s *TaskService) UpdateTaskResult(taskID string, result interface{}) error {
 resultJSON, err := json.Marshal(result)
 if err != nil {
@@ -92,7 +92,7 @@ Updates(map[string]interface{}{
 }).Error
 }
 
-// GetTask 获取任务信息
+// GetTask retrieves task information
 func (s *TaskService) GetTask(taskID string) (*models.AsyncTask, error) {
 var task models.AsyncTask
 if err := s.db.Where("id = ?", taskID).First(&task).Error; err != nil {
@@ -101,7 +101,7 @@ return nil, err
 return &task, nil
 }
 
-// GetTasksByResource 获取资源相关的所有任务
+// GetTasksByResource retrieves all tasks related to a resource
 func (s *TaskService) GetTasksByResource(resourceID string) ([]*models.AsyncTask, error) {
 var tasks []*models.AsyncTask
 if err := s.db.Where("resource_id = ?", resourceID).

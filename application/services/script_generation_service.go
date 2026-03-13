@@ -38,7 +38,7 @@ EpisodeID   uint    `json:"episode_id"`
 Outline     string  `json:"outline"`
 Count       int     `json:"count"`
 Temperature float64 `json:"temperature"`
-Model       string  `json:"model"` // 指定使用的文本模型
+Model       string  `json:"model"` // specify the text model to use
 }
 
 func (s *ScriptGenerationService) GenerateCharacters(req *GenerateCharactersRequest) (string, error) {
@@ -47,35 +47,35 @@ if err := s.db.Where("id = ? ", req.DramaID).First(&drama).Error; err != nil {
 return "", fmt.Errorf("drama not found")
 }
 
-// 创建任务
+// Create task
 task, err := s.taskService.CreateTask("character_generation", req.DramaID)
 if err != nil {
 s.log.Errorw("Failed to create character generation task", "error", err)
-return "", fmt.Errorf("创建任务失败: %w", err)
+return "", fmt.Errorf("failed to create task: %w", err)
 }
 
-// 异步处理角色生成
+// Process character generation asynchronously
 go s.processCharacterGeneration(task.ID, req)
 
 s.log.Infow("Character generation task created", "task_id", task.ID, "drama_id", req.DramaID)
 return task.ID, nil
 }
 
-// processCharacterGeneration 异步处理角色生成
+// processCharacterGeneration processes character generation asynchronously
 func (s *ScriptGenerationService) processCharacterGeneration(taskID string, req *GenerateCharactersRequest) {
-// 更新任务状态为处理中
-s.taskService.UpdateTaskStatus(taskID, "processing", 0, "正在生成角色...")
+// Update task status to processing
+s.taskService.UpdateTaskStatus(taskID, "processing", 0, "Generating characters...")
 
 count := req.Count
 if count == 0 {
 count = 5
 }
 
-// 获取 drama 的 style 信息
+// Get drama's style information
 var drama models.Drama
 if err := s.db.Where("id = ? ", req.DramaID).First(&drama).Error; err != nil {
 s.log.Errorw("Drama not found during character generation", "error", err, "drama_id", req.DramaID)
-s.taskService.UpdateTaskStatus(taskID, "failed", 0, "剧本信息不存在")
+s.taskService.UpdateTaskStatus(taskID, "failed", 0, "drama information not found")
 return
 }
 
@@ -93,7 +93,7 @@ if temperature == 0 {
 temperature = 0.7
 }
 
-// 如果指定了模型，使用指定的模型；否则使用默认配置
+// If model is specified, use it; otherwise use default config
 var text string
 var err error
 if req.Model != "" {
@@ -111,13 +111,13 @@ text, err = s.aiService.GenerateText(userPrompt, systemPrompt, ai.WithTemperatur
 
 if err != nil {
 s.log.Errorw("Failed to generate characters", "error", err, "task_id", taskID)
-s.taskService.UpdateTaskStatus(taskID, "failed", 0, "AI生成失败: "+err.Error())
+s.taskService.UpdateTaskStatus(taskID, "failed", 0, "AI generation failed: "+err.Error())
 return
 }
 
 s.log.Infow("AI response received for character generation", "length", len(text), "preview", text[:minInt(200, len(text))], "task_id", taskID)
 
-// AI直接返回数组格式
+// AI directly returns array format
 var result []struct {
 Name        string `json:"name"`
 Role        string `json:"role"`
@@ -129,23 +129,23 @@ VoiceStyle  string `json:"voice_style"`
 
 if err := utils.SafeParseAIJSON(text, &result); err != nil {
 s.log.Errorw("Failed to parse characters JSON", "error", err, "raw_response", text[:minInt(500, len(text))], "task_id", taskID)
-s.taskService.UpdateTaskStatus(taskID, "failed", 0, "解析AI返回结果失败")
+s.taskService.UpdateTaskStatus(taskID, "failed", 0, "failed to parse AI response")
 return
 }
 
 var characters []models.Character
 for _, char := range result {
-// 检查角色是否已存在
+// Check if character already exists
 var existingChar models.Character
 err := s.db.Where("drama_id = ? AND name = ?", req.DramaID, char.Name).First(&existingChar).Error
 if err == nil {
-// 角色已存在，直接使用已存在的角色，不覆盖
+// Character already exists, use existing one without overwriting
 s.log.Infow("Character already exists, skipping", "drama_id", req.DramaID, "name", char.Name, "task_id", taskID)
 characters = append(characters, existingChar)
 continue
 }
 
-// 角色不存在，创建新角色
+// Character does not exist, create new character
 dramaID, _ := strconv.ParseUint(req.DramaID, 10, 32)
 character := models.Character{
 DramaID:     uint(dramaID),
@@ -165,11 +165,11 @@ continue
 characters = append(characters, character)
 }
 
-// 如果提供了 EpisodeID，建立 episode_characters 关联关系
+// If EpisodeID is provided, establish episode_characters association
 if req.EpisodeID > 0 {
 var episode models.Episode
 if err := s.db.First(&episode, req.EpisodeID).Error; err == nil {
-// 使用 GORM 的 Association 建立多对多关联
+// Use GORM Association to establish many-to-many association
 if err := s.db.Model(&episode).Association("Characters").Append(characters); err != nil {
 s.log.Errorw("Failed to associate characters with episode", "error", err, "episode_id", req.EpisodeID, "task_id", taskID)
 } else {
@@ -180,7 +180,7 @@ s.log.Errorw("Episode not found for association", "episode_id", req.EpisodeID, "
 }
 }
 
-// 更新任务状态为完成
+// Update task status to completed
 resultData := map[string]interface{}{
 "characters": characters,
 "count":      len(characters),
@@ -190,10 +190,10 @@ s.taskService.UpdateTaskResult(taskID, resultData)
 s.log.Infow("Character generation completed", "task_id", taskID, "drama_id", req.DramaID, "character_count", len(characters))
 }
 
-// GenerateScenesForEpisode 已废弃，使用 StoryboardService.GenerateStoryboard 替代
-// ParseScript 已废弃，使用 GenerateCharacters 替代
+// GenerateScenesForEpisode is deprecated, use StoryboardService.GenerateStoryboard instead
+// ParseScript is deprecated, use GenerateCharacters instead
 
-// minInt 返回两个整数中较小的一个
+// minInt returns the smaller of two integers
 func minInt(a, b int) int {
 if a < b {
 return a
