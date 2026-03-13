@@ -1,6 +1,6 @@
 <template>
   <div class="storyboard-generation">
-    <el-empty description="分镜拆解功能开发中" />
+    <el-empty description="Storyboard breakdown feature coming soon" />
   </div>
 </template>
 

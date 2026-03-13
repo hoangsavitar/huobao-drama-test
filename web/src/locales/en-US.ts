@@ -146,6 +146,17 @@ export default {
       view: 'View',
       delete: 'Delete'
     },
+    styles: {
+      ghibli: 'Ghibli',
+      guoman: 'Guoman',
+      wasteland: 'Wasteland',
+      nostalgia: 'Nostalgia',
+      pixel: 'Pixel Art',
+      voxel: 'Voxel',
+      urban: 'Urban',
+      guoman3d: 'Guoman 3D',
+      chibi3d: 'Chibi 3D'
+    },
     management: {
       overview: 'Project Overview',
       episodes: 'Episode Management',

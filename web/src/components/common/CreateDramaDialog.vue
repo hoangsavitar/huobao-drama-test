@@ -126,15 +126,15 @@ const form = reactive<CreateDramaRequest>({
 // Validation rules / 验证规则
 const rules: FormRules = {
   title: [
-    { required: true, message: "请输入项目标题", trigger: "blur" },
+    { required: true, message: "Please enter project title", trigger: "blur" },
     {
       min: 1,
       max: 100,
-      message: "标题长度在 1 到 100 个字符",
+      message: "Title length must be 1 to 100 characters",
       trigger: "blur",
     },
   ],
-  style: [{ required: true, message: "请选择风格", trigger: "change" }],
+  style: [{ required: true, message: "Please select style", trigger: "change" }],
 };
 
 // Reset form when dialog closes / 关闭时重置表单
@@ -158,13 +158,13 @@ const handleSubmit = async () => {
       loading.value = true;
       try {
         const drama = await dramaAPI.create(form);
-        ElMessage.success("创建成功");
+        ElMessage.success("Created successfully");
         visible.value = false;
         emit("created", drama.id);
         // Navigate to drama detail page / 跳转到短剧详情页
         router.push(`/dramas/${drama.id}`);
       } catch (error: any) {
-        ElMessage.error(error.message || "创建失败");
+        ElMessage.error(error.message || "Create failed");
       } finally {
         loading.value = false;
       }

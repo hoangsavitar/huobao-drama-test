@@ -1,14 +1,14 @@
 <template>
   <el-dialog
     v-model="visible"
-    title="AI 视频生成"
+    title="AI Video Generation"
     width="700px"
     :close-on-click-modal="false"
     @close="handleClose"
   >
     <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
-      <el-form-item label="选择剧本" prop="drama_id">
-        <el-select v-model="form.drama_id" placeholder="选择剧本" @change="onDramaChange">
+      <el-form-item label="Script" prop="drama_id">
+        <el-select v-model="form.drama_id" placeholder="Select script" @change="onDramaChange">
           <el-option
             v-for="drama in dramas"
             :key="drama.id"
@@ -18,10 +18,10 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="选择图片" prop="image_gen_id">
+      <el-form-item label="Select Image" prop="image_gen_id">
         <el-select
           v-model="form.image_gen_id"
-          placeholder="选择已生成的图片"
+          placeholder="Select a generated image"
           clearable
           @change="onImageChange"
         >
@@ -37,10 +37,10 @@
             </div>
           </el-option>
         </el-select>
-        <div class="form-tip">或直接输入图片 URL</div>
+        <div class="form-tip">Or enter image URL directly</div>
       </el-form-item>
 
-      <el-form-item label="图片 URL" prop="image_url">
+      <el-form-item label="Image URL" prop="image_url">
         <el-input
           v-model="form.image_url"
           placeholder="https://example.com/image.jpg"
@@ -48,26 +48,26 @@
         />
       </el-form-item>
 
-      <el-form-item label="视频提示词" prop="prompt">
+      <el-form-item label="Video Prompt" prop="prompt">
         <el-input
           v-model="form.prompt"
           type="textarea"
           :rows="5"
-          placeholder="描述视频中的动作和运镜&#10;例如：Camera slowly zooms in, wind blowing through hair, cinematic lighting"
+          placeholder="Describe the action and camera movement&#10;e.g. Camera slowly zooms in, wind blowing through hair, cinematic lighting"
           maxlength="2000"
           show-word-limit
         />
       </el-form-item>
 
-      <el-form-item label="AI 服务">
-        <el-select v-model="form.provider" placeholder="选择服务">
-          <el-option label="豆包视频" value="doubao" />
+      <el-form-item label="AI Service">
+        <el-select v-model="form.provider" placeholder="Select service">
+          <el-option label="Doubao Video" value="doubao" />
           <el-option label="Runway" value="runway" />
           <el-option label="Pika" value="pika" />
         </el-select>
       </el-form-item>
 
-      <el-form-item label="视频时长">
+      <el-form-item label="Duration">
         <el-slider
           v-model="form.duration"
           :min="3"
@@ -75,20 +75,20 @@
           :marks="durationMarks"
           show-stops
         />
-        <span class="slider-value">{{ form.duration }} 秒</span>
+        <span class="slider-value">{{ form.duration }}s</span>
       </el-form-item>
 
-      <el-form-item label="宽高比">
+      <el-form-item label="Aspect Ratio">
         <el-radio-group v-model="form.aspect_ratio">
-          <el-radio label="16:9">16:9 (横屏)</el-radio>
-          <el-radio label="9:16">9:16 (竖屏)</el-radio>
-          <el-radio label="1:1">1:1 (方形)</el-radio>
+          <el-radio label="16:9">16:9 (Landscape)</el-radio>
+          <el-radio label="9:16">9:16 (Portrait)</el-radio>
+          <el-radio label="1:1">1:1 (Square)</el-radio>
         </el-radio-group>
       </el-form-item>
 
       <el-collapse>
-        <el-collapse-item title="高级设置" name="advanced">
-          <el-form-item label="运动强度">
+        <el-collapse-item title="Advanced Settings" name="advanced">
+          <el-form-item label="Motion Level">
             <el-slider
               v-model="form.motion_level"
               :min="0"
@@ -98,35 +98,35 @@
             <span class="slider-value">{{ form.motion_level }}</span>
           </el-form-item>
 
-          <el-form-item label="镜头运动">
-            <el-select v-model="form.camera_motion" placeholder="选择镜头运动" clearable>
-              <el-option label="静止" value="static" />
-              <el-option label="推进 (Zoom In)" value="zoom_in" />
-              <el-option label="拉远 (Zoom Out)" value="zoom_out" />
-              <el-option label="左移 (Pan Left)" value="pan_left" />
-              <el-option label="右移 (Pan Right)" value="pan_right" />
-              <el-option label="上移 (Tilt Up)" value="tilt_up" />
-              <el-option label="下移 (Tilt Down)" value="tilt_down" />
-              <el-option label="环绕 (Orbit)" value="orbit" />
+          <el-form-item label="Camera Motion">
+            <el-select v-model="form.camera_motion" placeholder="Select camera motion" clearable>
+              <el-option label="Static" value="static" />
+              <el-option label="Zoom In" value="zoom_in" />
+              <el-option label="Zoom Out" value="zoom_out" />
+              <el-option label="Pan Left" value="pan_left" />
+              <el-option label="Pan Right" value="pan_right" />
+              <el-option label="Tilt Up" value="tilt_up" />
+              <el-option label="Tilt Down" value="tilt_down" />
+              <el-option label="Orbit" value="orbit" />
             </el-select>
           </el-form-item>
 
-          <el-form-item label="风格" v-if="form.provider === 'doubao'">
-            <el-input v-model="form.style" placeholder="例如：电影级、动画风格" />
+          <el-form-item label="Style" v-if="form.provider === 'doubao'">
+            <el-input v-model="form.style" placeholder="e.g. Cinematic, Anime style" />
           </el-form-item>
 
-          <el-form-item label="随机种子">
-            <el-input-number v-model="form.seed" :min="-1" placeholder="留空随机" />
-            <span class="form-tip">设置相同种子可复现视频</span>
+          <el-form-item label="Seed">
+            <el-input-number v-model="form.seed" :min="-1" placeholder="Leave empty for random" />
+            <span class="form-tip">Same seed reproduces the same video</span>
           </el-form-item>
         </el-collapse-item>
       </el-collapse>
     </el-form>
 
     <template #footer>
-      <el-button @click="handleClose">取消</el-button>
+      <el-button @click="handleClose">Cancel</el-button>
       <el-button type="primary" :loading="generating" @click="handleGenerate">
-        生成视频
+        Generate Video
       </el-button>
     </template>
   </el-dialog>
@@ -179,11 +179,11 @@ const form = reactive<GenerateVideoRequest & { image_gen_id?: number }>({
 
 const rules: FormRules = {
   drama_id: [
-    { required: true, message: '请选择剧本', trigger: 'change' }
+    { required: true, message: 'Please select a script', trigger: 'change' }
   ],
   prompt: [
-    { required: true, message: '请输入视频提示词', trigger: 'blur' },
-    { min: 5, message: '提示词至少5个字符', trigger: 'blur' }
+    { required: true, message: 'Please enter a video prompt', trigger: 'blur' },
+    { min: 5, message: 'Prompt must be at least 5 characters', trigger: 'blur' }
   ]
 }
 
@@ -195,9 +195,9 @@ const durationMarks = {
 }
 
 const motionMarks = {
-  0: '静态',
-  50: '适中',
-  100: '剧烈'
+  0: 'Still',
+  50: 'Medium',
+  100: 'Dynamic'
 }
 
 watch(() => props.modelValue, (val) => {
@@ -265,7 +265,7 @@ const handleGenerate = async () => {
   
   if (!formRef.value) {
     console.error('formRef is null')
-    ElMessage.error('表单初始化失败，请刷新页面重试')
+    ElMessage.error('Form initialization failed, please refresh the page')
     return
   }
 
@@ -292,12 +292,10 @@ const handleGenerate = async () => {
           provider: form.provider
         }
 
-        // 判断参考图模式
         if (form.image_url && form.image_url.trim()) {
           params.image_url = form.image_url
           params.reference_mode = 'single'
         } else {
-          // 纯文本生成，无参考图
           params.reference_mode = 'none'
         }
 
@@ -312,18 +310,18 @@ const handleGenerate = async () => {
         await videoAPI.generateVideo(params)
       }
       
-      ElMessage.success('视频生成任务已提交，请稍后查看结果')
+      ElMessage.success('Video generation task submitted, please check back shortly')
       emit('success')
       handleClose()
     } catch (error: any) {
       console.error('Video generation failed:', error)
-      ElMessage.error(error.response?.data?.message || error.message || '生成失败')
+      ElMessage.error(error.response?.data?.message || error.message || 'Generation failed')
     } finally {
       generating.value = false
     }
   } catch (error: any) {
     console.error('Form validation error:', error)
-    ElMessage.warning('请检查表单填写是否完整')
+    ElMessage.warning('Please check that all required fields are filled in')
   }
 }
 

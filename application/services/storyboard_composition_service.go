@@ -373,8 +373,7 @@ func (s *StoryboardCompositionService) GenerateSceneImage(req *GenerateSceneImag
 		// 使用场景的Prompt字段
 		prompt = scene.Prompt
 		if prompt == "" {
-			// 如果Prompt为空，使用Location和Time构建
-			prompt = fmt.Sprintf("%s场景，%s", scene.Location, scene.Time)
+			prompt = fmt.Sprintf("%s scene, %s", scene.Location, scene.Time)
 		}
 		s.log.Infow("Using scene prompt", "scene_id", req.SceneID, "prompt", prompt)
 	}

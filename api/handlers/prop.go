@@ -24,7 +24,6 @@ func NewPropHandler(db *gorm.DB, cfg *config.Config, log *logger.Logger, aiServi
 	}
 }
 
-// ListProps 获取道具列表
 func (h *PropHandler) ListProps(c *gin.Context) {
 	dramaIDStr := c.Query("drama_id")
 	if dramaIDStr == "" {
@@ -47,7 +46,6 @@ func (h *PropHandler) ListProps(c *gin.Context) {
 	response.Success(c, props)
 }
 
-// CreateProp 创建道具
 func (h *PropHandler) CreateProp(c *gin.Context) {
 	var prop models.Prop
 	if err := c.ShouldBindJSON(&prop); err != nil {
@@ -63,7 +61,6 @@ func (h *PropHandler) CreateProp(c *gin.Context) {
 	response.Created(c, prop)
 }
 
-// UpdateProp 更新道具
 func (h *PropHandler) UpdateProp(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -86,7 +83,6 @@ func (h *PropHandler) UpdateProp(c *gin.Context) {
 	response.Success(c, nil)
 }
 
-// DeleteProp 删除道具
 func (h *PropHandler) DeleteProp(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -103,7 +99,6 @@ func (h *PropHandler) DeleteProp(c *gin.Context) {
 	response.Success(c, nil)
 }
 
-// ExtractProps 提取道具
 func (h *PropHandler) ExtractProps(c *gin.Context) {
 	episodeIDStr := c.Param("episode_id")
 	episodeID, err := strconv.ParseUint(episodeIDStr, 10, 32)
@@ -121,7 +116,6 @@ func (h *PropHandler) ExtractProps(c *gin.Context) {
 	response.Success(c, gin.H{"task_id": taskID})
 }
 
-// GenerateImage 生成道具图片
 func (h *PropHandler) GenerateImage(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -137,10 +131,9 @@ func (h *PropHandler) GenerateImage(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, gin.H{"task_id": taskID, "message": "图片生成任务已提交"})
+	response.Success(c, gin.H{"task_id": taskID, "message": "Image generation task submitted"})
 }
 
-// AssociateProps 关联道具
 func (h *PropHandler) AssociateProps(c *gin.Context) {
 	storyboardIDStr := c.Param("id")
 	storyboardID, err := strconv.ParseUint(storyboardIDStr, 10, 32)

@@ -14,7 +14,7 @@
         <div class="header-actions">
           <el-button type="success" size="small" @click="showQuickSetupDialog">
             <el-icon><MagicStick /></el-icon>
-            <span>一键配置火宝</span>
+            <span>Quick Setup</span>
           </el-button>
           <el-button type="primary" size="small" @click="showCreateDialog">
             <el-icon><Plus /></el-icon>
@@ -68,22 +68,22 @@
     <!-- Quick Setup Dialog -->
     <el-dialog
       v-model="quickSetupVisible"
-      title="一键配置"
+      title="Quick Setup"
       width="500px"
       :close-on-click-modal="false"
       append-to-body
     >
       <div class="quick-setup-info">
-        <p>将自动创建以下配置：</p>
+        <p>The following configs will be created automatically:</p>
         <ul>
           <li>
-            <strong>文本服务</strong>: {{ providerConfigs.text[1].models[0] }}
+            <strong>Text Service</strong>: {{ providerConfigs.text[1].models[0] }}
           </li>
           <li>
-            <strong>图片服务</strong>: {{ providerConfigs.image[1].models[0] }}
+            <strong>Image Service</strong>: {{ providerConfigs.image[1].models[0] }}
           </li>
           <li>
-            <strong>视频服务</strong>: {{ providerConfigs.video[1].models[0] }}
+            <strong>Video Service</strong>: {{ providerConfigs.video[1].models[0] }}
           </li>
         </ul>
         <p class="quick-setup-tip">Base URL: https://api.chatfire.site/v1</p>
@@ -94,7 +94,7 @@
             v-model="quickSetupApiKey"
             type="password"
             show-password
-            placeholder="请输入 ChatFire API Key"
+            placeholder="Enter ChatFire API Key"
           />
         </el-form-item>
       </el-form>
@@ -105,16 +105,16 @@
             target="_blank"
             class="register-link"
           >
-            没有 API Key？点击注册
+            No API Key? Click to register
           </a>
           <div class="footer-buttons">
-            <el-button @click="quickSetupVisible = false">取消</el-button>
+            <el-button @click="quickSetupVisible = false">Cancel</el-button>
             <el-button
               type="primary"
               @click="handleQuickSetup"
               :loading="quickSetupLoading"
             >
-              确认配置
+              Confirm Setup
             </el-button>
           </div>
         </div>
@@ -222,7 +222,7 @@
             target="_blank"
             class="register-link"
           >
-            没有 API Key？点击注册
+            No API Key? Click to register
           </a>
           <div class="footer-buttons">
             <el-button @click="editDialogVisible = false">{{
@@ -339,7 +339,7 @@ const providerConfigs: Record<AIServiceType, ProviderConfig[]> = {
   image: [
     {
       id: "volcengine",
-      name: "火山引擎",
+      name: "Volcengine",
       models: ["doubao-seedream-4-5-251128", "doubao-seedream-4-0-250828"],
     },
     {
@@ -357,7 +357,7 @@ const providerConfigs: Record<AIServiceType, ProviderConfig[]> = {
   video: [
     {
       id: "volces",
-      name: "火山引擎",
+      name: "Volcengine",
       models: [
         "doubao-seedance-1-5-pro-251215",
         "doubao-seedance-1-0-lite-i2v-250428",
@@ -381,7 +381,7 @@ const providerConfigs: Record<AIServiceType, ProviderConfig[]> = {
     },
     {
       id: "minimax",
-      name: "MiniMax 海螺",
+      name: "MiniMax Hailuo",
       models: [
         "MiniMax-Hailuo-2.3",
         "MiniMax-Hailuo-2.3-Fast",
@@ -451,17 +451,17 @@ const fullEndpointExample = computed(() => {
 });
 
 const rules: FormRules = {
-  name: [{ required: true, message: "请输入配置名称", trigger: "blur" }],
-  provider: [{ required: true, message: "请选择厂商", trigger: "change" }],
+  name: [{ required: true, message: "Please enter config name", trigger: "blur" }],
+  provider: [{ required: true, message: "Please select provider", trigger: "change" }],
   base_url: [
-    { required: true, message: "请输入 Base URL", trigger: "blur" },
-    { type: "url", message: "请输入正确的 URL 格式", trigger: "blur" },
+    { required: true, message: "Please enter Base URL", trigger: "blur" },
+    { type: "url", message: "Please enter a valid URL", trigger: "blur" },
   ],
-  api_key: [{ required: true, message: "请输入 API Key", trigger: "blur" }],
+  api_key: [{ required: true, message: "Please enter API Key", trigger: "blur" }],
   model: [
     {
       required: true,
-      message: "请至少选择一个模型",
+      message: "Please select at least one model",
       trigger: "change",
       validator: (rule: any, value: any, callback: any) => {
         if (Array.isArray(value) && value.length > 0) {
@@ -469,7 +469,7 @@ const rules: FormRules = {
         } else if (typeof value === "string" && value.length > 0) {
           callback();
         } else {
-          callback(new Error("请至少选择一个模型"));
+          callback(new Error("Please select at least one model"));
         }
       },
     },
@@ -481,7 +481,7 @@ const loadConfigs = async () => {
   try {
     configs.value = await aiAPI.list(activeTab.value);
   } catch (error: any) {
-    ElMessage.error(error.message || "加载失败");
+    ElMessage.error(error.message || "Load failed");
   } finally {
     loading.value = false;
   }
@@ -499,9 +499,9 @@ const generateConfigName = (
   };
 
   const serviceNames: Record<AIServiceType, string> = {
-    text: "文本",
-    image: "图片",
-    video: "视频",
+    text: "Text",
+    image: "Image",
+    video: "Video",
   };
 
   const randomNum = Math.floor(Math.random() * 10000)
@@ -547,18 +547,18 @@ const handleEdit = (config: AIServiceConfig) => {
 
 const handleDelete = async (config: AIServiceConfig) => {
   try {
-    await ElMessageBox.confirm("确定要删除该配置吗？", "警告", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
+    await ElMessageBox.confirm("Delete this config?", "Warning", {
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
       type: "warning",
     });
 
     await aiAPI.delete(config.id);
-    ElMessage.success("删除成功");
+    ElMessage.success("Deleted");
     loadConfigs();
   } catch (error: any) {
     if (error !== "cancel") {
-      ElMessage.error(error.message || "删除失败");
+      ElMessage.error(error.message || "Delete failed");
     }
   }
 };
@@ -567,10 +567,10 @@ const handleToggleActive = async (config: AIServiceConfig) => {
   try {
     const newActiveState = !config.is_active;
     await aiAPI.update(config.id, { is_active: newActiveState });
-    ElMessage.success(newActiveState ? "已启用配置" : "已禁用配置");
+    ElMessage.success(newActiveState ? "Config enabled" : "Config disabled");
     await loadConfigs();
   } catch (error: any) {
-    ElMessage.error(error.message || "操作失败");
+    ElMessage.error(error.message || "Operation failed");
   }
 };
 
@@ -588,9 +588,9 @@ const testConnection = async () => {
       model: form.model,
       provider: form.provider,
     });
-    ElMessage.success("连接测试成功！");
+    ElMessage.success("Connection test successful");
   } catch (error: any) {
-    ElMessage.error(error.message || "连接测试失败");
+    ElMessage.error(error.message || "Connection test failed");
   } finally {
     testing.value = false;
   }
@@ -605,9 +605,9 @@ const handleTest = async (config: AIServiceConfig) => {
       model: config.model,
       provider: config.provider,
     });
-    ElMessage.success("连接测试成功！");
+    ElMessage.success("Connection test successful");
   } catch (error: any) {
-    ElMessage.error(error.message || "连接测试失败");
+    ElMessage.error(error.message || "Connection test failed");
   } finally {
     testing.value = false;
   }
@@ -632,17 +632,17 @@ const handleSubmit = async () => {
           is_active: form.is_active,
         };
         await aiAPI.update(editingId.value, updateData);
-        ElMessage.success("更新成功");
+        ElMessage.success("Updated");
       } else {
         await aiAPI.create(form);
-        ElMessage.success("创建成功");
+        ElMessage.success("Created");
       }
 
       editDialogVisible.value = false;
       loadConfigs();
       emit("config-updated");
     } catch (error: any) {
-      ElMessage.error(error.message || "操作失败");
+      ElMessage.error(error.message || "Operation failed");
     } finally {
       submitting.value = false;
     }
@@ -698,7 +698,7 @@ const showQuickSetupDialog = () => {
 
 const handleQuickSetup = async () => {
   if (!quickSetupApiKey.value.trim()) {
-    ElMessage.warning("请输入 API Key");
+    ElMessage.warning("Please enter API Key");
     return;
   }
 
@@ -732,9 +732,9 @@ const handleQuickSetup = async () => {
         model: [textProvider.models[0]],
         priority: 0,
       });
-      createdServices.push("文本");
+      createdServices.push("Text");
     } else {
-      skippedServices.push("文本");
+      skippedServices.push("Text");
     }
 
     // 创建图片配置（如果不存在）
@@ -754,9 +754,9 @@ const handleQuickSetup = async () => {
         model: [imageProvider.models[0]],
         priority: 0,
       });
-      createdServices.push("图片");
+      createdServices.push("Image");
     } else {
-      skippedServices.push("图片");
+      skippedServices.push("Image");
     }
 
     // 创建视频配置（如果不存在）
@@ -776,22 +776,22 @@ const handleQuickSetup = async () => {
         model: [videoProvider.models[0]],
         priority: 0,
       });
-      createdServices.push("视频");
+      createdServices.push("Video");
     } else {
-      skippedServices.push("视频");
+      skippedServices.push("Video");
     }
 
     // 显示结果消息
     if (createdServices.length > 0 && skippedServices.length > 0) {
       ElMessage.success(
-        `已创建 ${createdServices.join("、")} 配置，${skippedServices.join("、")} 配置已存在`,
+        `Created ${createdServices.join(", ")} configs; ${skippedServices.join(", ")} already exist`,
       );
     } else if (createdServices.length > 0) {
       ElMessage.success(
-        `一键配置成功！已创建 ${createdServices.join("、")} 服务配置`,
+        `Quick setup completed. Created ${createdServices.join(", ")} service configs`,
       );
     } else {
-      ElMessage.info("所有配置已存在，无需重复创建");
+      ElMessage.info("All configs already exist");
     }
 
     quickSetupVisible.value = false;
@@ -800,7 +800,7 @@ const handleQuickSetup = async () => {
       emit("config-updated");
     }
   } catch (error: any) {
-    ElMessage.error(error.message || "配置失败");
+    ElMessage.error(error.message || "Configuration failed");
   } finally {
     quickSetupLoading.value = false;
   }

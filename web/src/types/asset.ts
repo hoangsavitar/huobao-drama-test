@@ -88,7 +88,7 @@ export interface ListAssetsParams {
 }
 
 export const ASSET_CATEGORIES = {
-  image: ['角色', '场景', '道具', '背景', '其他'],
-  video: ['分镜', '特效', '片头', '片尾', '其他'],
-  audio: ['配音', '音效', '背景音乐', '片头曲', '片尾曲', '其他']
+  image: ['Character', 'Scene', 'Prop', 'Background', 'Other'],
+  video: ['Storyboard', 'Effect', 'Intro', 'Outro', 'Other'],
+  audio: ['Voiceover', 'Sound Effect', 'Background Music', 'Opening Theme', 'Ending Theme', 'Other']
 }

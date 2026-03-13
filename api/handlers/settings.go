@@ -20,11 +20,10 @@ func NewSettingsHandler(cfg *config.Config, log *logger.Logger) *SettingsHandler
 	}
 }
 
-// GetLanguage 获取当前系统语言
 func (h *SettingsHandler) GetLanguage(c *gin.Context) {
 	language := h.config.App.Language
 	if language == "" {
-		language = "zh" // 默认中文
+		language = "en"
 	}
 
 	response.Success(c, gin.H{
@@ -32,30 +31,26 @@ func (h *SettingsHandler) GetLanguage(c *gin.Context) {
 	})
 }
 
-// UpdateLanguage 更新系统语言
 func (h *SettingsHandler) UpdateLanguage(c *gin.Context) {
 	var req struct {
 		Language string `json:"language" binding:"required,oneof=zh en"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		response.BadRequest(c, "语言参数错误，只支持 zh 或 en")
+		response.BadRequest(c, "Invalid language parameter, only zh or en is allowed")
 		return
 	}
 
-	// 更新内存中的配置
 	h.config.App.Language = req.Language
 
-	// 更新配置文件
 	viper.Set("app.language", req.Language)
 	if err := viper.WriteConfig(); err != nil {
 		h.log.Warnw("Failed to write config file", "error", err)
-		// 即使写入文件失败，内存配置也已更新，仍然可用
 	}
 
 	h.log.Infow("System language updated", "language", req.Language)
 
-	message := "语言已切换为中文"
+	message := "Language switched to Chinese"
 	if req.Language == "en" {
 		message = "Language switched to English"
 	}

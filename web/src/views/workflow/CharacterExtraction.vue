@@ -62,25 +62,25 @@
       </div>
     </el-card>
 
-    <!-- 编辑对话框 -->
-    <el-dialog v-model="editDialogVisible" title="编辑角色" width="600px">
+    <!-- Edit dialog -->
+    <el-dialog v-model="editDialogVisible" title="Edit Character" width="600px">
       <el-form :model="editForm" label-width="80px">
-        <el-form-item label="姓名">
+        <el-form-item label="Name">
           <el-input v-model="editForm.name" />
         </el-form-item>
-        <el-form-item label="角色">
+        <el-form-item label="Role">
           <el-input v-model="editForm.role" />
         </el-form-item>
-        <el-form-item label="性格">
+        <el-form-item label="Personality">
           <el-input v-model="editForm.personality" type="textarea" :rows="3" />
         </el-form-item>
-        <el-form-item label="外貌">
+        <el-form-item label="Appearance">
           <el-input v-model="editForm.appearance" type="textarea" :rows="3" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="editDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="saveCharacter">保存</el-button>
+        <el-button @click="editDialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="saveCharacter">Save</el-button>
       </template>
     </el-dialog>
   </div>
@@ -128,11 +128,11 @@ const addCharacter = () => {
 const saveCharacters = async () => {
   saving.value = true
   try {
-    // TODO: 调用保存角色API
+    // TODO: Call save character API
     await new Promise(resolve => setTimeout(resolve, 1000))
-    ElMessage.success('保存成功')
+    ElMessage.success('Saved successfully')
   } catch (error: any) {
-    ElMessage.error(error.message || '保存失败')
+    ElMessage.error(error.message || 'Save failed')
   } finally {
     saving.value = false
   }
@@ -144,9 +144,9 @@ const editCharacter = (character: Character) => {
 }
 
 const saveCharacter = () => {
-  // TODO: 保存角色信息
+  // TODO: Save character info
   editDialogVisible.value = false
-  ElMessage.success('保存成功')
+  ElMessage.success('Saved successfully')
 }
 
 const generateCharacterImage = (character: Character) => {
@@ -158,7 +158,7 @@ const goToNextStep = () => {
 }
 
 onMounted(() => {
-  // TODO: 加载已有角色
+  // TODO: Load existing characters
 })
 </script>
 

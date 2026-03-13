@@ -112,7 +112,7 @@
     <!-- 右侧参数面板 -->
     <div class="right-panel">
       <el-tabs v-model="activeTab" class="panel-tabs">
-        <el-tab-pane label="基础信息" name="info">
+        <el-tab-pane label="Basic Info" name="info">
           <div class="param-section" v-if="currentShot">
             <div class="param-group">
               <label>镜号</label>
@@ -121,32 +121,32 @@
             <div class="param-group">
               <label>景别</label>
               <el-select v-model="currentShot.shot_type" size="small" @change="handleShotUpdateImmediate">
-                <el-option label="特写" value="特写" />
-                <el-option label="近景" value="近景" />
-                <el-option label="中景" value="中景" />
-                <el-option label="全景" value="全景" />
-                <el-option label="远景" value="远景" />
+                <el-option label="Extreme Close Up" value="Extreme Close Up" />
+                <el-option label="Close Up" value="Close Up" />
+                <el-option label="Medium Shot" value="Medium Shot" />
+                <el-option label="Full Shot" value="Full Shot" />
+                <el-option label="Long Shot" value="Long Shot" />
               </el-select>
             </div>
             <div class="param-group">
               <label>镜头角度</label>
               <el-select v-model="currentShot.angle" size="small" @change="handleShotUpdateImmediate">
-                <el-option label="平视" value="平视" />
-                <el-option label="仰视" value="仰视" />
-                <el-option label="俯视" value="俯视" />
-                <el-option label="侧面" value="侧面" />
-                <el-option label="背面" value="背面" />
+                <el-option label="Eye Level" value="Eye Level" />
+                <el-option label="Low Angle" value="Low Angle" />
+                <el-option label="High Angle" value="High Angle" />
+                <el-option label="Side View" value="Side View" />
+                <el-option label="Back View" value="Back View" />
               </el-select>
             </div>
             <div class="param-group">
               <label>运镜方式</label>
               <el-select v-model="currentShot.movement" size="small" @change="handleShotUpdateImmediate">
-                <el-option label="固定镜头" value="固定镜头" />
-                <el-option label="推镜" value="推镜" />
-                <el-option label="拉镜" value="拉镜" />
-                <el-option label="摇镜" value="摇镜" />
-                <el-option label="跟镜" value="跟镜" />
-                <el-option label="移镜" value="移镜" />
+                <el-option label="Static Shot" value="Static Shot" />
+                <el-option label="Push In" value="Push In" />
+                <el-option label="Pull Out" value="Pull Out" />
+                <el-option label="Pan Shot" value="Pan Shot" />
+                <el-option label="Follow Shot" value="Follow Shot" />
+                <el-option label="Tracking Shot" value="Tracking Shot" />
               </el-select>
             </div>
             <div class="param-row">
@@ -169,7 +169,7 @@
                 type="textarea" 
                 :rows="2"
                 size="small"
-                placeholder="角色对话或旁白"
+                placeholder="Character dialogue or narration"
                 @blur="handleShotUpdateImmediate"
               />
             </div>
@@ -203,7 +203,7 @@
                 type="textarea" 
                 :rows="2"
                 size="small"
-                placeholder="描述光线、色调、声音环境等"
+                placeholder="Describe lighting, color tone, ambient sound, etc."
                 @blur="handleShotUpdateImmediate"
               />
             </div>
@@ -220,7 +220,7 @@
           </div>
         </el-tab-pane>
 
-        <el-tab-pane label="场景制作" name="scene">
+        <el-tab-pane label="Scene Production" name="scene">
           <div class="param-section" v-if="currentShot">
             <!-- 人物选择 -->
             <div class="section-title">人物设置</div>
@@ -229,7 +229,7 @@
               <el-select 
                 v-model="selectedCharacters" 
                 multiple 
-                placeholder="选择出现的角色"
+                placeholder="Select appearing characters"
                 size="small"
                 style="width: 100%"
               >
@@ -302,7 +302,7 @@
                 v-model="backgroundPrompt" 
                 type="textarea" 
                 :rows="2"
-                placeholder="描述场景背景"
+                placeholder="Describe scene background"
                 size="small"
               />
             </div>
@@ -327,7 +327,7 @@
             
             <div class="param-group" v-if="!currentShot.background_url">
               <el-alert
-                title="请先生成背景图"
+                title="Generate background image first"
                 type="warning"
                 :closable="false"
                 show-icon
@@ -335,7 +335,7 @@
             </div>
             <div class="param-group" v-else-if="selectedCharacters.length === 0">
               <el-alert
-                title="请先选择场景角色"
+                title="Select scene characters first"
                 type="warning"
                 :closable="false"
                 show-icon
@@ -357,7 +357,7 @@
           </div>
         </el-tab-pane>
 
-        <el-tab-pane label="视频生成" name="video">
+        <el-tab-pane label="Video Generation" name="video">
           <div class="param-section" v-if="currentShot">
             <div class="param-group">
               <label>视频预览</label>
@@ -375,7 +375,7 @@
             
             <div class="param-group" v-if="!currentShot.background_url">
               <el-alert
-                title="请先生成背景图"
+                title="Generate background image first"
                 type="warning"
                 :closable="false"
                 show-icon
@@ -383,7 +383,7 @@
             </div>
             <div class="param-group" v-else-if="selectedCharacters.length === 0">
               <el-alert
-                title="建议选择场景角色以生成更完整的视频"
+                title="Select scene characters for a fuller video"
                 type="info"
                 :closable="false"
                 show-icon
@@ -495,8 +495,8 @@ const toggleVideoPlay = () => {
 
 const router = useRouter()
 
-const cameraIcons = ['正面', '侧面', '俯视', '仰视', '特写', '远景']
-const motionIcons = ['静止', '推进', '拉远', '平移', '跟随', '环绕']
+const cameraIcons = ['Front', 'Side', 'High', 'Low', 'Close', 'Long']
+const motionIcons = ['Static', 'Push', 'Pull', 'Pan', 'Follow', 'Orbit']
 
 const handleBack = () => {
   if (props.dramaId) {
@@ -568,7 +568,7 @@ const autoSelectCharacters = () => {
 
 // 测试函数：不使用防抖，立即触发
 const handleShotUpdateImmediate = async () => {
-  console.log('=== handleShotUpdate 被触发 ===')
+  console.log("=== handleShotUpdate triggered ===")
   
   if (!currentShot.value) {
     console.warn('handleShotUpdate: currentShot.value is null')
@@ -598,7 +598,7 @@ const handleShotUpdateImmediate = async () => {
     if (currentShot.value.bgm_prompt !== undefined) updateData.bgm_prompt = currentShot.value.bgm_prompt
     if (currentShot.value.sound_effect !== undefined) updateData.sound_effect = currentShot.value.sound_effect
     
-    console.log('调用更新接口:', {
+    console.log("Calling update API:", {
       storyboard_id: currentShot.value.id,
       updateData
     })
@@ -606,10 +606,10 @@ const handleShotUpdateImmediate = async () => {
     await dramaAPI.updateStoryboard(currentShot.value.id.toString(), updateData)
     
     emit('update:storyboard', currentShot.value)
-    ElMessage.success('分镜更新成功')
+    ElMessage.success("Storyboard updated")
   } catch (error: any) {
-    console.error('更新分镜失败:', error)
-    ElMessage.error(error.message || '更新失败')
+    console.error("Failed to update storyboard:", error)
+    ElMessage.error(error.message || "Update failed")
   }
 }
 
@@ -642,7 +642,7 @@ const handleShotUpdate = debounce(async () => {
     if (currentShot.value.bgm_prompt !== undefined) updateData.bgm_prompt = currentShot.value.bgm_prompt
     if (currentShot.value.sound_effect !== undefined) updateData.sound_effect = currentShot.value.sound_effect
     
-    console.log('调用更新接口:', {
+    console.log("Calling update API:", {
       storyboard_id: currentShot.value.id,
       updateData
     })
@@ -650,16 +650,16 @@ const handleShotUpdate = debounce(async () => {
     await dramaAPI.updateStoryboard(currentShot.value.id.toString(), updateData)
     
     emit('update:storyboard', currentShot.value)
-    ElMessage.success('分镜更新成功')
+    ElMessage.success("Storyboard updated")
   } catch (error: any) {
-    console.error('更新分镜失败:', error)
-    ElMessage.error(error.message || '更新失败')
+    console.error("Failed to update storyboard:", error)
+    ElMessage.error(error.message || "Update failed")
   }
 }, 500)
 
 // 使用立即触发版本进行测试
 const testUpdate = () => {
-  console.log('testUpdate 被调用')
+  console.log("testUpdate called")
   handleShotUpdateImmediate()
 }
 
@@ -673,35 +673,35 @@ const generating = ref(false)
 
 const handleGenerateBackground = async () => {
   if (!currentShot.value || !currentShot.value.id) {
-    ElMessage.warning('请先选择一个镜头')
+    ElMessage.warning("Please select a shot first")
     return
   }
 
   // 检查是否有 background_id
   if (!currentShot.value.background_id) {
-    ElMessage.warning('该镜头未关联背景信息，请先提取背景')
+    ElMessage.warning("This shot is not linked to a background. Extract backgrounds first")
     return
   }
 
   // 检查是否有背景描述
   if (!backgroundPrompt.value) {
-    ElMessage.warning('背景描述为空，请先填写背景描述')
+    ElMessage.warning("Background description is empty")
     return
   }
 
   try {
     await ElMessageBox.confirm(
-      `将使用以下描述生成背景图片：\n\n${backgroundPrompt.value}\n\n是否继续？`,
-      '生成背景',
+      `Generate background image with this prompt:\n\n${backgroundPrompt.value}\n\nContinue?`,
+      "Generate Background",
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: "Confirm",
+        cancelButtonText: "Cancel",
         type: 'info'
       }
     )
 
     generating.value = true
-    ElMessage.info('正在生成背景图片...')
+    ElMessage.info("Generating background image...")
     
     if (props.dramaId) {
       // 使用 background_id 和 backgrounds 表中的中文 prompt
@@ -716,11 +716,11 @@ const handleGenerateBackground = async () => {
       )
     }
     
-    ElMessage.success('背景图片生成成功')
+    ElMessage.success("Background image generated")
     emit('refresh')
   } catch (error: any) {
     if (error !== 'cancel') {
-      ElMessage.error(error.message || '生成失败')
+      ElMessage.error(error.message || "Generation failed")
     }
   } finally {
     generating.value = false
@@ -729,43 +729,43 @@ const handleGenerateBackground = async () => {
 
 const handleGenerateVideo = async () => {
   if (!currentShot.value || !currentShot.value.id) {
-    ElMessage.warning('请先选择一个镜头')
+    ElMessage.warning("Please select a shot first")
     return
   }
 
   if (!currentShot.value.background_url) {
-    ElMessage.warning('请先生成背景图片')
+    ElMessage.warning("Generate background image first")
     return
   }
 
   try {
     const characterInfo = selectedCharacters.value.length > 0
-      ? `\n角色：${selectedCharacters.value.map(id => getCharacterById(id)?.name).filter(Boolean).join('、')}`
+      ? `\nCharacters: ${selectedCharacters.value.map(id => getCharacterById(id)?.name).filter(Boolean).join(", ")}`
       : ''
     
     await ElMessageBox.confirm(
-      `将生成视频：\n场景：${currentShot.value.location}\n动作：${currentShot.value.action}${characterInfo}\n\n预计需要1-3分钟，是否继续？`,
-      '视频生成',
+      `Generate video:\nScene: ${currentShot.value.location}\nAction: ${currentShot.value.action}${characterInfo}\n\nEstimated 1-3 minutes. Continue?`,
+      "Generate Video",
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: "Confirm",
+        cancelButtonText: "Cancel",
         type: 'success'
       }
     )
 
     generating.value = true
-    ElMessage.info('正在生成视频...')
+    ElMessage.info("Generating video...")
     
     await videoAPI.generateVideo({
       scene_id: parseInt(currentShot.value.id),
       prompt: currentShot.value.action
     })
     
-    ElMessage.success('视频生成任务已创建，请稍后查看')
+    ElMessage.success("Video generation task created. Check back shortly.")
     emit('refresh')
   } catch (error: any) {
     if (error !== 'cancel') {
-      ElMessage.error(error.message || '生成失败')
+      ElMessage.error(error.message || "Generation failed")
     }
   } finally {
     generating.value = false
@@ -773,7 +773,7 @@ const handleGenerateVideo = async () => {
 }
 
 const handleUploadBackground = () => {
-  ElMessage.info('上传功能开发中')
+  ElMessage.info("Upload feature is under development")
 }
 
 const getCharacterById = (id: string) => {
@@ -784,12 +784,12 @@ const handleComposeScene = async () => {
   if (!currentShot.value) return
   
   if (!currentShot.value.background_url) {
-    ElMessage.warning('请先生成背景图')
+    ElMessage.warning("Generate background image first")
     return
   }
   
   if (selectedCharacters.length === 0) {
-    ElMessage.warning('请先选择场景角色')
+    ElMessage.warning("Select scene characters first")
     return
   }
   
@@ -800,26 +800,26 @@ const handleComposeScene = async () => {
       .join('、')
     
     await ElMessageBox.confirm(
-      `将合成以下内容：\n背景：${currentShot.value.location}\n角色：${characterNames}\n\n是否继续？`,
-      '场景合成',
+      `Compose scene with:\nBackground: ${currentShot.value.location}\nCharacters: ${characterNames}\n\nContinue?`,
+      "Compose Scene",
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: "Confirm",
+        cancelButtonText: "Cancel",
         type: 'info'
       }
     )
     
     generating.value = true
-    ElMessage.info('正在合成场景...')
+    ElMessage.info("Composing scene...")
     
     // TODO: 调用场景合成API
     // await compositionAPI.composeScene(currentShot.value.id, selectedCharacters.value)
     
-    ElMessage.success('场景合成成功')
+    ElMessage.success("Scene composed")
     emit('refresh')
   } catch (error: any) {
     if (error !== 'cancel') {
-      ElMessage.error(error.message || '合成失败')
+      ElMessage.error(error.message || "Composition failed")
     }
   } finally {
     generating.value = false
@@ -831,16 +831,16 @@ const handleRegenerateShot = async () => {
   
   try {
     await ElMessageBox.confirm(
-      '重新生成将清空当前镜头的背景和视频，是否继续？',
-      '重新生成',
+      "Regeneration will clear current background and video for this shot. Continue?",
+      "Regenerate",
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: "Confirm",
+        cancelButtonText: "Cancel",
         type: 'warning'
       }
     )
     
-    ElMessage.info('功能开发中')
+    ElMessage.info("Feature under development")
   } catch {
     // 用户取消
   }
@@ -856,7 +856,7 @@ const loadBackgrounds = async () => {
     // 加载完背景数据后，重新加载当前背景描述
     loadBackgroundPrompt()
   } catch (error) {
-    console.error('加载背景数据失败:', error)
+    console.error("Failed to load background data:", error)
   }
 }
 
@@ -873,7 +873,7 @@ onMounted(async () => {
       // 加载完角色后，自动选择当前镜头相关的角色
       autoSelectCharacters()
     } catch (error) {
-      console.error('加载角色失败:', error)
+      console.error("Failed to load characters:", error)
     }
   }
 })

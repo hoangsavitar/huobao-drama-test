@@ -25,20 +25,16 @@ func NewStoryboardHandler(db *gorm.DB, cfg *config.Config, log *logger.Logger) *
 	}
 }
 
-// GenerateStoryboard 生成分镜头（异步）
 func (h *StoryboardHandler) GenerateStoryboard(c *gin.Context) {
 	episodeID := c.Param("episode_id")
 
-	// 接收可选的 model 参数
 	var req struct {
 		Model string `json:"model"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		// 如果没有提供body或者解析失败，使用空字符串（使用默认模型）
 		req.Model = ""
 	}
 
-	// 调用生成服务，该服务已经是异步的，会返回任务ID
 	taskID, err := h.storyboardService.GenerateStoryboard(episodeID, req.Model)
 	if err != nil {
 		h.log.Errorw("Failed to generate storyboard", "error", err, "episode_id", episodeID)
@@ -46,15 +42,13 @@ func (h *StoryboardHandler) GenerateStoryboard(c *gin.Context) {
 		return
 	}
 
-	// 立即返回任务ID
 	response.Success(c, gin.H{
 		"task_id": taskID,
 		"status":  "pending",
-		"message": "分镜头生成任务已创建，正在后台处理...",
+		"message": "Storyboard generation task created and processing in background...",
 	})
 }
 
-// UpdateStoryboard 更新分镜
 func (h *StoryboardHandler) UpdateStoryboard(c *gin.Context) {
 	storyboardID := c.Param("id")
 
@@ -75,7 +69,6 @@ func (h *StoryboardHandler) UpdateStoryboard(c *gin.Context) {
 	response.Success(c, gin.H{"message": "Storyboard updated successfully"})
 }
 
-// CreateStoryboard 创建分镜
 func (h *StoryboardHandler) CreateStoryboard(c *gin.Context) {
 	var req services.CreateStoryboardRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -93,7 +86,6 @@ func (h *StoryboardHandler) CreateStoryboard(c *gin.Context) {
 	response.Created(c, sb)
 }
 
-// DeleteStoryboard 删除分镜
 func (h *StoryboardHandler) DeleteStoryboard(c *gin.Context) {
 	storyboardIDStr := c.Param("id")
 	storyboardID, err := strconv.ParseUint(storyboardIDStr, 10, 32)

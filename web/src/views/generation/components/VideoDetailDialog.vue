@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="visible"
-    title="视频详情"
+    title="Video Details"
     width="1000px"
     @close="handleClose"
   >
@@ -18,24 +18,24 @@
               loop
               :poster="video.first_frame_url"
             >
-              您的浏览器不支持视频播放
+              Your browser does not support video playback
             </video>
 
             <div v-else-if="video.status === 'processing'" class="video-status">
               <el-icon class="loading-icon"><Loading /></el-icon>
-              <span>生成中，请稍候...</span>
-              <div class="status-message">预计需要 1-3 分钟</div>
+              <span>Generating, please wait...</span>
+              <div class="status-message">Estimated 1-3 minutes</div>
             </div>
 
             <div v-else-if="video.status === 'failed'" class="video-status error">
               <el-icon><CircleClose /></el-icon>
-              <span>生成失败</span>
+              <span>Generation failed</span>
               <div class="error-message">{{ video.error_msg }}</div>
             </div>
 
             <div v-else class="video-status">
               <el-icon><VideoCamera /></el-icon>
-              <span>等待生成</span>
+              <span>Pending</span>
             </div>
           </div>
         </el-col>
@@ -43,29 +43,29 @@
         <el-col :span="8">
           <div class="video-info">
             <el-descriptions :column="1" border>
-              <el-descriptions-item label="状态">
+              <el-descriptions-item label="Status">
                 <el-tag :type="getStatusType(video.status)">
                   {{ getStatusText(video.status) }}
                 </el-tag>
               </el-descriptions-item>
 
-              <el-descriptions-item label="AI 服务">
+              <el-descriptions-item label="AI Service">
                 {{ video.provider }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="模型" v-if="video.model">
+              <el-descriptions-item label="Model" v-if="video.model">
                 {{ video.model }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="时长" v-if="video.duration">
-                {{ video.duration }} 秒
+              <el-descriptions-item label="Duration" v-if="video.duration">
+                {{ video.duration }}s
               </el-descriptions-item>
 
-              <el-descriptions-item label="宽高比" v-if="video.aspect_ratio">
+              <el-descriptions-item label="Aspect Ratio" v-if="video.aspect_ratio">
                 {{ video.aspect_ratio }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="分辨率" v-if="video.width && video.height">
+              <el-descriptions-item label="Resolution" v-if="video.width && video.height">
                 {{ video.width }} × {{ video.height }}
               </el-descriptions-item>
 
@@ -73,27 +73,27 @@
                 {{ video.fps }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="运动强度" v-if="video.motion_level !== undefined">
+              <el-descriptions-item label="Motion Level" v-if="video.motion_level !== undefined">
                 {{ video.motion_level }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="镜头运动" v-if="video.camera_motion">
+              <el-descriptions-item label="Camera Motion" v-if="video.camera_motion">
                 {{ getCameraMotionText(video.camera_motion) }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="风格" v-if="video.style">
+              <el-descriptions-item label="Style" v-if="video.style">
                 {{ video.style }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="随机种子" v-if="video.seed">
+              <el-descriptions-item label="Seed" v-if="video.seed">
                 {{ video.seed }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="创建时间">
+              <el-descriptions-item label="Created At">
                 {{ formatDateTime(video.created_at) }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="完成时间" v-if="video.completed_at">
+              <el-descriptions-item label="Completed At" v-if="video.completed_at">
                 {{ formatDateTime(video.completed_at) }}
               </el-descriptions-item>
             </el-descriptions>
@@ -101,12 +101,12 @@
             <el-divider />
 
             <div class="prompt-section">
-              <h4>视频提示词</h4>
+              <h4>Video Prompt</h4>
               <div class="prompt-text">{{ video.prompt }}</div>
             </div>
 
             <div v-if="video.image_url" class="image-section">
-              <h4>源图片</h4>
+              <h4>Source Image</h4>
               <el-image
                 :src="video.image_url"
                 fit="contain"
@@ -120,14 +120,14 @@
     </div>
 
     <template #footer>
-      <el-button @click="handleClose">关闭</el-button>
+      <el-button @click="handleClose">Close</el-button>
       <el-button
         v-if="video?.status === 'completed' && video?.video_url"
         type="primary"
         @click="downloadVideo"
       >
         <el-icon><Download /></el-icon>
-        下载视频
+        Download Video
       </el-button>
       <el-button
         v-if="video?.status === 'completed'"
@@ -135,7 +135,7 @@
         @click="regenerate"
       >
         <el-icon><Refresh /></el-icon>
-        重新生成
+        Regenerate
       </el-button>
     </template>
   </el-dialog>
@@ -179,10 +179,10 @@ const getStatusType = (status: VideoStatus) => {
 
 const getStatusText = (status: VideoStatus) => {
   const texts: Record<VideoStatus, string> = {
-    pending: '等待中',
-    processing: '生成中',
-    completed: '已完成',
-    failed: '失败'
+    pending: 'Pending',
+    processing: 'Generating',
+    completed: 'Completed',
+    failed: 'Failed'
   }
   return texts[status]
 }
@@ -193,7 +193,7 @@ const getCameraMotionText = (motion: string) => {
 }
 
 const formatDateTime = (dateString: string) => {
-  return new Date(dateString).toLocaleString('zh-CN')
+  return new Date(dateString).toLocaleString('en-US')
 }
 
 const downloadVideo = () => {

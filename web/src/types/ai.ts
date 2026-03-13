@@ -1,14 +1,14 @@
 export interface AIServiceConfig {
   id: number
   service_type: AIServiceType
-  provider?: string  // 厂商标识
+  provider?: string
   name: string
   base_url: string
   api_key: string
-  model: string | string[]  // 支持单个或多个模型
+  model: string | string[]
   endpoint: string
-  query_endpoint?: string  // 异步查询端点（用于视频等异步任务）
-  priority: number  // 优先级，数值越大优先级越高
+  query_endpoint?: string
+  priority: number
   is_active: boolean
   settings?: string
   created_at: string
@@ -19,26 +19,26 @@ export type AIServiceType = 'text' | 'image' | 'video'
 
 export interface CreateAIConfigRequest {
   service_type: AIServiceType
-  provider?: string  // 厂商标识
+  provider?: string
   name: string
   base_url: string
   api_key: string
-  model: string | string[]  // 支持单个或多个模型
+  model: string | string[]
   endpoint?: string
-  query_endpoint?: string  // 异步查询端点（用于视频等异步任务）
-  priority?: number  // 优先级，数值越大优先级越高
+  query_endpoint?: string
+  priority?: number
   settings?: string
 }
 
 export interface UpdateAIConfigRequest {
   name?: string
-  provider?: string  // 厂商标识
+  provider?: string
   base_url?: string
   api_key?: string
-  model?: string | string[]  // 支持单个或多个模型
+  model?: string | string[]
   endpoint?: string
-  query_endpoint?: string  // 异步查询端点（用于视频等异步任务）
-  priority?: number  // 优先级，数值越大优先级越高
+  query_endpoint?: string
+  priority?: number
   is_active?: boolean
   settings?: string
 }
@@ -46,10 +46,10 @@ export interface UpdateAIConfigRequest {
 export interface TestConnectionRequest {
   base_url: string
   api_key: string
-  model: string | string[]  // 支持单个或多个模型
-  provider?: string  // 厂商标识
+  model: string | string[]
+  provider?: string
   endpoint?: string
-  query_endpoint?: string  // 异步查询端点（用于视频等异步任务）
+  query_endpoint?: string
 }
 
 export interface AIServiceProvider {

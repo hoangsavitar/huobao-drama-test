@@ -1,8 +1,8 @@
 <template>
   <div class="scene-images-container">
-    <el-page-header @back="goBack" title="返回项目">
+    <el-page-header @back="goBack" title="Back to Project">
       <template #content>
-        <h2>场景图片生成</h2>
+        <h2>Scene Image Generation</h2>
       </template>
     </el-page-header>
 
@@ -11,7 +11,7 @@
         <el-tab-pane
           v-for="episode in episodes"
           :key="episode.id"
-          :label="`第${episode.episode_number}集`"
+          :label="`Episode ${episode.episode_number}`"
           :name="episode.id"
         >
           <el-row :gutter="20">
@@ -24,7 +24,7 @@
                 <template #header>
                   <div class="scene-header">
                     <span class="scene-number"
-                      >场景 {{ scene.storyboard_number }}</span
+                      >Scene {{ scene.storyboard_number }}</span
                     >
                     <el-tag size="small">{{ scene.location }}</el-tag>
                   </div>
@@ -38,7 +38,7 @@
                   />
                   <div v-else class="placeholder">
                     <el-icon :size="48"><Picture /></el-icon>
-                    <p>未生成</p>
+                    <p>Not generated</p>
                   </div>
                 </div>
 
@@ -54,7 +54,7 @@
                   :disabled="!!generatingId && generatingId !== scene.id"
                   style="width: 100%"
                 >
-                  {{ hasImage(scene) ? "重新生成" : "生成图片" }}
+                  {{ hasImage(scene) ? "Regenerate" : "Generate Image" }}
                 </el-button>
               </el-card>
             </el-col>
@@ -69,7 +69,7 @@
           @click="goToNextStep"
           :disabled="!allImagesGenerated"
         >
-          下一步：视频生成
+          Next: Video Generation
         </el-button>
       </div>
     </el-card>
@@ -105,7 +105,6 @@ const generateImage = async (scene: Scene) => {
   try {
     const { imageAPI } = await import("@/api/image");
 
-    // 构建场景提示词
     let prompt = `${scene.location}, ${scene.time}`;
     if (scene.description) {
       prompt += `, ${scene.description}`;
@@ -118,9 +117,9 @@ const generateImage = async (scene: Scene) => {
       prompt: prompt,
     });
 
-    ElMessage.success("场景图片生成任务已提交");
+    ElMessage.success("Scene image generation submitted");
   } catch (error: any) {
-    ElMessage.error(error.message || "生成失败");
+    ElMessage.error(error.message || "Generation failed");
   } finally {
     generatingId.value = undefined;
   }
@@ -131,7 +130,7 @@ const goToNextStep = () => {
 };
 
 onMounted(() => {
-  // TODO: 加载剧集和场景列表
+  // TODO: Load episodes and scenes list
   episodes.value = [];
 });
 </script>

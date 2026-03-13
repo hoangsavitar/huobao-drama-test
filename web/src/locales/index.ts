@@ -2,21 +2,21 @@ import { createI18n } from 'vue-i18n'
 import zhCN from './zh-CN'
 import enUS from './en-US'
 
-// 从 localStorage 获取保存的语言，默认为中文
+// Get stored language from localStorage, default to English
 const getStoredLanguage = (): string => {
   const stored = localStorage.getItem('language')
   if (stored) return stored
   
-  // 自动检测浏览器语言
+  // Auto-detect browser language
   const browserLang = navigator.language.toLowerCase()
   if (browserLang.startsWith('zh')) return 'zh-CN'
   return 'en-US'
 }
 
 const i18n = createI18n({
-  legacy: false, // 使用 Composition API 模式
+  legacy: false, // Use Composition API mode
   locale: getStoredLanguage(),
-  fallbackLocale: 'zh-CN',
+  fallbackLocale: 'en-US',
   messages: {
     'zh-CN': zhCN,
     'en-US': enUS
@@ -25,7 +25,7 @@ const i18n = createI18n({
 
 export default i18n
 
-// 导出语言切换函数
+// Export language switch function
 export const setLanguage = (lang: string) => {
   i18n.global.locale.value = lang as any
   localStorage.setItem('language', lang)

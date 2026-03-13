@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="visible"
-    title="图片详情"
+    title="Image Details"
     width="900px"
     @close="handleClose"
   >
@@ -19,19 +19,19 @@
               <template #error>
                 <div class="image-error">
                   <el-icon><PictureFilled /></el-icon>
-                  <span>加载失败</span>
+                  <span>Load failed</span>
                 </div>
               </template>
             </el-image>
 
             <div v-else-if="image.status === 'processing'" class="image-status">
               <el-icon class="loading-icon"><Loading /></el-icon>
-              <span>生成中，请稍候...</span>
+              <span>Generating, please wait...</span>
             </div>
 
             <div v-else-if="image.status === 'failed'" class="image-status error">
               <el-icon><CircleClose /></el-icon>
-              <span>生成失败</span>
+              <span>Generation failed</span>
               <div class="error-message">{{ image.error_msg }}</div>
             </div>
           </div>
@@ -40,37 +40,37 @@
         <el-col :span="10">
           <div class="image-info">
             <el-descriptions :column="1" border>
-              <el-descriptions-item label="状态">
+              <el-descriptions-item label="Status">
                 <el-tag :type="getStatusType(image.status)">
                   {{ getStatusText(image.status) }}
                 </el-tag>
               </el-descriptions-item>
 
-              <el-descriptions-item label="AI 服务">
+              <el-descriptions-item label="AI Service">
                 {{ image.provider }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="模型" v-if="image.model">
+              <el-descriptions-item label="Model" v-if="image.model">
                 {{ image.model }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="尺寸" v-if="image.size">
+              <el-descriptions-item label="Size" v-if="image.size">
                 {{ image.size }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="分辨率" v-if="image.width && image.height">
+              <el-descriptions-item label="Resolution" v-if="image.width && image.height">
                 {{ image.width }} × {{ image.height }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="质量" v-if="image.quality">
+              <el-descriptions-item label="Quality" v-if="image.quality">
                 {{ image.quality }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="风格" v-if="image.style">
+              <el-descriptions-item label="Style" v-if="image.style">
                 {{ image.style }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="采样步数" v-if="image.steps">
+              <el-descriptions-item label="Steps" v-if="image.steps">
                 {{ image.steps }}
               </el-descriptions-item>
 
@@ -78,15 +78,15 @@
                 {{ image.cfg_scale }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="随机种子" v-if="image.seed">
+              <el-descriptions-item label="Seed" v-if="image.seed">
                 {{ image.seed }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="创建时间">
+              <el-descriptions-item label="Created At">
                 {{ formatDateTime(image.created_at) }}
               </el-descriptions-item>
 
-              <el-descriptions-item label="完成时间" v-if="image.completed_at">
+              <el-descriptions-item label="Completed At" v-if="image.completed_at">
                 {{ formatDateTime(image.completed_at) }}
               </el-descriptions-item>
             </el-descriptions>
@@ -94,12 +94,12 @@
             <el-divider />
 
             <div class="prompt-section">
-              <h4>提示词</h4>
+              <h4>Prompt</h4>
               <div class="prompt-text">{{ image.prompt }}</div>
             </div>
 
             <div v-if="image.negative_prompt" class="prompt-section">
-              <h4>反向提示词</h4>
+              <h4>Negative Prompt</h4>
               <div class="prompt-text">{{ image.negative_prompt }}</div>
             </div>
           </div>
@@ -108,14 +108,14 @@
     </div>
 
     <template #footer>
-      <el-button @click="handleClose">关闭</el-button>
+      <el-button @click="handleClose">Close</el-button>
       <el-button
         v-if="image?.status === 'completed' && image?.image_url"
         type="primary"
         @click="downloadImage"
       >
         <el-icon><Download /></el-icon>
-        下载图片
+        Download Image
       </el-button>
       <el-button
         v-if="image?.status === 'completed'"
@@ -123,7 +123,7 @@
         @click="regenerate"
       >
         <el-icon><Refresh /></el-icon>
-        重新生成
+        Regenerate
       </el-button>
     </template>
   </el-dialog>
@@ -167,16 +167,16 @@ const getStatusType = (status: ImageStatus) => {
 
 const getStatusText = (status: ImageStatus) => {
   const texts: Record<ImageStatus, string> = {
-    pending: '等待中',
-    processing: '生成中',
-    completed: '已完成',
-    failed: '失败'
+    pending: 'Pending',
+    processing: 'Generating',
+    completed: 'Completed',
+    failed: 'Failed'
   }
   return texts[status]
 }
 
 const formatDateTime = (dateString: string) => {
-  return new Date(dateString).toLocaleString('zh-CN')
+  return new Date(dateString).toLocaleString('en-US')
 }
 
 const downloadImage = () => {

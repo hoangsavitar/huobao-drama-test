@@ -7,11 +7,11 @@
         <template #left>
           <el-button text @click="goBack" class="back-btn">
             <el-icon><ArrowLeft /></el-icon>
-            <span>返回</span>
+            <span>Back</span>
           </el-button>
           <div class="page-title">
-            <h1>创建新项目</h1>
-            <span class="subtitle">填写基本信息来创建你的短剧项目</span>
+            <h1>Create New Project</h1>
+            <span class="subtitle">Fill in basic info to create your drama project</span>
           </div>
         </template>
       </AppHeader>
@@ -27,22 +27,22 @@
           class="create-form"
           @submit.prevent="handleSubmit"
         >
-          <el-form-item label="项目标题" prop="title" required>
+          <el-form-item label="Project Title" prop="title" required>
             <el-input 
               v-model="form.title" 
-              placeholder="给你的短剧起个名字"
+              placeholder="Give your project a name"
               size="large"
               maxlength="100"
               show-word-limit
             />
           </el-form-item>
 
-          <el-form-item label="项目描述" prop="description">
+          <el-form-item label="Project Description" prop="description">
             <el-input 
               v-model="form.description" 
               type="textarea" 
               :rows="5"
-              placeholder="简要描述你的短剧内容、风格或创意（可选）"
+              placeholder="Briefly describe content, style, or idea (optional)"
               maxlength="500"
               show-word-limit
               resize="none"
@@ -50,7 +50,7 @@
           </el-form-item>
 
           <div class="form-actions">
-            <el-button size="large" @click="goBack">取消</el-button>
+            <el-button size="large" @click="goBack">Cancel</el-button>
             <el-button 
               type="primary" 
               size="large"
@@ -58,7 +58,7 @@
               @click="handleSubmit"
             >
               <el-icon v-if="!loading"><Plus /></el-icon>
-              创建项目
+              Create Project
             </el-button>
           </div>
         </el-form>
@@ -87,8 +87,8 @@ const form = reactive<CreateDramaRequest>({
 
 const rules: FormRules = {
   title: [
-    { required: true, message: '请输入项目标题', trigger: 'blur' },
-    { min: 1, max: 100, message: '标题长度在 1 到 100 个字符', trigger: 'blur' }
+    { required: true, message: 'Please enter project title', trigger: 'blur' },
+    { min: 1, max: 100, message: 'Title length must be 1 to 100 characters', trigger: 'blur' }
   ]
 }
 
@@ -101,10 +101,10 @@ const handleSubmit = async () => {
       loading.value = true
       try {
         const drama = await dramaAPI.create(form)
-        ElMessage.success('创建成功')
+        ElMessage.success('Created successfully')
         router.push(`/dramas/${drama.id}`)
       } catch (error: any) {
-        ElMessage.error(error.message || '创建失败')
+        ElMessage.error(error.message || 'Create failed')
       } finally {
         loading.value = false
       }

@@ -1,55 +1,55 @@
 <template>
   <div class="drama-settings-container">
-    <el-page-header @back="goBack" title="返回项目">
+    <el-page-header @back="goBack" title="Back to Project">
       <template #content>
-        <h2>项目设置</h2>
+        <h2>Project Settings</h2>
       </template>
     </el-page-header>
 
     <el-card shadow="never" class="main-card">
       <el-tabs v-model="activeTab">
-        <el-tab-pane label="基本信息" name="basic">
+        <el-tab-pane label="Basic Info" name="basic">
           <el-form :model="form" label-width="100px" style="max-width: 600px">
-            <el-form-item label="项目标题">
+            <el-form-item label="Title">
               <el-input v-model="form.title" />
             </el-form-item>
-            <el-form-item label="项目描述">
+            <el-form-item label="Description">
               <el-input v-model="form.description" type="textarea" :rows="4" />
             </el-form-item>
-            <el-form-item label="类型">
+            <el-form-item label="Genre">
               <el-select v-model="form.genre">
-                <el-option label="都市" value="都市" />
-                <el-option label="古装" value="古装" />
-                <el-option label="悬疑" value="悬疑" />
-                <el-option label="爱情" value="爱情" />
-                <el-option label="喜剧" value="喜剧" />
+                <el-option label="Urban" value="都市" />
+                <el-option label="Historical" value="古装" />
+                <el-option label="Mystery" value="悬疑" />
+                <el-option label="Romance" value="爱情" />
+                <el-option label="Comedy" value="喜剧" />
               </el-select>
             </el-form-item>
-            <el-form-item label="状态">
+            <el-form-item label="Status">
               <el-select v-model="form.status">
-                <el-option label="草稿" value="draft" />
-                <el-option label="策划中" value="planning" />
-                <el-option label="制作中" value="production" />
-                <el-option label="已完成" value="completed" />
-                <el-option label="已归档" value="archived" />
+                <el-option label="Draft" value="draft" />
+                <el-option label="Planning" value="planning" />
+                <el-option label="In Production" value="production" />
+                <el-option label="Completed" value="completed" />
+                <el-option label="Archived" value="archived" />
               </el-select>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="saveSettings">保存设置</el-button>
+              <el-button type="primary" @click="saveSettings">Save Settings</el-button>
             </el-form-item>
           </el-form>
         </el-tab-pane>
 
-        <el-tab-pane label="危险操作" name="danger">
+        <el-tab-pane label="Danger Zone" name="danger">
           <el-alert
-            title="警告"
+            title="Warning"
             type="warning"
-            description="以下操作不可恢复，请谨慎操作"
+            description="The following operations cannot be undone. Please proceed with caution."
             :closable="false"
             show-icon
           />
           <div class="danger-zone">
-            <el-button type="danger" @click="deleteProject">删除项目</el-button>
+            <el-button type="danger" @click="deleteProject">Delete Project</el-button>
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -82,30 +82,30 @@ const goBack = () => {
 const saveSettings = async () => {
   try {
     await dramaAPI.update(dramaId, form)
-    ElMessage.success('设置保存成功')
+    ElMessage.success('Settings saved successfully')
   } catch (error: any) {
-    ElMessage.error(error.message || '保存失败')
+    ElMessage.error(error.message || 'Save failed')
   }
 }
 
 const deleteProject = async () => {
   try {
     await ElMessageBox.confirm(
-      '确定要删除此项目吗？此操作不可恢复！',
-      '警告',
+      'Are you sure to delete this project? This cannot be undone!',
+      'Warning',
       {
-        confirmButtonText: '确定删除',
-        cancelButtonText: '取消',
+        confirmButtonText: 'Confirm Delete',
+        cancelButtonText: 'Cancel',
         type: 'warning',
       }
     )
     
     await dramaAPI.delete(dramaId)
-    ElMessage.success('项目已删除')
+    ElMessage.success('Project deleted')
     router.push('/dramas')
   } catch (error: any) {
     if (error !== 'cancel') {
-      ElMessage.error(error.message || '删除失败')
+      ElMessage.error(error.message || 'Delete failed')
     }
   }
 }
@@ -115,7 +115,7 @@ onMounted(async () => {
     const drama = await dramaAPI.get(dramaId)
     Object.assign(form, drama)
   } catch (error: any) {
-    ElMessage.error(error.message || '加载失败')
+    ElMessage.error(error.message || 'Load failed')
   }
 })
 </script>

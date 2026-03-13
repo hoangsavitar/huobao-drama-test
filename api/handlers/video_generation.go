@@ -45,7 +45,7 @@ func (h *VideoGenerationHandler) GenerateVideoFromImage(c *gin.Context) {
 
 	imageGenID, err := strconv.ParseUint(c.Param("image_gen_id"), 10, 32)
 	if err != nil {
-		response.BadRequest(c, "无效的图片ID")
+		response.BadRequest(c, "Invalid image ID")
 		return
 	}
 
@@ -77,13 +77,13 @@ func (h *VideoGenerationHandler) GetVideoGeneration(c *gin.Context) {
 
 	videoGenID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		response.BadRequest(c, "无效的ID")
+		response.BadRequest(c, "Invalid ID")
 		return
 	}
 
 	videoGen, err := h.videoService.GetVideoGeneration(uint(videoGenID))
 	if err != nil {
-		response.NotFound(c, "视频生成记录不存在")
+		response.NotFound(c, "Video generation record not found")
 		return
 	}
 
@@ -92,7 +92,6 @@ func (h *VideoGenerationHandler) GetVideoGeneration(c *gin.Context) {
 
 func (h *VideoGenerationHandler) ListVideoGenerations(c *gin.Context) {
 	var storyboardID *uint
-	// 优先使用storyboard_id参数
 	if storyboardIDStr := c.Query("storyboard_id"); storyboardIDStr != "" {
 		id, err := strconv.ParseUint(storyboardIDStr, 10, 32)
 		if err == nil {
@@ -118,7 +117,6 @@ func (h *VideoGenerationHandler) ListVideoGenerations(c *gin.Context) {
 		dramaIDUint = &didUint
 	}
 
-	// 计算offset：(page - 1) * pageSize
 	offset := (page - 1) * pageSize
 	videos, total, err := h.videoService.ListVideoGenerations(dramaIDUint, storyboardID, status, pageSize, offset)
 
@@ -135,7 +133,7 @@ func (h *VideoGenerationHandler) DeleteVideoGeneration(c *gin.Context) {
 
 	videoGenID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		response.BadRequest(c, "无效的ID")
+		response.BadRequest(c, "Invalid ID")
 		return
 	}
 

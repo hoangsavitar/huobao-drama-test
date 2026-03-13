@@ -74,6 +74,6 @@ const router = createRouter({
   routes
 })
 
-// 开源版本 - 无需认证
+// Open-source version: no auth required.
 
 export default router

@@ -58,14 +58,14 @@
         </div>
 
         <div class="info-item">
-          <label>优先级：</label>
+          <label>Priority:</label>
           <el-tag size="small" :type="(config.priority || 0) >= 50 ? 'danger' : (config.priority || 0) >= 20 ? 'warning' : 'info'">
             {{ config.priority || 0 }}
           </el-tag>
         </div>
 
         <div class="info-item">
-          <label>模型：</label>
+          <label>Model:</label>
           <template v-if="Array.isArray(config.model)">
             <el-tag 
               v-for="(model, index) in config.model" 
@@ -86,7 +86,7 @@
         </div>
 
         <div class="info-item">
-          <label>创建时间：</label>
+          <label>Created At:</label>
           <span class="time-text">{{ formatDate(config.created_at) }}</span>
         </div>
       </div>
@@ -118,7 +118,7 @@ const maskApiKey = (key: string) => {
 }
 
 const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleString('zh-CN')
+  return new Date(dateString).toLocaleString('en-US')
 }
 </script>
 

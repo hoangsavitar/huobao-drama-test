@@ -147,19 +147,19 @@ export interface CreateTransitionRequest {
 }
 
 export const TRANSITION_TYPES = [
-  { label: '淡入淡出', value: 'fade' },
-  { label: '交叉淡化', value: 'crossfade' },
-  { label: '滑动', value: 'slide' },
-  { label: '擦除', value: 'wipe' },
-  { label: '缩放', value: 'zoom' },
-  { label: '溶解', value: 'dissolve' }
+  { label: 'Fade', value: 'fade' },
+  { label: 'Crossfade', value: 'crossfade' },
+  { label: 'Slide', value: 'slide' },
+  { label: 'Wipe', value: 'wipe' },
+  { label: 'Zoom', value: 'zoom' },
+  { label: 'Dissolve', value: 'dissolve' }
 ]
 
 export const EFFECT_TYPES = [
-  { label: '滤镜', value: 'filter' },
-  { label: '色彩', value: 'color' },
-  { label: '模糊', value: 'blur' },
-  { label: '亮度', value: 'brightness' },
-  { label: '对比度', value: 'contrast' },
-  { label: '饱和度', value: 'saturation' }
+  { label: 'Filter', value: 'filter' },
+  { label: 'Color', value: 'color' },
+  { label: 'Blur', value: 'blur' },
+  { label: 'Brightness', value: 'brightness' },
+  { label: 'Contrast', value: 'contrast' },
+  { label: 'Saturation', value: 'saturation' }
 ]

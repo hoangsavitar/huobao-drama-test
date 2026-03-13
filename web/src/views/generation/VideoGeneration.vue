@@ -60,23 +60,23 @@
               controls
               :poster="video.first_frame_url"
             >
-              您的浏览器不支持视频播放
+              Your browser does not support video playback
             </video>
 
             <div v-else-if="video.status === 'processing'" class="video-placeholder processing">
               <el-icon class="loading-icon"><Loading /></el-icon>
-              <span>生成中...</span>
-              <div class="progress-text">预计需要 1-3 分钟</div>
+              <span>Generating...</span>
+              <div class="progress-text">Estimated 1-3 minutes</div>
             </div>
 
             <div v-else-if="video.status === 'failed'" class="video-placeholder failed">
               <el-icon><CircleClose /></el-icon>
-              <span>生成失败</span>
+              <span>Generation failed</span>
             </div>
 
             <div v-else class="video-placeholder">
               <el-icon><VideoCamera /></el-icon>
-              <span>等待生成</span>
+              <span>Pending</span>
             </div>
 
             <div class="video-overlay">
@@ -107,7 +107,7 @@
             <div class="card-actions">
               <el-button text size="small" @click="viewDetails(video)">
                 <el-icon><View /></el-icon>
-                查看
+                View
               </el-button>
               <el-button
                 v-if="video.status === 'completed'"
@@ -116,16 +116,16 @@
                 @click="downloadVideo(video)"
               >
                 <el-icon><Download /></el-icon>
-                下载
+                Download
               </el-button>
               <el-popconfirm
-                title="确定删除该视频吗？"
+                title="Are you sure to delete this video?"
                 @confirm="deleteVideo(video.id)"
               >
                 <template #reference>
                   <el-button text size="small" type="danger">
                     <el-icon><Delete /></el-icon>
-                    删除
+                    Delete
                   </el-button>
                 </template>
               </el-popconfirm>
@@ -135,7 +135,7 @@
       </el-col>
     </el-row>
 
-    <el-empty v-if="!loading && videos.length === 0" description="暂无视频，开始生成吧！" />
+    <el-empty v-if="!loading && videos.length === 0" description="No videos yet. Start generating!" />
 
     <el-pagination
       v-if="total > 0"
@@ -211,7 +211,7 @@ const loadVideos = async () => {
     videos.value = result.items
     total.value = result.pagination.total
   } catch (error: any) {
-    ElMessage.error(error.message || '加载失败')
+    ElMessage.error(error.message || 'Load failed')
   } finally {
     loading.value = false
   }
@@ -246,10 +246,10 @@ const downloadVideo = (video: VideoGeneration) => {
 const deleteVideo = async (id: number) => {
   try {
     await videoAPI.deleteVideo(id)
-    ElMessage.success('删除成功')
+    ElMessage.success('Deleted successfully')
     loadVideos()
   } catch (error: any) {
-    ElMessage.error(error.message || '删除失败')
+    ElMessage.error(error.message || 'Delete failed')
   }
 }
 
@@ -265,10 +265,10 @@ const getStatusType = (status: VideoStatus) => {
 
 const getStatusText = (status: VideoStatus) => {
   const texts: Record<VideoStatus, string> = {
-    pending: '等待中',
-    processing: '生成中',
-    completed: '已完成',
-    failed: '失败'
+    pending: 'Pending',
+    processing: 'Generating',
+    completed: 'Completed',
+    failed: 'Failed'
   }
   return texts[status]
 }
@@ -283,10 +283,10 @@ const formatTime = (dateString: string) => {
   const now = new Date()
   const diff = now.getTime() - date.getTime()
   
-  if (diff < 60000) return '刚刚'
-  if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`
-  if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`
-  return date.toLocaleDateString('zh-CN')
+  if (diff < 60000) return 'Just now'
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`
+  return date.toLocaleDateString('en-US')
 }
 
 const goBack = () => {

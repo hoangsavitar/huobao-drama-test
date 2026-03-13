@@ -5,12 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GenerateCharacterImage AI生成角色形象
 func (h *CharacterLibraryHandler) GenerateCharacterImage(c *gin.Context) {
 
 	characterID := c.Param("id")
 
-	// 获取请求体中的model和style参数
 	var req struct {
 		Model string `json:"model"`
 		Style string `json:"style"`
@@ -20,20 +18,20 @@ func (h *CharacterLibraryHandler) GenerateCharacterImage(c *gin.Context) {
 	imageGen, err := h.libraryService.GenerateCharacterImage(characterID, h.imageService, req.Model, req.Style)
 	if err != nil {
 		if err.Error() == "character not found" {
-			response.NotFound(c, "角色不存在")
+			response.NotFound(c, "Character not found")
 			return
 		}
 		if err.Error() == "unauthorized" {
-			response.Forbidden(c, "无权限")
+			response.Forbidden(c, "No permission")
 			return
 		}
 		h.log.Errorw("Failed to generate character image", "error", err)
-		response.InternalError(c, "生成失败")
+		response.InternalError(c, "Generation failed")
 		return
 	}
 
 	response.Success(c, gin.H{
-		"message":          "角色图片生成已启动",
+		"message":          "Character image generation started",
 		"image_generation": imageGen,
 	})
 }

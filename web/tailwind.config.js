@@ -8,7 +8,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary brand colors / 主品牌色
+        // Primary brand colors
         primary: {
           50: '#f0f9ff',
           100: '#e0f2fe',
@@ -21,23 +21,23 @@ export default {
           800: '#075985',
           900: '#0c4a6e',
         },
-        // Neutral colors for backgrounds / 中性色背景
+        // Neutral colors for backgrounds
         surface: {
           light: '#ffffff',
           DEFAULT: '#f8fafc',
           dark: '#0f172a',
         },
-        // Card backgrounds / 卡片背景
+        // Card backgrounds
         card: {
           light: '#ffffff',
           dark: '#1e293b',
         },
-        // Border colors / 边框色
+        // Border colors
         border: {
           light: '#e2e8f0',
           dark: '#334155',
         },
-        // Text colors / 文字色
+        // Text colors
         content: {
           primary: '#0f172a',
           secondary: '#64748b',

@@ -80,7 +80,7 @@
 
             <div v-else class="image-placeholder">
               <el-icon><Picture /></el-icon>
-              <span>等待生成</span>
+              <span>Pending</span>
             </div>
 
             <div class="image-overlay">
@@ -104,7 +104,7 @@
             <div class="card-actions">
               <el-button text size="small" @click="viewDetails(image)">
                 <el-icon><View /></el-icon>
-                查看
+                View
               </el-button>
               <el-button
                 v-if="image.status === 'completed'"
@@ -113,16 +113,16 @@
                 @click="downloadImage(image)"
               >
                 <el-icon><Download /></el-icon>
-                下载
+                Download
               </el-button>
               <el-popconfirm
-                title="确定删除该图片吗？"
+                title="Are you sure to delete this image?"
                 @confirm="deleteImage(image.id)"
               >
                 <template #reference>
                   <el-button text size="small" type="danger">
                     <el-icon><Delete /></el-icon>
-                    删除
+                    Delete
                   </el-button>
                 </template>
               </el-popconfirm>
@@ -132,7 +132,7 @@
       </el-col>
     </el-row>
 
-    <el-empty v-if="!loading && images.length === 0" description="暂无图片，开始生成吧！" />
+    <el-empty v-if="!loading && images.length === 0" description="No images yet. Start generating!" />
 
     <el-pagination
       v-if="total > 0"
@@ -207,7 +207,7 @@ const loadImages = async () => {
     images.value = result.items
     total.value = result.pagination.total
   } catch (error: any) {
-    ElMessage.error(error.message || '加载失败')
+    ElMessage.error(error.message || 'Load failed')
   } finally {
     loading.value = false
   }
@@ -242,10 +242,10 @@ const downloadImage = (image: ImageGeneration) => {
 const deleteImage = async (id: number) => {
   try {
     await imageAPI.deleteImage(id)
-    ElMessage.success('删除成功')
+    ElMessage.success('Deleted successfully')
     loadImages()
   } catch (error: any) {
-    ElMessage.error(error.message || '删除失败')
+    ElMessage.error(error.message || 'Delete failed')
   }
 }
 
@@ -261,10 +261,10 @@ const getStatusType = (status: ImageStatus) => {
 
 const getStatusText = (status: ImageStatus) => {
   const texts: Record<ImageStatus, string> = {
-    pending: '等待中',
-    processing: '生成中',
-    completed: '已完成',
-    failed: '失败'
+    pending: 'Pending',
+    processing: 'Generating',
+    completed: 'Completed',
+    failed: 'Failed'
   }
   return texts[status]
 }
@@ -279,10 +279,10 @@ const formatTime = (dateString: string) => {
   const now = new Date()
   const diff = now.getTime() - date.getTime()
   
-  if (diff < 60000) return '刚刚'
-  if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`
-  if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`
-  return date.toLocaleDateString('zh-CN')
+  if (diff < 60000) return 'Just now'
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`
+  return date.toLocaleDateString('en-US')
 }
 
 const goBack = () => {

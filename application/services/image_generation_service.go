@@ -282,7 +282,7 @@ func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 
 	// 如果有参考图，在提示词末尾添加参考图一致性说明
 	if len(referenceImages) > 0 {
-		prompt += "\n\n**重要：**\n**必须严格**遵守参考图内的内容元素，保持场景和角色的**一致性**"
+		prompt += "\n\nImportant: strictly follow reference image elements and keep scene/character consistency."
 		s.log.Infow("Added reference image consistency instruction to prompt",
 			"id", imageGenID,
 			"reference_count", len(referenceImages))
@@ -666,7 +666,7 @@ func (s *ImageGenerationService) CreateImageFromUpload(req *UploadImageRequest) 
 
 	prompt := req.Prompt
 	if prompt == "" {
-		prompt = "用户上传图片"
+		prompt = "User uploaded image"
 	}
 
 	now := time.Now()
@@ -712,7 +712,7 @@ func (s *ImageGenerationService) GenerateImagesForScene(sceneID string) ([]*mode
 	prompt := scene.Prompt
 	if prompt == "" {
 		// 如果Prompt为空，使用Location和Time构建
-		prompt = fmt.Sprintf("%s场景，%s", scene.Location, scene.Time)
+		prompt = fmt.Sprintf("%s scene, %s", scene.Location, scene.Time)
 	}
 
 	req := &GenerateImageRequest{
@@ -828,7 +828,7 @@ func (s *ImageGenerationService) ExtractBackgroundsForEpisode(episodeID string, 
 	task, err := s.taskService.CreateTask("background_extraction", episodeID)
 	if err != nil {
 		s.log.Errorw("Failed to create background extraction task", "error", err, "episode_id", episodeID)
-		return "", fmt.Errorf("创建任务失败: %w", err)
+		return "", fmt.Errorf("failed to create task: %w", err)
 	}
 
 	// 异步处理场景提取
@@ -841,18 +841,18 @@ func (s *ImageGenerationService) ExtractBackgroundsForEpisode(episodeID string, 
 // processBackgroundExtraction 异步处理场景提取
 func (s *ImageGenerationService) processBackgroundExtraction(taskID string, episodeID string, model string, style string) {
 	// 更新任务状态为处理中
-	s.taskService.UpdateTaskStatus(taskID, "processing", 0, "正在提取场景信息...")
+	s.taskService.UpdateTaskStatus(taskID, "processing", 0, "Extracting scene information...")
 
 	var episode models.Episode
 	if err := s.db.Preload("Storyboards").First(&episode, episodeID).Error; err != nil {
 		s.log.Errorw("Episode not found during background extraction", "error", err, "episode_id", episodeID)
-		s.taskService.UpdateTaskStatus(taskID, "failed", 0, "剧集信息不存在")
+		s.taskService.UpdateTaskStatus(taskID, "failed", 0, "Episode info not found")
 		return
 	}
 
 	if episode.ScriptContent == nil || *episode.ScriptContent == "" {
 		s.log.Errorw("Episode has no script content during background extraction", "episode_id", episodeID)
-		s.taskService.UpdateTaskStatus(taskID, "failed", 0, "剧本内容为空")
+		s.taskService.UpdateTaskStatus(taskID, "failed", 0, "Script content is empty")
 		return
 	}
 
@@ -863,7 +863,7 @@ func (s *ImageGenerationService) processBackgroundExtraction(taskID string, epis
 	backgroundsInfo, err := s.extractBackgroundsFromScript(*episode.ScriptContent, dramaID, model, style)
 	if err != nil {
 		s.log.Errorw("Failed to extract backgrounds from script", "error", err, "task_id", taskID)
-		s.taskService.UpdateTaskStatus(taskID, "failed", 0, "AI提取场景失败: "+err.Error())
+		s.taskService.UpdateTaskStatus(taskID, "failed", 0, "AI scene extraction failed: "+err.Error())
 		return
 	}
 
@@ -907,7 +907,7 @@ func (s *ImageGenerationService) processBackgroundExtraction(taskID string, epis
 
 	if err != nil {
 		s.log.Errorw("Failed to save scenes to database", "error", err, "task_id", taskID)
-		s.taskService.UpdateTaskStatus(taskID, "failed", 0, "保存场景信息失败: "+err.Error())
+		s.taskService.UpdateTaskStatus(taskID, "failed", 0, "Failed to save scene information: "+err.Error())
 		return
 	}
 
@@ -954,10 +954,8 @@ func (s *ImageGenerationService) extractBackgroundsFromScript(scriptContent stri
 	systemPrompt := s.promptI18n.GetSceneExtractionPrompt(style)
 	contentLabel := s.promptI18n.FormatUserPrompt("script_content_label")
 
-	// 根据语言构建不同的格式说明
 	var formatInstructions string
-	if s.promptI18n.IsEnglish() {
-		formatInstructions = `[Output JSON Format]
+	formatInstructions = `[Output JSON Format]
 {
   "backgrounds": [
     {
@@ -994,45 +992,6 @@ Correct example (note: no characters):
 ❌ "Character moving in the room" - contains character
 
 Please strictly follow the JSON format and ensure all fields use English.`
-	} else {
-		formatInstructions = `【输出JSON格式】
-{
-  "backgrounds": [
-    {
-      "location": "地点名称（中文）",
-      "time": "时间描述（中文）",
-      "atmosphere": "氛围描述（中文）",
-      "prompt": "一个电影感的动漫风格纯背景场景，展现[地点描述]在[时间]的环境。画面呈现[环境细节、建筑、物品、光线等，不包含人物]。风格：细节丰富，高质量，氛围光照。情绪：[环境情绪描述]。"
-    }
-  ]
-}
-
-【示例】
-正确示例（注意：不包含人物）：
-{
-  "backgrounds": [
-    {
-      "location": "维修店内部",
-      "time": "深夜",
-      "atmosphere": "昏暗、孤独、工业感",
-      "prompt": "一个电影感的动漫风格纯背景场景，展现凌乱的维修店内部在深夜的环境。昏暗的日光灯照射下，工作台上散落着各种扳手、螺丝刀和机械零件，墙上挂着油污斑斑的工具挂板和褪色海报，地面有油渍痕迹，角落堆放着废旧轮胎。风格：细节丰富，高质量，昏暗氛围。情绪：孤独、工业感。"
-    },
-    {
-      "location": "城市街道",
-      "time": "黄昏",
-      "atmosphere": "温暖、繁忙、生活气息",
-      "prompt": "一个电影感的动漫风格纯背景场景，展现繁华的城市街道在黄昏时分的环境。夕阳的余晖洒在街道的沥青路面上，两旁的商铺霓虹灯开始点亮，街边有自行车停靠架和公交站牌，远处高楼林立，天空呈现橙红色渐变。风格：细节丰富，高质量，温暖氛围。情绪：生活气息、繁忙。"
-    }
-  ]
-}
-
-【错误示例（包含人物，禁止）】：
-❌ "展现主角站在街道上的场景" - 包含人物
-❌ "人们匆匆而过" - 包含人物
-❌ "角色在房间里活动" - 包含人物
-
-请严格按照JSON格式输出，确保所有字段都使用中文。`
-	}
 
 	prompt := fmt.Sprintf(`%s
 
@@ -1050,7 +1009,7 @@ Please strictly follow the JSON format and ensure all fields use English.`
 	response, err := client.GenerateText(prompt, "", ai.WithTemperature(0.7))
 	if err != nil {
 		s.log.Errorw("Failed to extract backgrounds with AI", "error", err)
-		return nil, fmt.Errorf("AI提取场景失败: %w", err)
+		return nil, fmt.Errorf("AI scene extraction failed: %w", err)
 	}
 
 	// 打印AI返回的原始响应
@@ -1071,7 +1030,7 @@ Please strictly follow the JSON format and ensure all fields use English.`
 		}
 		if err := utils.SafeParseAIJSON(response, &result); err != nil {
 			s.log.Errorw("Failed to parse AI response in both formats", "error", err, "response", response[:min(len(response), 500)])
-			return nil, fmt.Errorf("解析AI响应失败: %w", err)
+			return nil, fmt.Errorf("failed to parse AI response: %w", err)
 		}
 		backgrounds = result.Backgrounds
 		s.log.Infow("Parsed backgrounds as object format", "count", len(backgrounds))
@@ -1110,7 +1069,7 @@ func (s *ImageGenerationService) extractBackgroundsWithAI(storyboards []models.S
 			description = *storyboard.Description
 		}
 
-		scenesText += fmt.Sprintf("镜头%d:\n地点: %s\n时间: %s\n动作: %s\n描述: %s\n\n",
+		scenesText += fmt.Sprintf("Shot %d:\nLocation: %s\nTime: %s\nAction: %s\nDescription: %s\n\n",
 			storyboard.StoryboardNumber, location, time, action, description)
 	}
 
@@ -1118,10 +1077,8 @@ func (s *ImageGenerationService) extractBackgroundsWithAI(storyboards []models.S
 	systemPrompt := s.promptI18n.GetSceneExtractionPrompt(style)
 	storyboardLabel := s.promptI18n.FormatUserPrompt("storyboard_list_label")
 
-	// 根据语言构建不同的提示词
 	var formatInstructions string
-	if s.promptI18n.IsEnglish() {
-		formatInstructions = `[Output JSON Format]
+	formatInstructions = `[Output JSON Format]
 {
   "backgrounds": [
     {
@@ -1156,43 +1113,6 @@ Please strictly follow the JSON format and ensure:
 1. prompt field uses English
 2. scene_numbers includes all scene numbers using this background
 3. All scenes are assigned to a background`
-	} else {
-		formatInstructions = `【输出JSON格式】
-{
-  "backgrounds": [
-    {
-      "location": "地点名称（中文）",
-      "time": "时间描述（中文）",
-      "prompt": "一个电影感的动漫风格背景，展现[地点描述]在[时间]的场景。画面呈现[细节描述]。风格：细节丰富，高质量，氛围光照。情绪：[情绪描述]。",
-      "scene_numbers": [1, 2, 3]
-    }
-  ]
-}
-
-【示例】
-正确示例：
-{
-  "backgrounds": [
-    {
-      "location": "维修店",
-      "time": "深夜",
-      "prompt": "一个电影感的动漫风格背景，展现凌乱的维修店内部在深夜的场景。昏暗的灯光下，工作台上散落着各种工具和零件，墙上挂着油污的海报。风格：细节丰富，高质量，昏暗氛围。情绪：孤独、工业感。",
-      "scene_numbers": [1, 5, 6, 10, 15]
-    },
-    {
-      "location": "城市全景",
-      "time": "深夜·酸雨",
-      "prompt": "一个电影感的动漫风格背景，展现沿海城市全景在深夜酸雨中的场景。霓虹灯在雨中模糊，高楼大厦笼罩在灰绿色的雨幕中，街道反射着五颜六色的光。风格：细节丰富，高质量，赛博朋克氛围。情绪：压抑、科幻、末世感。",
-      "scene_numbers": [2, 7]
-    }
-  ]
-}
-
-请严格按照JSON格式输出，确保：
-1. prompt字段使用中文
-2. scene_numbers包含所有使用该背景的场景编号
-3. 所有场景都被分配到某个背景`
-	}
 
 	prompt := fmt.Sprintf(`%s
 

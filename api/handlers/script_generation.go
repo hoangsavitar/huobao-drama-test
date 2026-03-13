@@ -30,7 +30,6 @@ func (h *ScriptGenerationHandler) GenerateCharacters(c *gin.Context) {
 		return
 	}
 
-	// 直接调用服务层的异步方法，该方法会创建任务并返回任务ID
 	taskID, err := h.scriptService.GenerateCharacters(&req)
 	if err != nil {
 		h.log.Errorw("Failed to generate characters", "error", err, "drama_id", req.DramaID)
@@ -38,10 +37,9 @@ func (h *ScriptGenerationHandler) GenerateCharacters(c *gin.Context) {
 		return
 	}
 
-	// 立即返回任务ID
 	response.Success(c, gin.H{
 		"task_id": taskID,
 		"status":  "pending",
-		"message": "角色生成任务已创建，正在后台处理...",
+		"message": "Character generation task created and processing in background...",
 	})
 }

@@ -1,11 +1,11 @@
 <template>
   <div class="script-edit-container">
-    <el-page-header @back="goBack" title="返回">
+    <el-page-header @back="goBack" title="Back">
       <template #content>
-        <h2>剧本编辑</h2>
+        <h2>Script Editor</h2>
       </template>
     </el-page-header>
-    <p>功能开发中...</p>
+    <p>Feature coming soon...</p>
   </div>
 </template>
 

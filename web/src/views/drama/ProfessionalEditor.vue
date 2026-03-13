@@ -1,6 +1,6 @@
 <template>
   <div class="professional-editor">
-    <!-- 顶部工具栏 -->
+    <!-- Top toolbar -->
     <AppHeader
       :fixed="false"
       :show-logo="false"
@@ -20,9 +20,9 @@
       </template>
     </AppHeader>
 
-    <!-- 主编辑区域 -->
+    <!-- Main editing area -->
     <div class="editor-main">
-      <!-- 左侧分镜列表 -->
+      <!-- Left storyboard list -->
       <div class="storyboard-panel">
         <div class="panel-header">
           <h3>{{ $t("storyboard.scriptStructure") }}</h3>
@@ -70,7 +70,7 @@
         </div>
       </div>
 
-      <!-- 中间时间线编辑区域 -->
+      <!-- Center timeline editing area -->
       <div class="timeline-area">
         <VideoTimelineEditor
           ref="timelineEditorRef"
@@ -90,7 +90,7 @@
         />
       </div>
 
-      <!-- 右侧编辑面板 -->
+      <!-- Right editing panel -->
       <div class="edit-panel">
         <el-tabs v-model="activeTab" class="edit-tabs">
           <!-- 镜头属性标签 -->
@@ -260,15 +260,15 @@
                       :placeholder="$t('editor.shotTypePlaceholder')"
                       @change="saveStoryboardField('shot_type')"
                     >
-                      <el-option label="大远景" value="大远景" />
-                      <el-option label="远景" value="远景" />
-                      <el-option label="全景" value="全景" />
-                      <el-option label="中全景" value="中全景" />
-                      <el-option label="中景" value="中景" />
-                      <el-option label="中近景" value="中近景" />
-                      <el-option label="近景" value="近景" />
-                      <el-option label="特写" value="特写" />
-                      <el-option label="大特写" value="大特写" />
+                      <el-option label="Extreme Long Shot" value="大远景" />
+                      <el-option label="Long Shot" value="远景" />
+                      <el-option label="Full Shot" value="全景" />
+                      <el-option label="Medium Full Shot" value="中全景" />
+                      <el-option label="Medium Shot" value="中景" />
+                      <el-option label="Medium Close-up" value="中近景" />
+                      <el-option label="Close-up" value="近景" />
+                      <el-option label="Tight Close-up" value="特写" />
+                      <el-option label="Extreme Close-up" value="大特写" />
                     </el-select>
                   </div>
 
@@ -280,20 +280,20 @@
                       :placeholder="$t('editor.movementPlaceholder')"
                       @change="saveStoryboardField('movement')"
                     >
-                      <el-option label="固定镜头" value="固定镜头" />
-                      <el-option label="推镜" value="推镜" />
-                      <el-option label="拉镜" value="拉镜" />
-                      <el-option label="摇镜" value="摇镜" />
-                      <el-option label="移镜" value="移镜" />
-                      <el-option label="跟镜" value="跟镜" />
-                      <el-option label="升降镜头" value="升降镜头" />
-                      <el-option label="环绕" value="环绕" />
-                      <el-option label="甩镜" value="甩镜" />
-                      <el-option label="变焦" value="变焦" />
-                      <el-option label="手持晃动" value="手持晃动" />
-                      <el-option label="稳定器运动" value="稳定器运动" />
-                      <el-option label="轨道推拉" value="轨道推拉" />
-                      <el-option label="航拍" value="航拍" />
+                      <el-option label="Static Shot" value="固定镜头" />
+                      <el-option label="Push In" value="推镜" />
+                      <el-option label="Pull Out" value="拉镜" />
+                      <el-option label="Pan" value="摇镜" />
+                      <el-option label="Truck" value="移镜" />
+                      <el-option label="Follow Shot" value="跟镜" />
+                      <el-option label="Crane Shot" value="升降镜头" />
+                      <el-option label="Orbit" value="环绕" />
+                      <el-option label="Whip Pan" value="甩镜" />
+                      <el-option label="Zoom" value="变焦" />
+                      <el-option label="Handheld" value="手持晃动" />
+                      <el-option label="Gimbal" value="稳定器运动" />
+                      <el-option label="Dolly Zoom" value="轨道推拉" />
+                      <el-option label="Aerial Shot" value="航拍" />
                     </el-select>
                   </div>
 
@@ -305,23 +305,23 @@
                       :placeholder="$t('editor.anglePlaceholder')"
                       @change="saveStoryboardField('angle')"
                     >
-                      <el-option label="平视" value="平视" />
-                      <el-option label="俯视" value="俯视" />
-                      <el-option label="仰视" value="仰视" />
+                      <el-option label="Eye Level" value="平视" />
+                      <el-option label="High Angle" value="俯视" />
+                      <el-option label="Low Angle" value="仰视" />
                       <el-option
-                        label="大俯视（鸟瞰）"
+                        label="Bird's Eye View"
                         value="大俯视（鸟瞰）"
                       />
-                      <el-option label="大仰视" value="大仰视" />
-                      <el-option label="正侧面" value="正侧面" />
-                      <el-option label="斜侧面" value="斜侧面" />
-                      <el-option label="背面" value="背面" />
+                      <el-option label="Worm's Eye View" value="大仰视" />
+                      <el-option label="Profile Shot" value="正侧面" />
+                      <el-option label="Three-Quarter" value="斜侧面" />
+                      <el-option label="Back Shot" value="背面" />
                       <el-option
-                        label="倾斜（荷兰角）"
+                        label="Dutch Angle"
                         value="倾斜（荷兰角）"
                       />
-                      <el-option label="主观视角" value="主观视角" />
-                      <el-option label="过肩" value="过肩" />
+                      <el-option label="POV Shot" value="主观视角" />
+                      <el-option label="Over-the-Shoulder" value="过肩" />
                     </el-select>
                   </div>
                 </div>
@@ -620,7 +620,7 @@
                 </div>
               </div>
             </div>
-            <el-empty v-else description="未选择镜头" />
+            <el-empty v-else description="No shot selected" />
           </el-tab-pane>
 
           <!-- 视频生成标签 -->
@@ -629,7 +629,7 @@
               <div class="video-generation-section">
                 <!-- 生成提示词展示 -->
                 <div class="video-prompt-box">
-                  {{ currentStoryboard.video_prompt || "暂无提示词" }}
+                  {{ currentStoryboard.video_prompt || "No prompt yet" }}
                 </div>
 
                 <!-- 视频参数设置 -->
@@ -662,20 +662,20 @@
                               size="small"
                               type="success"
                               style="margin-left: 4px"
-                              >多图</el-tag
+                              >Multi-img</el-tag
                             >
                             <el-tag
                               v-if="model.supportFirstLastFrame"
                               size="small"
                               type="primary"
                               style="margin-left: 4px"
-                              >首尾帧</el-tag
+                              >First/Last</el-tag
                             >
                             <el-tag
                               size="small"
                               type="info"
                               style="margin-left: 4px"
-                              >最多{{ model.maxImages }}张</el-tag
+                              >Max {{ model.maxImages }}</el-tag
                             >
                           </div>
                         </div>
@@ -690,10 +690,10 @@
                     "
                     class="param-row"
                   >
-                    <span class="param-label">参考图</span>
+                    <span class="param-label">Reference</span>
                     <el-select
                       v-model="selectedReferenceMode"
-                      placeholder="请选择参考图模式"
+                      placeholder="Select reference mode"
                       size="default"
                       style="flex: 1"
                     >
@@ -758,11 +758,11 @@
                       v-model="selectedVideoFrameType"
                       size="default"
                     >
-                      <el-radio-button label="first">首帧</el-radio-button>
-                      <el-radio-button label="last">尾帧</el-radio-button>
-                      <!-- <el-radio-button label="panel">分镜板</el-radio-button> -->
-                      <el-radio-button label="action">动作序列</el-radio-button>
-                      <el-radio-button label="key">关键帧</el-radio-button>
+                      <el-radio-button label="first">First Frame</el-radio-button>
+                      <el-radio-button label="last">Last Frame</el-radio-button>
+                      <!-- <el-radio-button label="panel">Storyboard</el-radio-button> -->
+                      <el-radio-button label="action">Action Sequence</el-radio-button>
+                      <el-radio-button label="key">Key Frame</el-radio-button>
                     </el-radio-group>
                   </div>
 
@@ -791,12 +791,12 @@
                           "
                         >
                           <el-tag size="small" type="primary">
-                            上一镜头 #{{
+                            Prev Shot #{{
                               previousStoryboard?.storyboard_number
                             }}
-                            尾帧
+                            Last Frame
                           </el-tag>
-                          <span class="hint-text">点击添加为首帧参考</span>
+                          <span class="hint-text">Click to add as first frame reference</span>
                         </div>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap">
                           <div
@@ -911,7 +911,7 @@
                               i.frame_type === 'first',
                           ) && previousStoryboardLastFrames.length === 0
                         "
-                        description="暂无首帧图片"
+                        description="No first frame images"
                         size="small"
                       />
                     </div>
@@ -993,7 +993,7 @@
                               i.frame_type === 'key',
                           )
                         "
-                        description="暂无关键帧图片"
+                        description="No key frame images"
                         size="small"
                       />
                     </div>
@@ -1075,7 +1075,7 @@
                               i.frame_type === 'last',
                           )
                         "
-                        description="暂无尾帧图片"
+                        description="No last frame images"
                         size="small"
                       />
                     </div>
@@ -1157,7 +1157,7 @@
                               i.frame_type === 'panel',
                           )
                         "
-                        description="暂无分镜板图片"
+                        description="No storyboard images"
                         size="small"
                       />
                     </div>
@@ -1239,7 +1239,7 @@
                               i.frame_type === 'action',
                           )
                         "
-                        description="暂无动作序列图片"
+                        description="No action sequence images"
                         size="small"
                       />
                     </div>
@@ -1264,7 +1264,7 @@
                       v-if="selectedReferenceMode === 'single'"
                       style="text-align: center"
                     >
-                      <div class="reference-mode-title">单图参考</div>
+                      <div class="reference-mode-title">Single Image Reference</div>
                       <div style="display: inline-block">
                         <div
                           class="image-slot"
@@ -1283,7 +1283,7 @@
                             <el-icon :size="32" color="#c0c4cc">
                               <Plus />
                             </el-icon>
-                            <div class="slot-hint">点击上方选择图片</div>
+                            <div class="slot-hint">Click above to select image</div>
                           </div>
                           <div
                             v-if="selectedImageObjects[0]"
@@ -1302,7 +1302,7 @@
                       v-else-if="selectedReferenceMode === 'first_last'"
                       style="text-align: center"
                     >
-                      <div class="reference-mode-title">首尾帧</div>
+                      <div class="reference-mode-title">First / Last Frame</div>
                       <div
                         style="
                           display: flex;
@@ -1312,7 +1312,7 @@
                         "
                       >
                         <div>
-                          <div class="frame-label">首帧</div>
+                          <div class="frame-label">First Frame</div>
                           <div
                             class="image-slot"
                             @click="
@@ -1334,7 +1334,7 @@
                               <el-icon :size="32" color="#c0c4cc">
                                 <Plus />
                               </el-icon>
-                              <div class="slot-hint">选择首帧</div>
+                              <div class="slot-hint">Select first frame</div>
                             </div>
                             <div
                               v-if="firstFrameSlotImage"
@@ -1350,7 +1350,7 @@
                           <Right />
                         </el-icon>
                         <div>
-                          <div class="frame-label">尾帧</div>
+                          <div class="frame-label">Last Frame</div>
                           <div
                             class="image-slot"
                             @click="
@@ -1372,7 +1372,7 @@
                               <el-icon :size="32" color="#c0c4cc">
                                 <Plus />
                               </el-icon>
-                              <div class="slot-hint">选择尾帧</div>
+                              <div class="slot-hint">Select last frame</div>
                             </div>
                             <div
                               v-if="lastFrameSlotImage"
@@ -1400,7 +1400,7 @@
                           font-weight: 500;
                         "
                       >
-                        多图参考 ({{ selectedImagesForVideo.length }}/{{
+                        Multi-image Reference ({{ selectedImagesForVideo.length }}/{{
                           currentModelCapability?.maxImages || 6
                         }})
                       </div>
@@ -1484,7 +1484,7 @@
                     "
                     @click="generateVideo"
                   >
-                    {{ generatingVideo ? "生成中..." : "生成视频" }}
+                    {{ generatingVideo ? "Generating..." : "Generate Video" }}
                   </el-button>
                 </div>
 
@@ -1506,7 +1506,7 @@
                     "
                   >
                     <span></span>
-                    生成结果 ({{ generatedVideos.length }})
+                    Generation Results ({{ generatedVideos.length }})
                   </div>
                   <div class="image-grid">
                     <div
@@ -1573,7 +1573,7 @@
                 </div>
               </div>
             </div>
-            <el-empty v-else description="未选择镜头" />
+            <el-empty v-else description="No shot selected" />
           </el-tab-pane>
 
           <!-- 音效与配乐标签 -->
@@ -1645,12 +1645,12 @@
                         >
                           {{
                             merge.status === "pending"
-                              ? "等待中"
+                              ? "Pending"
                               : merge.status === "processing"
-                                ? "合成中"
+                                ? "Processing"
                                 : merge.status === "completed"
-                                  ? "已完成"
-                                  : "失败"
+                                  ? "Completed"
+                                  : "Failed"
                           }}
                         </el-tag>
                       </div>
@@ -1684,7 +1684,7 @@
                             </el-icon>
                           </div>
                           <div class="detail-content">
-                            <div class="detail-label">创建时间</div>
+                            <div class="detail-label">Created At</div>
                             <div class="detail-value">
                               {{ formatDateTime(merge.created_at) }}
                             </div>
@@ -1697,7 +1697,7 @@
                             </el-icon>
                           </div>
                           <div class="detail-content">
-                            <div class="detail-label">完成时间</div>
+                            <div class="detail-label">Completed At</div>
                             <div class="detail-value">
                               {{ formatDateTime(merge.completed_at) }}
                             </div>
@@ -1734,14 +1734,14 @@
                             "
                             round
                           >
-                            下载视频
+                            Download Video
                           </el-button>
                           <el-button
                             :icon="View"
                             @click="previewMergedVideo(merge.merged_url)"
                             round
                           >
-                            在线预览
+                            Preview
                           </el-button>
                         </template>
                         <el-button
@@ -1750,7 +1750,7 @@
                           @click="deleteMerge(merge.id)"
                           round
                         >
-                          删除
+                          Delete
                         </el-button>
                       </div>
                     </div>
@@ -1775,7 +1775,7 @@
           :src="getImageUrl(previewCharacter)"
           :alt="previewCharacter.name"
         />
-        <el-empty v-else description="暂无图片" />
+        <el-empty v-else description="No image available" />
       </div>
       <!-- ... -->
     </el-dialog>
@@ -1786,7 +1786,7 @@
       :title="
         currentStoryboard?.background
           ? `${currentStoryboard.background.location} · ${currentStoryboard.background.time}`
-          : '场景预览'
+          : 'Scene Preview'
       "
       width="800px"
     >
@@ -1794,14 +1794,14 @@
         class="scene-image-preview"
         v-if="currentStoryboard?.background?.image_url"
       >
-        <img :src="currentStoryboard.background.image_url" alt="场景" />
+        <img :src="currentStoryboard.background.image_url" alt="Scene" />
       </div>
     </el-dialog>
 
     <!-- 角色选择对话框 -->
     <el-dialog
       v-model="showCharacterSelector"
-      title="添加角色到镜头"
+      title="Add Character to Shot"
       width="800px"
     >
       <div class="character-selector-grid">
@@ -1822,7 +1822,7 @@
           </div>
           <div class="character-info">
             <div class="character-name">{{ char.name }}</div>
-            <div class="character-role">{{ char.role || "角色" }}</div>
+            <div class="character-role">{{ char.role || "Character" }}</div>
           </div>
           <div class="character-check" v-if="isCharacterInCurrentShot(char.id)">
             <el-icon color="#409eff" :size="24">
@@ -1831,11 +1831,11 @@
           </div>
         </div>
         <div v-if="availableCharacters.length === 0" class="empty-characters">
-          <el-empty description="暂无角色，请先在剧集中创建角色" />
+          <el-empty description="No characters yet. Please create characters in the episode first." />
         </div>
       </div>
       <template #footer>
-        <el-button @click="showCharacterSelector = false">关闭</el-button>
+        <el-button @click="showCharacterSelector = false">Close</el-button>
       </template>
     </el-dialog>
 
@@ -1887,7 +1887,7 @@
     </el-dialog>
 
     <!-- 场景选择对话框 -->
-    <el-dialog v-model="showSceneSelector" title="选择场景背景" width="800px">
+    <el-dialog v-model="showSceneSelector" title="Select Scene Background" width="800px">
       <div class="scene-selector-grid">
         <div
           v-for="scene in availableScenes"
@@ -1912,7 +1912,7 @@
           </div>
         </div>
         <div v-if="availableScenes.length === 0" class="empty-scenes">
-          <el-empty description="暂无可用场景" />
+          <el-empty description="No scenes available" />
         </div>
       </div>
     </el-dialog>
@@ -1920,7 +1920,7 @@
     <!-- 视频预览对话框 -->
     <el-dialog
       v-model="showVideoPreview"
-      title="视频预览"
+      title="Video Preview"
       width="800px"
       :close-on-click-modal="true"
       destroy-on-close
@@ -1943,7 +1943,7 @@
           <el-icon :size="48" color="#ccc">
             <VideoCamera />
           </el-icon>
-          <p style="margin-top: 16px; color: #909399">视频生成中...</p>
+          <p style="margin-top: 16px; color: #909399">Video generating...</p>
         </div>
         <div class="video-meta">
           <div
@@ -1982,7 +1982,7 @@
               line-height: 1.6;
             "
           >
-            <strong>提示词：</strong>{{ previewVideo.prompt }}
+            <strong>Prompt: </strong>{{ previewVideo.prompt }}
           </div>
         </div>
       </div>
@@ -2351,8 +2351,8 @@ const loadVideoModels = async () => {
       },
     );
   } catch (error: any) {
-    console.error("加载视频模型配置失败:", error);
-    ElMessage.error("加载视频模型失败");
+    console.error("Failed to load video model config:", error);
+    ElMessage.error("Failed to load video models");
   }
 };
 
@@ -2369,7 +2369,7 @@ const loadVideoAssets = async () => {
     // 检查数据结构并正确赋值
     videoAssets.value = result.items || [];
   } catch (error: any) {
-    console.error("加载视频素材库失败:", error);
+    console.error("Failed to load video asset library:", error);
   }
 };
 
@@ -2389,27 +2389,27 @@ const availableReferenceModes = computed(() => {
     [];
 
   if (capability.supportTextOnly) {
-    modes.push({ value: "none", label: "纯文本", description: "不使用参考图" });
+    modes.push({ value: "none", label: "Text Only", description: "No reference image" });
   }
   if (capability.supportSingleImage) {
     modes.push({
       value: "single",
-      label: "单图",
-      description: "使用单张参考图",
+      label: "Single Image",
+      description: "Use one reference image",
     });
   }
   if (capability.supportFirstLastFrame) {
     modes.push({
       value: "first_last",
-      label: "首尾帧",
-      description: "使用首帧和尾帧",
+      label: "First/Last Frame",
+      description: "Use first and last frames",
     });
   }
   if (capability.supportMultipleImages) {
     modes.push({
       value: "multiple",
-      label: "多图",
-      description: `最多${capability.maxImages}张`,
+      label: "Multi-Image",
+      description: `Up to ${capability.maxImages} images`,
     });
   }
 
@@ -2478,7 +2478,7 @@ const loadPreviousStoryboardLastFrame = async () => {
       (img: any) => img.status === "completed" && img.image_url,
     );
   } catch (error) {
-    console.error("加载上一镜头尾帧失败:", error);
+    console.error("Failed to load previous shot last frame:", error);
     previousStoryboardLastFrames.value = [];
   }
 };
@@ -2510,12 +2510,12 @@ const selectPreviousLastFrame = (img: any) => {
       capability &&
       selectedImagesForVideo.value.length >= capability.maxImages
     ) {
-      ElMessage.warning(`最多只能选择${capability.maxImages}张图片`);
+      ElMessage.warning(`Maximum ${capability.maxImages} images allowed`);
       return;
     }
     selectedImagesForVideo.value.push(img.id);
   }
-  ElMessage.success("已添加为首帧参考");
+    ElMessage.success("Added as first frame reference");
 };
 
 // 监听帧类型切换，从存储中加载或清空
@@ -2775,7 +2775,7 @@ const saveStoryboardField = async (fieldName: string) => {
       updateData,
     );
   } catch (error: any) {
-    ElMessage.error("保存失败: " + (error.message || "未知错误"));
+    ElMessage.error("Save failed: " + (error.message || "Unknown error"));
   }
 };
 
@@ -2816,12 +2816,12 @@ const extractFramePrompt = async () => {
               result = JSON.parse(result);
             } catch (e) {
               console.error("Failed to parse task result", e);
-              throw new Error("解析任务结果失败");
+              throw new Error("Failed to parse task result");
             }
           }
           return result.response;
         } else if (task.status === "failed") {
-          throw new Error(task.message || task.error || "生成失败");
+          throw new Error(task.message || task.error || "Generation failed");
         }
         // 等待1秒后继续轮询
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -2862,9 +2862,9 @@ const extractFramePrompt = async () => {
     // 因为切换镜头时会重新读取sessionStorage。
     // 但为了确保如果用户没切走也能看到，上面已经更新了 currentFramePrompt
 
-    ElMessage.success(`${getFrameTypeLabel(targetFrameType)}提示词提取成功`);
+    ElMessage.success(`${getFrameTypeLabel(targetFrameType)} prompt extracted successfully`);
   } catch (error: any) {
-    ElMessage.error("提取失败: " + (error.message || "未知错误"));
+    ElMessage.error("Extraction failed: " + (error.message || "Unknown error"));
   } finally {
     // 清除该镜头的生成状态
     const stateKey = `${storyboardId}_${targetFrameType}`;
@@ -2883,13 +2883,12 @@ const isGeneratingPrompt = (
   return !!generatingPromptStates.value[`${storyboardId}_${frameType}`];
 };
 
-// 获取帧类型的中文标签
 const getFrameTypeLabel = (frameType: string): string => {
   const labels: Record<string, string> = {
-    key: "关键帧",
-    first: "首帧",
-    last: "尾帧",
-    panel: "分镜版",
+    key: "Key Frame",
+    first: "First Frame",
+    last: "Last Frame",
+    panel: "Storyboard",
   };
   return labels[frameType] || frameType;
 };
@@ -3028,14 +3027,13 @@ const generateFrameImage = async () => {
     // 提示信息
     const refMsg =
       referenceImages.length > 0
-        ? ` (已添加${referenceImages.length}张参考图)`
+        ? ` (${referenceImages.length} reference image(s) added)`
         : "";
-    ElMessage.success(`图片生成任务已提交${refMsg}`);
+    ElMessage.success(`Image generation task submitted${refMsg}`);
 
-    // 启动轮询
     startPolling();
   } catch (error: any) {
-    ElMessage.error("生成失败: " + (error.message || "未知错误"));
+    ElMessage.error("Generation failed: " + (error.message || "Unknown error"));
   } finally {
     generatingImage.value = false;
   }
@@ -3061,7 +3059,7 @@ const playVideo = (video: VideoGeneration) => {
 // 添加视频到素材库
 const addVideoToAssets = async (video: VideoGeneration) => {
   if (video.status !== "completed" || !video.video_url) {
-    ElMessage.warning("只能添加已完成的视频到素材库");
+    ElMessage.warning("Only completed videos can be added to the asset library");
     return;
   }
 
@@ -3081,21 +3079,21 @@ const addVideoToAssets = async (video: VideoGeneration) => {
         try {
           await assetAPI.deleteAsset(existingAsset.id);
         } catch (error) {
-          console.error("删除旧素材失败:", error);
+          console.error("Failed to delete old asset:", error);
         }
       }
     }
 
     // 添加新素材
     await assetAPI.importFromVideo(video.id);
-    ElMessage.success("已添加到素材库");
+    ElMessage.success("Added to asset library");
 
     // 重新加载素材库列表
     await loadVideoAssets();
 
     // 如果是替换操作，更新时间线中使用该分镜的所有视频片段
     if (isReplacing && video.storyboard_id && video.video_url) {
-      console.log("=== 视频替换，准备更新时间线 ===");
+      console.log("=== Video replaced, updating timeline ===");
       console.log("timelineEditorRef.value:", timelineEditorRef.value);
       console.log("video.storyboard_id:", video.storyboard_id);
       console.log("video.video_url:", video.video_url);
@@ -3106,11 +3104,11 @@ const addVideoToAssets = async (video: VideoGeneration) => {
           video.video_url,
         );
       } else {
-        console.warn("⚠️ timelineEditorRef.value 为空，无法更新时间线");
+        console.warn("⚠️ timelineEditorRef.value is null, cannot update timeline");
       }
     }
   } catch (error: any) {
-    ElMessage.error(error.message || "添加失败");
+    ElMessage.error(error.message || "Add failed");
   } finally {
     addingToAssets.value.delete(video.id);
   }
@@ -3122,24 +3120,23 @@ const handleDeleteVideo = async (video: VideoGeneration) => {
 
   try {
     await ElMessageBox.confirm(
-      "确定要删除这个视频吗？删除后无法恢复。",
-      "确认删除",
+      "Are you sure to delete this video? This cannot be undone.",
+      "Confirm Delete",
       {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        confirmButtonText: "Confirm",
+        cancelButtonText: "Cancel",
         type: "warning",
       },
     );
 
     await videoAPI.deleteVideo(video.id);
-    ElMessage.success("删除成功");
+    ElMessage.success("Deleted successfully");
 
-    // 重新加载当前镜头的视频列表
     await loadStoryboardVideos(Number(currentStoryboard.value.id));
   } catch (error: any) {
     if (error !== "cancel") {
-      console.error("删除视频失败:", error);
-      ElMessage.error(error.message || "删除失败");
+      console.error("Failed to delete video:", error);
+      ElMessage.error(error.message || "Delete failed");
     }
   }
 };
@@ -3147,23 +3144,22 @@ const handleDeleteVideo = async (video: VideoGeneration) => {
 // 获取状态中文文本
 const getStatusText = (status: string) => {
   const statusTextMap: Record<string, string> = {
-    pending: "等待中",
-    processing: "生成中",
-    completed: "已完成",
-    failed: "失败",
+    pending: "Pending",
+    processing: "Generating",
+    completed: "Completed",
+    failed: "Failed",
   };
   return statusTextMap[status] || status;
 };
 
-// 获取帧类型中文文本
 const getFrameTypeText = (frameType?: string) => {
   if (!frameType) return "";
   const frameTypeMap: Record<string, string> = {
-    first: "首帧",
-    key: "关键帧",
-    last: "尾帧",
-    panel: "分镜板",
-    action: "动作序列",
+    first: "First Frame",
+    key: "Key Frame",
+    last: "Last Frame",
+    panel: "Storyboard",
+    action: "Action Sequence",
   };
   return frameTypeMap[frameType] || frameType;
 };
@@ -3186,12 +3182,12 @@ const getStoryboardThumbnail = (storyboard: any) => {
 // 处理图片选择（根据模型能力）
 const handleImageSelect = (imageId: number) => {
   if (!selectedReferenceMode.value) {
-    ElMessage.warning("请先选择参考图模式");
+    ElMessage.warning("Please select a reference mode first");
     return;
   }
 
   if (!currentModelCapability.value) {
-    ElMessage.warning("请先选择视频生成模型");
+    ElMessage.warning("Please select a video generation model first");
     return;
   }
 
@@ -3232,21 +3228,21 @@ const handleImageSelect = (imageId: number) => {
         // 尾帧：设置到单独的变量
         selectedLastImageForVideo.value = imageId;
       } else {
-        ElMessage.warning("首尾帧模式下，请选择首帧或尾帧类型的图片");
+        ElMessage.warning("In first/last frame mode, please select a first or last frame type image");
       }
       break;
 
     case "multiple":
       // 多图模式：检查是否超出最大数量
       if (selectedImagesForVideo.value.length >= capability.maxImages) {
-        ElMessage.warning(`最多只能选择${capability.maxImages}张图片`);
+        ElMessage.warning(`Maximum ${capability.maxImages} images allowed`);
         return;
       }
       selectedImagesForVideo.value.push(imageId);
       break;
 
     default:
-      ElMessage.warning("未知的参考图模式");
+      ElMessage.warning("Unknown reference mode");
   }
 };
 
@@ -3312,21 +3308,20 @@ const removeSelectedImage = (imageId: number) => {
 // 生成视频
 const generateVideo = async () => {
   if (!selectedVideoModel.value) {
-    ElMessage.warning("请先选择视频生成模型");
+    ElMessage.warning("Please select a video generation model first");
     return;
   }
 
   if (!currentStoryboard.value) {
-    ElMessage.warning("请先选择分镜");
+    ElMessage.warning("Please select a shot first");
     return;
   }
 
-  // 检查参考图模式
   if (
     selectedReferenceMode.value !== "none" &&
     selectedImagesForVideo.value.length === 0
   ) {
-    ElMessage.warning("请选择参考图片");
+    ElMessage.warning("Please select a reference image");
     return;
   }
 
@@ -3345,7 +3340,7 @@ const generateVideo = async () => {
         (img) => img.id === selectedImagesForVideo.value[0],
       );
     if (!selectedImage || !selectedImage.image_url) {
-      ElMessage.error("请选择有效的参考图片");
+      ElMessage.error("Please select a valid reference image");
       return;
     }
   }
@@ -3429,12 +3424,11 @@ const generateVideo = async () => {
     const result = await videoAPI.generateVideo(requestParams);
 
     generatedVideos.value.unshift(result);
-    ElMessage.success("视频生成任务已提交");
+    ElMessage.success("Video generation task submitted");
 
-    // 启动视频轮询
     startVideoPolling();
   } catch (error: any) {
-    ElMessage.error("生成失败: " + (error.message || "未知错误"));
+    ElMessage.error("Generation failed: " + (error.message || "Unknown error"));
   } finally {
     generatingVideo.value = false;
   }
@@ -3450,7 +3444,7 @@ const loadVideoReferenceImages = async (storyboardId: number) => {
     });
     videoReferenceImages.value = result.items || [];
   } catch (error: any) {
-    console.error("加载视频参考图片失败:", error);
+    console.error("Failed to load video reference images:", error);
   }
 };
 
@@ -3473,7 +3467,7 @@ const loadStoryboardVideos = async (storyboardId: number) => {
       startVideoPolling();
     }
   } catch (error: any) {
-    console.error("加载视频列表失败:", error);
+    console.error("Failed to load video list:", error);
   } finally {
     loadingVideos.value = false;
   }
@@ -3518,7 +3512,7 @@ const startVideoPolling = () => {
           );
           storyboards.value = storyboardsRes?.storyboards || [];
         } catch (error) {
-          console.error("重新加载分镜列表失败:", error);
+          console.error("Failed to reload storyboard list:", error);
         }
       }
 
@@ -3530,7 +3524,7 @@ const startVideoPolling = () => {
         stopVideoPolling();
       }
     } catch (error) {
-      console.error("轮询视频状态失败:", error);
+      console.error("Failed to poll video status:", error);
     }
   }, 5000); // 每5秒轮询一次
 };
@@ -3578,12 +3572,12 @@ const toggleCharacterInShot = async (charId: number) => {
     });
 
     if (existIndex > -1) {
-      ElMessage.success(`已移除角色: ${char.name}`);
+      ElMessage.success(`Removed character: ${char.name}`);
     } else {
-      ElMessage.success(`已添加角色: ${char.name}`);
+      ElMessage.success(`Added character: ${char.name}`);
     }
   } catch (error: any) {
-    ElMessage.error("保存失败: " + (error.message || "未知错误"));
+    ElMessage.error("Save failed: " + (error.message || "Unknown error"));
     // 回滚操作
     if (existIndex > -1) {
       currentStoryboard.value.characters.push(char);
@@ -3627,10 +3621,9 @@ const removeCharacterFromShot = async (charId: number) => {
       character_ids: characterIds,
     });
 
-    ElMessage.success(`已移除角色: ${char.name}`);
+    ElMessage.success(`Removed character: ${char.name}`);
   } catch (error: any) {
-    ElMessage.error("保存失败: " + (error.message || "未知错误"));
-    // 回滚操作
+    ElMessage.error("Save failed: " + (error.message || "Unknown error"));
     currentStoryboard.value.characters.push(char);
   }
 };
@@ -3646,7 +3639,7 @@ const loadData = async () => {
       (e) => e.episode_number === episodeNumber,
     );
     if (!ep) {
-      ElMessage.error("章节不存在");
+      ElMessage.error("Episode not found");
       router.back();
       return;
     }
@@ -3677,7 +3670,7 @@ const loadData = async () => {
     // 加载视频素材库
     await loadVideoAssets();
   } catch (error: any) {
-    ElMessage.error("加载数据失败: " + (error.message || "未知错误"));
+    ElMessage.error("Failed to load data: " + (error.message || "Unknown error"));
   }
 };
 
@@ -3693,9 +3686,9 @@ const selectScene = async (sceneId: number) => {
     // 重新加载数据
     await loadData();
     showSceneSelector.value = false;
-    ElMessage.success("场景关联成功");
+    ElMessage.success("Scene linked successfully");
   } catch (error: any) {
-    ElMessage.error(error.message || "场景关联失败");
+    ElMessage.error(error.message || "Failed to link scene");
   }
 };
 
@@ -3722,30 +3715,29 @@ const formatTime = (seconds: number) => {
 };
 
 const zoomIn = () => {
-  ElMessage.info("时间线缩放功能开发中");
+  ElMessage.info("Timeline zoom feature is under development");
 };
 
 const zoomOut = () => {
-  ElMessage.info("时间线缩放功能开发中");
+  ElMessage.info("Timeline zoom feature is under development");
 };
 
 const generateImage = async () => {
   if (!currentStoryboard.value) return;
 
   try {
-    ElMessage.info("图片生成功能开发中");
+    ElMessage.info("Image generation feature is under development");
   } catch (error: any) {
-    ElMessage.error(error.message || "生成失败");
+    ElMessage.error(error.message || "Generation failed");
   }
 };
 
 const uploadImage = () => {
   if (!currentStoryboard.value) {
-    ElMessage.warning("请先选择镜头");
+    ElMessage.warning("Please select a shot first");
     return;
   }
 
-  // 创建隐藏的文件输入
   const input = document.createElement("input");
   input.type = "file";
   input.accept = "image/*";
@@ -3754,25 +3746,22 @@ const uploadImage = () => {
     const file = target.files?.[0];
     if (!file) return;
 
-    // 验证文件大小 (10MB)
     if (file.size > 10 * 1024 * 1024) {
-      ElMessage.error("图片大小不能超过 10MB");
+      ElMessage.error("Image size cannot exceed 10MB");
       return;
     }
 
     try {
-      // 创建 FormData
       const formData = new FormData();
       formData.append("file", file);
 
-      // 上传到服务器
       const response = await fetch("/api/v1/upload/image", {
         method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error("上传失败");
+        throw new Error("Upload failed");
       }
 
       const result = await response.json();
@@ -3794,11 +3783,11 @@ const uploadImage = () => {
           selectedFrameType.value,
         );
 
-        ElMessage.success("图片上传成功");
+        ElMessage.success("Image uploaded successfully");
       }
     } catch (error: any) {
-      console.error("上传图片失败:", error);
-      ElMessage.error(error.message || "上传失败");
+      console.error("Failed to upload image:", error);
+      ElMessage.error(error.message || "Upload failed");
     }
   };
   input.click();
@@ -3809,24 +3798,23 @@ const handleDeleteImage = async (img: ImageGeneration) => {
   if (!currentStoryboard.value) return;
 
   try {
-    await ElMessageBox.confirm("确定要删除这张图片吗？", "确认删除", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
+    await ElMessageBox.confirm("Are you sure to delete this image?", "Confirm Delete", {
+      confirmButtonText: "Confirm",
+      cancelButtonText: "Cancel",
       type: "warning",
     });
 
     await imageAPI.deleteImage(img.id);
-    ElMessage.success("删除成功");
+    ElMessage.success("Deleted successfully");
 
-    // 重新加载当前帧类型的图片列表
     await loadStoryboardImages(
       currentStoryboard.value.id,
       selectedFrameType.value,
     );
   } catch (error: any) {
     if (error !== "cancel") {
-      console.error("删除图片失败:", error);
-      ElMessage.error(error.message || "删除失败");
+      console.error("Failed to delete image:", error);
+      ElMessage.error(error.message || "Delete failed");
     }
   }
 };
@@ -3843,7 +3831,7 @@ const loadAllGeneratedImages = async () => {
     });
     allGeneratedImages.value = result.items || [];
   } catch (error: any) {
-    console.error("加载所有图片失败:", error);
+    console.error("Failed to load all images:", error);
   }
 };
 
@@ -3894,18 +3882,15 @@ const handleCropSave = async (images: { blob: Blob; frameType: string }[]) => {
       });
     }
 
-    ElMessage.success("裁剪图片保存成功");
+    ElMessage.success("Cropped images saved successfully");
 
-    // 刷新图片列表 - 刷新所有帧类型的图片，确保新裁剪的图片能在视频生成tab中被选择到
     if (currentStoryboard.value) {
-      // 刷新当前镜头的所有图片（不限制帧类型）
       await loadStoryboardImages(currentStoryboard.value.id);
-      // 刷新所有生成的图片列表
       await loadAllGeneratedImages();
     }
   } catch (error) {
     console.error("Failed to save cropped images:", error);
-    ElMessage.error("保存裁剪图片失败");
+    ElMessage.error("Failed to save cropped images");
   }
 };
 
@@ -3928,9 +3913,9 @@ const handleAddStoryboard = async () => {
     await dramaAPI.createStoryboard({
       episode_id: parseInt(episodeId.value),
       storyboard_number: nextShotNumber,
-      title: `镜头 ${nextShotNumber}`,
-      description: "新镜头描述",
-      action: "动作描述",
+      title: `Shot ${nextShotNumber}`,
+      description: "New shot description",
+      action: "Action description",
       dialogue: "",
       duration: 5,
       scene_id:
@@ -3939,35 +3924,33 @@ const handleAddStoryboard = async () => {
           : undefined,
     });
 
-    ElMessage.success("添加分镜成功");
-    await loadData(); // Refresh list
+    ElMessage.success("Shot added successfully");
+    await loadData();
 
-    // Select the new storyboard (the last one)
     if (storyboards.value.length > 0) {
       selectStoryboard(storyboards.value[storyboards.value.length - 1].id);
     }
   } catch (error: any) {
-    console.error("添加分镜失败:", error);
-    ElMessage.error(error.message || "添加分镜失败");
+    console.error("Failed to add shot:", error);
+    ElMessage.error(error.message || "Failed to add shot");
   }
 };
 
 const handleDeleteStoryboard = async (storyboard: any) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除镜头 ${storyboard.storyboard_number} 吗？此操作不可恢复。`,
-      "删除确认",
+      `Are you sure to delete shot ${storyboard.storyboard_number}? This cannot be undone.`,
+      "Confirm Delete",
       {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        confirmButtonText: "Confirm",
+        cancelButtonText: "Cancel",
         type: "warning",
       },
     );
 
     await dramaAPI.deleteStoryboard(storyboard.id);
-    ElMessage.success("删除分镜成功");
+    ElMessage.success("Shot deleted successfully");
 
-    // If deleted current storyboard, clear selection or select another
     if (currentStoryboardId.value === storyboard.id) {
       currentStoryboardId.value = undefined;
       currentStoryboard.value = undefined;
@@ -3976,8 +3959,8 @@ const handleDeleteStoryboard = async (storyboard: any) => {
     await loadData();
   } catch (error: any) {
     if (error !== "cancel") {
-      console.error("删除分镜失败:", error);
-      ElMessage.error(error.message || "删除分镜失败");
+      console.error("Failed to delete shot:", error);
+      ElMessage.error(error.message || "Failed to delete shot");
     }
   }
 };
@@ -4007,8 +3990,8 @@ const loadVideoMerges = async () => {
       stopMergePolling();
     }
   } catch (error: any) {
-    console.error("加载视频合成列表失败:", error);
-    ElMessage.error("加载视频合成列表失败");
+    console.error("Failed to load video merge list:", error);
+    ElMessage.error("Failed to load video merge list");
   } finally {
     loadingMerges.value = false;
   }
@@ -4065,7 +4048,7 @@ const handleMergeCompleted = async (mergeId: number) => {
 const downloadVideo = async (url: string, title: string) => {
   try {
     const loadingMsg = ElMessage.info({
-      message: "正在准备下载...",
+      message: "Preparing download...",
       duration: 0,
     });
 
@@ -4096,10 +4079,10 @@ const downloadVideo = async (url: string, title: string) => {
     }, 100);
 
     loadingMsg.close();
-    ElMessage.success("视频下载已开始");
+    ElMessage.success("Video download started");
   } catch (error) {
-    console.error("下载视频失败:", error);
-    ElMessage.error("视频下载失败，请稍后重试");
+    console.error("Failed to download video:", error);
+    ElMessage.error("Video download failed, please try again later");
   }
 };
 
@@ -4114,23 +4097,22 @@ const previewMergedVideo = (url: string) => {
 const deleteMerge = async (mergeId: number) => {
   try {
     await ElMessageBox.confirm(
-      "确定要删除此合成记录吗？此操作不可恢复。",
-      "删除确认",
+      "Are you sure to delete this merge record? This cannot be undone.",
+      "Confirm Delete",
       {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        confirmButtonText: "Confirm",
+        cancelButtonText: "Cancel",
         type: "warning",
       },
     );
 
     await videoMergeAPI.deleteMerge(mergeId);
-    ElMessage.success("删除成功");
-    // 刷新列表
+    ElMessage.success("Deleted successfully");
     await loadVideoMerges();
   } catch (error: any) {
     if (error !== "cancel") {
-      console.error("删除失败:", error);
-      ElMessage.error(error.response?.data?.message || "删除失败");
+      console.error("Delete failed:", error);
+      ElMessage.error(error.response?.data?.message || "Delete failed");
     }
   }
 };
@@ -4144,12 +4126,12 @@ const formatDateTime = (dateStr: string) => {
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (minutes < 1) return "刚刚";
-  if (minutes < 60) return `${minutes}分钟前`;
-  if (hours < 24) return `${hours}小时前`;
-  if (days < 7) return `${days}天前`;
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
 
-  // 超过7天显示完整日期
+  // Show full date after 7 days
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   const hour = String(date.getHours()).padStart(2, "0");

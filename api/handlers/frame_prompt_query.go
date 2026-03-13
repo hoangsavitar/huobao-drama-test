@@ -8,7 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// GetStoryboardFramePrompts 查询镜头的所有帧提示词
 // GET /api/v1/storyboards/:id/frame-prompts
 func GetStoryboardFramePrompts(db *gorm.DB, log *logger.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {

@@ -208,10 +208,10 @@ export const useEpisodeStore = defineStore('episode', () => {
         cache.data = episode
         cache.lastFetch = now
       } else {
-        cache.error = '未找到章节数据'
+        cache.error = 'Episode data not found'
       }
     } catch (error: any) {
-      cache.error = error.message || '加载章节数据失败'
+      cache.error = error.message || 'Failed to load episode data'
       console.error('Failed to fetch episode:', error)
     } finally {
       cache.loading = false

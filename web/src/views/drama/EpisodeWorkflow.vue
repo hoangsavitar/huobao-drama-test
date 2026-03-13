@@ -48,7 +48,7 @@
             @click="showModelConfigDialog"
             :title="$t('workflow.modelConfig')"
           >
-            图文配置
+            Text/Image Config
           </el-button>
         </template>
       </AppHeader>
@@ -618,7 +618,7 @@
                   width="80"
                 >
                   <template #default="{ row }">
-                    {{ row.duration || "-" }}秒
+                    {{ row.duration || "-" }}s
                   </template>
                 </el-table-column>
                 <el-table-column
@@ -791,13 +791,13 @@
                   v-model="editingShot.shot_type"
                   :placeholder="$t('workflow.selectShotType')"
                 >
-                  <el-option :label="$t('workflow.longShot')" value="远景" />
-                  <el-option :label="$t('workflow.fullShot')" value="全景" />
-                  <el-option :label="$t('workflow.mediumShot')" value="中景" />
-                  <el-option :label="$t('workflow.closeUp')" value="近景" />
+                  <el-option :label="$t('workflow.longShot')" value="Long Shot" />
+                  <el-option :label="$t('workflow.fullShot')" value="Full Shot" />
+                  <el-option :label="$t('workflow.mediumShot')" value="Medium Shot" />
+                  <el-option :label="$t('workflow.closeUp')" value="Close Up" />
                   <el-option
                     :label="$t('workflow.extremeCloseUp')"
-                    value="特写"
+                    value="Extreme Close Up"
                   />
                 </el-select>
               </el-form-item>
@@ -808,10 +808,10 @@
                   v-model="editingShot.angle"
                   :placeholder="$t('workflow.selectAngle')"
                 >
-                  <el-option :label="$t('workflow.eyeLevel')" value="平视" />
-                  <el-option :label="$t('workflow.lowAngle')" value="仰视" />
-                  <el-option :label="$t('workflow.highAngle')" value="俯视" />
-                  <el-option :label="$t('workflow.sideView')" value="侧面" />
+                  <el-option :label="$t('workflow.eyeLevel')" value="Eye Level" />
+                  <el-option :label="$t('workflow.lowAngle')" value="Low Angle" />
+                  <el-option :label="$t('workflow.highAngle')" value="High Angle" />
+                  <el-option :label="$t('workflow.sideView')" value="Side View" />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -823,11 +823,11 @@
                 >
                   <el-option
                     :label="$t('workflow.staticShot')"
-                    value="固定镜头"
+                    value="Static Shot"
                   />
-                  <el-option :label="$t('workflow.pushIn')" value="推镜" />
-                  <el-option :label="$t('workflow.pullOut')" value="拉镜" />
-                  <el-option :label="$t('workflow.followShot')" value="跟镜" />
+                  <el-option :label="$t('workflow.pushIn')" value="Push In" />
+                  <el-option :label="$t('workflow.pullOut')" value="Pull Out" />
+                  <el-option :label="$t('workflow.followShot')" value="Follow Shot" />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -1439,7 +1439,7 @@ const loadAIConfigs = async () => {
       !availableTextModelNames.includes(selectedTextModel.value)
     ) {
       console.warn(
-        `已选择的文本模型 ${selectedTextModel.value} 不在可用列表中，重置为默认值`,
+        `Selected text model ${selectedTextModel.value} is unavailable, reset to default`,
       );
       selectedTextModel.value =
         textModels.value.length > 0 ? textModels.value[0].modelName : "";
@@ -1457,7 +1457,7 @@ const loadAIConfigs = async () => {
       !availableImageModelNames.includes(selectedImageModel.value)
     ) {
       console.warn(
-        `已选择的图片模型 ${selectedImageModel.value} 不在可用列表中，重置为默认值`,
+        `Selected image model ${selectedImageModel.value} is unavailable, reset to default`,
       );
       // 优先选择包含 nano 的模型
       const nanoModel = imageModels.value.find((m) =>
@@ -1478,7 +1478,7 @@ const loadAIConfigs = async () => {
       }
     }
   } catch (error: any) {
-    console.error("加载AI配置失败:", error);
+    console.error("Failed to load AI configs:", error);
   }
 };
 
@@ -1542,7 +1542,7 @@ const loadDramaData = async () => {
     // 检查是否有生成中的角色或场景，自动启动轮询
     await checkAndStartPolling();
   } catch (error: any) {
-    ElMessage.error(error.message || "加载项目数据失败");
+    ElMessage.error(error.message || "Failed to load project data");
   }
 };
 
@@ -1575,13 +1575,13 @@ const checkAndStartPolling = async () => {
           generatingCharacterImages.value[char.id] = true;
           pollImageStatus(charImageGen.id, async () => {
             await loadDramaData();
-            ElMessage.success(`${char.name}的图片生成完成！`);
+            ElMessage.success(`${char.name} image generation completed`);
           }).finally(() => {
             generatingCharacterImages.value[char.id] = false;
           });
         }
       } catch (error) {
-        console.error("[轮询] 查询角色图片生成记录失败:", error);
+        console.error("[Poll] Failed to query character image generation:", error);
       }
     }
   }
@@ -1611,13 +1611,13 @@ const checkAndStartPolling = async () => {
           generatingSceneImages.value[scene.id] = true;
           pollImageStatus(sceneImageGen.id, async () => {
             await loadDramaData();
-            ElMessage.success(`${scene.location}的图片生成完成！`);
+            ElMessage.success(`${scene.location} image generation completed`);
           }).finally(() => {
             generatingSceneImages.value[scene.id] = false;
           });
         }
       } catch (error) {
-        console.error("[轮询] 查询场景图片生成记录失败:", error);
+        console.error("[Poll] Failed to query scene image generation:", error);
       }
     }
   }
@@ -1644,17 +1644,17 @@ const saveChapterScript = async () => {
       // 创建新章节
       const newEpisode = {
         episode_number: episodeNumber,
-        title: `第${episodeNumber}集`,
+        title: `Episode ${episodeNumber}`,
         script_content: scriptContent.value,
       };
       updatedEpisodes = [...existingEpisodes, newEpisode];
     }
 
     await dramaAPI.saveEpisodes(dramaId, updatedEpisodes);
-    ElMessage.success("章节保存成功！");
+    ElMessage.success("Episode saved");
     await loadDramaData();
   } catch (error: any) {
-    ElMessage.error(error.message || "保存失败");
+    ElMessage.error(error.message || "Save failed");
   }
 };
 
@@ -1710,23 +1710,23 @@ const pollImageStatus = async (
         return;
       } else if (imageGen.status === "failed") {
         // 生成失败
-        ElMessage.error(`图片生成失败: ${imageGen.error_msg || "未知错误"}`);
+        ElMessage.error(`Image generation failed: ${imageGen.error_msg || "Unknown error"}`);
         return;
       }
       // 如果是pending或processing，继续轮询
     } catch (error: any) {
-      console.error("[轮询] 检查图片状态失败:", error);
+      console.error("[Poll] Failed to check image status:", error);
       // 继续轮询，不中断
     }
   }
 
   // 超时
-  ElMessage.warning("图片生成超时，请稍后刷新页面查看结果");
+  ElMessage.warning("Image generation timed out. Please refresh later.");
 };
 
 const extractCharactersAndBackgrounds = async () => {
   if (!currentEpisode.value?.id) {
-    ElMessage.error("章节信息不存在");
+    ElMessage.error("Episode info not found");
     return;
   }
 
@@ -1750,7 +1750,7 @@ const extractCharactersAndBackgrounds = async () => {
       ), // 传递用户选择的文本模型
     ]);
 
-    ElMessage.success("任务已创建，正在后台处理...");
+    ElMessage.success("Task created and processing in background...");
 
     // 并行轮询两个任务
     await Promise.all([
@@ -1764,7 +1764,7 @@ const extractCharactersAndBackgrounds = async () => {
     console.error($t("workflow.charactersAndScenesExtractFailed") + ":", error);
 
     const errorData = error.response?.data?.error;
-    const errorMsg = errorData?.message || error.message || "提取失败";
+    const errorMsg = errorData?.message || error.message || "Extraction failed";
 
     if (
       errorMsg.includes("no config found") ||
@@ -1773,7 +1773,7 @@ const extractCharactersAndBackgrounds = async () => {
     ) {
       ElMessage({
         type: "warning",
-        message: '未配置AI服务，请前往"设置 > AI服务配置"添加文本生成服务',
+        message: 'AI service is not configured. Go to "Settings > AI Config" and add a text service.',
         duration: 5000,
         showClose: true,
       });
@@ -1827,7 +1827,7 @@ const pollExtractTask = async (
       }
       // 否则继续轮询
     } catch (error: any) {
-      console.error(`轮询${type}任务状态失败:`, error);
+      console.error(`Failed to poll ${type} task status:`, error);
       throw error;
     }
   }
@@ -1852,18 +1852,18 @@ const generateCharacterImage = async (characterId: number) => {
     const imageGenId = response.image_generation?.id;
 
     if (imageGenId) {
-      ElMessage.info("角色图片生成中，请稍候...");
+      ElMessage.info("Generating character image...");
       // 轮询检查生成状态
       await pollImageStatus(imageGenId, async () => {
         await loadDramaData();
-        ElMessage.success("角色图片生成完成！");
+        ElMessage.success("Character image generated");
       });
     } else {
-      ElMessage.success("角色图片生成已启动");
+      ElMessage.success("Character image generation started");
       await loadDramaData();
     }
   } catch (error: any) {
-    ElMessage.error(error.message || "生成失败");
+    ElMessage.error(error.message || "Generation failed");
   } finally {
     generatingCharacterImages.value[characterId] = false;
   }
@@ -1889,7 +1889,7 @@ const toggleSelectAllScenes = () => {
 
 const batchGenerateCharacterImages = async () => {
   if (selectedCharacterIds.value.length === 0) {
-    ElMessage.warning("请先选择要生成的角色");
+    ElMessage.warning("Please select characters first");
     return;
   }
 
@@ -1937,7 +1937,7 @@ const generateSceneImage = async (sceneId: string) => {
       await loadDramaData();
     }
   } catch (error: any) {
-    ElMessage.error(error.message || "生成失败");
+    ElMessage.error(error.message || "Generation failed");
   } finally {
     generatingSceneImages.value[sceneId] = false;
   }
@@ -1945,7 +1945,7 @@ const generateSceneImage = async (sceneId: string) => {
 
 const batchGenerateSceneImages = async () => {
   if (selectedSceneIds.value.length === 0) {
-    ElMessage.warning("请先选择要生成的场景");
+    ElMessage.warning("Please select scenes first");
     return;
   }
 
@@ -1984,28 +1984,28 @@ let pollTimer: any = null;
 
 const generateShots = async () => {
   if (!currentEpisode.value?.id) {
-    ElMessage.error("章节信息不存在");
+    ElMessage.error("Episode info not found");
     return;
   }
 
   generatingShots.value = true;
   taskProgress.value = 0;
-  taskMessage.value = "初始化任务...";
+  taskMessage.value = "Initializing task...";
 
   try {
     const episodeId = currentEpisode.value.id.toString();
 
     // 【调试日志】输出当前操作的集数信息
-    console.log("=== 开始生成分镜 ===");
-    console.log("当前 episodeNumber (路由参数):", episodeNumber);
-    console.log("当前 episodeId (从 currentEpisode 获取):", episodeId);
-    console.log("currentEpisode 完整信息:", {
+    console.log("=== Start storyboard generation ===");
+    console.log("Current episodeNumber (route param):", episodeNumber);
+    console.log("Current episodeId (from currentEpisode):", episodeId);
+    console.log("currentEpisode details:", {
       id: currentEpisode.value?.id,
       episode_number: currentEpisode.value?.episode_number,
       title: currentEpisode.value?.title,
     });
     console.log(
-      "所有剧集列表:",
+      "All episodes:",
       drama.value?.episodes?.map((ep) => ({
         id: ep.id,
         episode_number: ep.episode_number,
@@ -2019,12 +2019,12 @@ const generateShots = async () => {
       selectedTextModel.value,
     );
 
-    taskMessage.value = response.message || "任务已创建";
+    taskMessage.value = response.message || "Task created";
 
     // 开始轮询任务状态
     await pollTaskStatus(response.task_id);
   } catch (error: any) {
-    ElMessage.error(error.message || "拆分失败");
+    ElMessage.error(error.message || "Split failed");
     generatingShots.value = false;
   }
 };
@@ -2035,7 +2035,7 @@ const pollTaskStatus = async (taskId: string) => {
       const task = await generationAPI.getTaskStatus(taskId);
 
       taskProgress.value = task.progress;
-      taskMessage.value = task.message || `处理中... ${task.progress}%`;
+      taskMessage.value = task.message || `Processing... ${task.progress}%`;
 
       if (task.status === "completed") {
         // 任务完成
@@ -2062,7 +2062,7 @@ const pollTaskStatus = async (taskId: string) => {
           pollTimer = null;
         }
         generatingShots.value = false;
-        ElMessage.error(task.error || "分镜拆分失败");
+        ElMessage.error(task.error || "Storyboard split failed");
       }
       // 否则继续轮询
     } catch (error: any) {
@@ -2071,7 +2071,7 @@ const pollTaskStatus = async (taskId: string) => {
         pollTimer = null;
       }
       generatingShots.value = false;
-      ElMessage.error("查询任务状态失败: " + error.message);
+      ElMessage.error("Failed to query task status: " + error.message);
     }
   };
 
@@ -2120,10 +2120,10 @@ const saveShotEdit = async () => {
       };
     }
 
-    ElMessage.success("镜头修改成功");
+    ElMessage.success("Shot updated");
     shotEditDialogVisible.value = false;
   } catch (error: any) {
-    ElMessage.error("保存失败: " + (error.message || "未知错误"));
+    ElMessage.error("Save failed: " + (error.message || "Unknown error"));
   } finally {
     savingShot.value = false;
   }
@@ -2152,12 +2152,12 @@ const savePrompt = async () => {
         time: currentEditItem.value.time || "",
       });
 
-      ElMessage.success("保存成功");
+      ElMessage.success("Saved");
       await loadDramaData();
     }
     promptDialogVisible.value = false;
   } catch (error: any) {
-    ElMessage.error(error.message || "保存失败");
+    ElMessage.error(error.message || "Save failed");
   }
 };
 
@@ -2215,12 +2215,12 @@ const selectLibraryItem = async (item: any) => {
         currentUploadTarget.value.id.toString(),
         item.id,
       );
-      ElMessage.success("应用角色形象成功！");
+      ElMessage.success("Character image applied");
       await loadDramaData();
       libraryDialogVisible.value = false;
     }
   } catch (error: any) {
-    ElMessage.error(error.message || "应用失败");
+    ElMessage.error(error.message || "Apply failed");
   }
 };
 
@@ -2230,7 +2230,7 @@ const handleUploadSuccess = async (response: any) => {
     const localPath = response.local_path || response.data?.local_path;
 
     if (!imageUrl && !localPath) {
-      ElMessage.error("上传失败：未获取到图片地址");
+      ElMessage.error("Upload failed: missing image URL");
       return;
     }
 
@@ -2242,7 +2242,7 @@ const handleUploadSuccess = async (response: any) => {
           local_path: localPath,
         },
       );
-      ElMessage.success("上传成功！");
+      ElMessage.success("Uploaded");
     } else if (currentUploadTarget.value?.type === "scene") {
       // 更新场景图片
       await dramaAPI.updateScene(currentUploadTarget.value.id.toString(), {
@@ -2255,12 +2255,12 @@ const handleUploadSuccess = async (response: any) => {
     await loadDramaData();
     uploadDialogVisible.value = false;
   } catch (error: any) {
-    ElMessage.error(error.message || "上传失败");
+    ElMessage.error(error.message || "Upload failed");
   }
 };
 
 const handleUploadError = () => {
-  ElMessage.error("上传失败，请重试");
+  ElMessage.error("Upload failed, please retry");
 };
 
 const deleteCharacter = async (characterId: number) => {
@@ -2276,18 +2276,18 @@ const deleteCharacter = async (characterId: number) => {
     );
 
     await characterLibraryAPI.deleteCharacter(characterId);
-    ElMessage.success("角色已删除");
+    ElMessage.success("Character deleted");
     await loadDramaData();
   } catch (error: any) {
     if (error !== "cancel") {
-      ElMessage.error(error.message || "删除失败");
+      ElMessage.error(error.message || "Delete failed");
     }
   }
 };
 
 const goToProfessionalUI = () => {
   if (!currentEpisode.value?.id) {
-    ElMessage.error("章节信息不存在");
+    ElMessage.error("Episode info not found");
     return;
   }
 
@@ -2302,7 +2302,7 @@ const goToProfessionalUI = () => {
 
 const goToCompose = () => {
   if (!currentEpisode.value?.id) {
-    ElMessage.error("章节信息不存在");
+    ElMessage.error("Episode info not found");
     return;
   }
 
@@ -2363,7 +2363,7 @@ const saveScene = async () => {
 
 // 处理场景图片上传成功
 const handleSceneImageSuccess = (response: any) => {
-  console.log("场景图片上传响应:", response);
+  console.log("Scene image upload response:", response);
 
   // 处理不同的响应结构
   const imageUrl = response.url || response.data?.url;
@@ -2376,7 +2376,7 @@ const handleSceneImageSuccess = (response: any) => {
     newScene.value.local_path = localPath;
   }
 
-  console.log("更新后的 newScene:", newScene.value);
+  console.log("Updated newScene:", newScene.value);
 
   if (imageUrl || localPath) {
     ElMessage.success($t("workflow.imageUploadSuccess"));
@@ -2391,11 +2391,11 @@ const beforeAvatarUpload = (file: File) => {
   const isLt10M = file.size / 1024 / 1024 < 10;
 
   if (!isImage) {
-    ElMessage.error("只能上传图片文件!");
+    ElMessage.error("Only image files are allowed");
     return false;
   }
   if (!isLt10M) {
-    ElMessage.error("图片大小不能超过 10MB!");
+    ElMessage.error("Image size cannot exceed 10MB");
     return false;
   }
   return true;

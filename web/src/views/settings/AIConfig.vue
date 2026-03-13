@@ -1,10 +1,9 @@
 <template>
   <div class="page-container">
     <div class="content-wrapper animate-fade-in">
-      <!-- Page Header / 页面头部 -->
       <PageHeader
         :title="$t('aiConfig.title')"
-        :subtitle="$t('aiConfig.subtitle') || '管理 AI 服务配置'"
+        :subtitle="$t('aiConfig.subtitle') || 'Manage AI service configurations'"
         :show-back="true"
         :back-text="$t('common.back')"
       >
@@ -16,7 +15,6 @@
         </template>
       </PageHeader>
 
-      <!-- Tabs / 标签页 -->
       <div class="tabs-wrapper">
         <el-tabs
           v-model="activeTab"
@@ -59,7 +57,7 @@
         </el-tabs>
       </div>
 
-      <!-- Edit/Create Dialog / 编辑创建弹窗 -->
+      <!-- Edit/Create Dialog -->
       <el-dialog
         v-model="dialogVisible"
         :title="isEdit ? $t('aiConfig.editConfig') : $t('aiConfig.addConfig')"
@@ -211,12 +209,11 @@ const form = reactive<
   name: "",
   base_url: "",
   api_key: "",
-  model: [], // 改为数组支持多选
-  priority: 0, // 默认优先级为0
+  model: [],
+  priority: 0,
   is_active: true,
 });
 
-// 厂商和模型配置
 interface ProviderConfig {
   id: string;
   name: string;
@@ -249,7 +246,7 @@ const providerConfigs: Record<AIServiceType, ProviderConfig[]> = {
   image: [
     {
       id: "volcengine",
-      name: "火山引擎",
+      name: "Volcengine",
       models: ["doubao-seedream-4-5-251128", "doubao-seedream-4-0-250828"],
     },
     {
@@ -267,7 +264,7 @@ const providerConfigs: Record<AIServiceType, ProviderConfig[]> = {
   video: [
     {
       id: "volces",
-      name: "火山引擎",
+      name: "Volcengine",
       models: [
         "doubao-seedance-1-5-pro-251215",
         "doubao-seedance-1-0-lite-i2v-250428",
@@ -294,26 +291,18 @@ const providerConfigs: Record<AIServiceType, ProviderConfig[]> = {
   ],
 };
 
-// 当前可用的厂商列表（只显示有激活配置的）
 const availableProviders = computed(() => {
-  // 获取当前service_type下所有激活的配置
   const activeConfigs = configs.value.filter(
     (c) => c.service_type === form.service_type && c.is_active,
   );
-
-  // 提取所有激活配置的provider，去重
   const activeProviderIds = new Set(activeConfigs.map((c) => c.provider));
-
-  // 从providerConfigs中筛选出有激活配置的provider
   const allProviders = providerConfigs[form.service_type] || [];
   return allProviders.filter((p) => activeProviderIds.has(p.id));
 });
 
-// 当前可用的模型列表（从已激活的配置中获取）
 const availableModels = computed(() => {
   if (!form.provider) return [];
 
-  // 从已激活的配置中提取该 provider 的所有模型
   const activeConfigsForProvider = configs.value.filter(
     (c) =>
       c.provider === form.provider &&
@@ -321,7 +310,6 @@ const availableModels = computed(() => {
       c.is_active,
   );
 
-  // 提取所有模型，去重
   const models = new Set<string>();
   activeConfigsForProvider.forEach((config) => {
     config.model.forEach((m) => models.add(m));
@@ -330,7 +318,7 @@ const availableModels = computed(() => {
   return Array.from(models);
 });
 
-// 完整端点示例
+// Full endpoint example
 const fullEndpointExample = computed(() => {
   const baseUrl = form.base_url || "https://api.example.com";
   const provider = form.provider;
@@ -370,17 +358,17 @@ const fullEndpointExample = computed(() => {
 });
 
 const rules: FormRules = {
-  name: [{ required: true, message: "请输入配置名称", trigger: "blur" }],
-  provider: [{ required: true, message: "请选择厂商", trigger: "change" }],
+  name: [{ required: true, message: "Please enter a config name", trigger: "blur" }],
+  provider: [{ required: true, message: "Please select a provider", trigger: "change" }],
   base_url: [
-    { required: true, message: "请输入 Base URL", trigger: "blur" },
-    { type: "url", message: "请输入正确的 URL 格式", trigger: "blur" },
+    { required: true, message: "Please enter Base URL", trigger: "blur" },
+    { type: "url", message: "Please enter a valid URL", trigger: "blur" },
   ],
-  api_key: [{ required: true, message: "请输入 API Key", trigger: "blur" }],
+  api_key: [{ required: true, message: "Please enter API Key", trigger: "blur" }],
   model: [
     {
       required: true,
-      message: "请至少选择一个模型",
+      message: "Please select at least one model",
       trigger: "change",
       validator: (rule: any, value: any, callback: any) => {
         if (Array.isArray(value) && value.length > 0) {
@@ -388,7 +376,7 @@ const rules: FormRules = {
         } else if (typeof value === "string" && value.length > 0) {
           callback();
         } else {
-          callback(new Error("请至少选择一个模型"));
+          callback(new Error("Please select at least one model"));
         }
       },
     },
@@ -400,13 +388,12 @@ const loadConfigs = async () => {
   try {
     configs.value = await aiAPI.list(activeTab.value);
   } catch (error: any) {
-    ElMessage.error(error.message || "加载失败");
+    ElMessage.error(error.message || "Load failed");
   } finally {
     loading.value = false;
   }
 };
 
-// 生成随机配置名称
 const generateConfigName = (
   provider: string,
   serviceType: AIServiceType,
@@ -419,9 +406,9 @@ const generateConfigName = (
   };
 
   const serviceNames: Record<AIServiceType, string> = {
-    text: "文本",
-    image: "图片",
-    video: "视频",
+    text: "Text",
+    image: "Image",
+    video: "Video",
   };
 
   const randomNum = Math.floor(Math.random() * 10000)
@@ -438,11 +425,8 @@ const showCreateDialog = () => {
   editingId.value = undefined;
   resetForm();
   form.service_type = activeTab.value;
-  // 默认选择 chatfire
   form.provider = "chatfire";
-  // 设置默认 base_url
   form.base_url = "https://api.chatfire.site/v1";
-  // 自动生成随机配置名称
   form.name = generateConfigName("chatfire", activeTab.value);
   dialogVisible.value = true;
 };
@@ -453,11 +437,11 @@ const handleEdit = (config: AIServiceConfig) => {
 
   Object.assign(form, {
     service_type: config.service_type,
-    provider: config.provider || "chatfire", // 直接使用配置中的 provider，默认为 chatfire
+    provider: config.provider || "chatfire",
     name: config.name,
     base_url: config.base_url,
     api_key: config.api_key,
-    model: Array.isArray(config.model) ? config.model : [config.model], // 统一转换为数组
+    model: Array.isArray(config.model) ? config.model : [config.model],
     priority: config.priority || 0,
     is_active: config.is_active,
   });
@@ -466,18 +450,18 @@ const handleEdit = (config: AIServiceConfig) => {
 
 const handleDelete = async (config: AIServiceConfig) => {
   try {
-    await ElMessageBox.confirm("确定要删除该配置吗？", "警告", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
+    await ElMessageBox.confirm("Are you sure to delete this config?", "Warning", {
+      confirmButtonText: "Confirm",
+      cancelButtonText: "Cancel",
       type: "warning",
     });
 
     await aiAPI.delete(config.id);
-    ElMessage.success("删除成功");
+    ElMessage.success("Deleted successfully");
     loadConfigs();
   } catch (error: any) {
     if (error !== "cancel") {
-      ElMessage.error(error.message || "删除失败");
+      ElMessage.error(error.message || "Delete failed");
     }
   }
 };
@@ -486,10 +470,10 @@ const handleToggleActive = async (config: AIServiceConfig) => {
   try {
     const newActiveState = !config.is_active;
     await aiAPI.update(config.id, { is_active: newActiveState });
-    ElMessage.success(newActiveState ? "已启用配置" : "已禁用配置");
+    ElMessage.success(newActiveState ? "Config enabled" : "Config disabled");
     await loadConfigs();
   } catch (error: any) {
-    ElMessage.error(error.message || "操作失败");
+    ElMessage.error(error.message || "Operation failed");
   }
 };
 
@@ -507,9 +491,9 @@ const testConnection = async () => {
       model: form.model,
       provider: form.provider,
     });
-    ElMessage.success("连接测试成功！");
+    ElMessage.success("Connection test successful!");
   } catch (error: any) {
-    ElMessage.error(error.message || "连接测试失败");
+    ElMessage.error(error.message || "Connection test failed");
   } finally {
     testing.value = false;
   }
@@ -524,9 +508,9 @@ const handleTest = async (config: AIServiceConfig) => {
       model: config.model,
       provider: config.provider,
     });
-    ElMessage.success("连接测试成功！");
+    ElMessage.success("Connection test successful!");
   } catch (error: any) {
-    ElMessage.error(error.message || "连接测试失败");
+    ElMessage.error(error.message || "Connection test failed");
   } finally {
     testing.value = false;
   }
@@ -551,16 +535,16 @@ const handleSubmit = async () => {
           is_active: form.is_active,
         };
         await aiAPI.update(editingId.value, updateData);
-        ElMessage.success("更新成功");
+        ElMessage.success("Updated successfully");
       } else {
         await aiAPI.create(form);
-        ElMessage.success("创建成功");
+        ElMessage.success("Created successfully");
       }
 
       dialogVisible.value = false;
       loadConfigs();
     } catch (error: any) {
-      ElMessage.error(error.message || "操作失败");
+      ElMessage.error(error.message || "Operation failed");
     } finally {
       submitting.value = false;
     }
@@ -568,31 +552,25 @@ const handleSubmit = async () => {
 };
 
 const handleTabChange = (tabName: string | number) => {
-  // 标签页切换时重新加载对应服务类型的配置
   activeTab.value = tabName as AIServiceType;
   loadConfigs();
 };
 
 const handleProviderChange = () => {
-  // 切换厂商时清空已选模型
   form.model = [];
 
-  // 根据厂商自动设置默认 base_url
   if (form.provider === "gemini" || form.provider === "google") {
     form.base_url = "https://api.chatfire.site";
   } else {
-    // openai, chatfire 等其他厂商
     form.base_url = "https://api.chatfire.site/v1";
   }
 
-  // 仅在新建配置时自动更新名称
   if (!isEdit.value) {
     form.name = generateConfigName(form.provider, form.service_type);
   }
 };
 
-// getDefaultEndpoint 已移除，端点由后端根据 provider 自动设置
-// 保留该函数定义以避免编译错误
+// Endpoint is set automatically by the backend based on provider
 const getDefaultEndpoint = (serviceType: AIServiceType): string => {
   switch (serviceType) {
     case "text":
@@ -614,7 +592,7 @@ const resetForm = () => {
     name: "",
     base_url: "",
     api_key: "",
-    model: [], // 改为空数组
+    model: [],
     priority: 0,
     is_active: true,
   });
@@ -632,7 +610,7 @@ onMounted(() => {
 
 <style scoped>
 /* ========================================
-   Page Layout / 页面布局 - 紧凑边距
+   Page Layout - Compact spacing
    ======================================== */
 .page-container {
   min-height: 100vh;
@@ -659,7 +637,7 @@ onMounted(() => {
 }
 
 /* ========================================
-   Tabs / 标签页 - 紧凑内边距
+   Tabs - Compact padding
    ======================================== */
 .tabs-wrapper {
   background: var(--bg-card);
@@ -676,7 +654,7 @@ onMounted(() => {
 }
 
 /* ========================================
-   Form Tips / 表单提示
+   Form Tips
    ======================================== */
 .form-tip {
   font-size: 0.75rem;
@@ -685,7 +663,7 @@ onMounted(() => {
 }
 
 /* ========================================
-   Dialog / 弹窗
+   Dialog
    ======================================== */
 :deep(.el-dialog) {
   border-radius: 0.75rem;
@@ -713,7 +691,7 @@ onMounted(() => {
 }
 
 /* ========================================
-   Dark Mode / 深色模式
+   Dark Mode
    ======================================== */
 .dark .tabs-wrapper {
   background: var(--bg-card);

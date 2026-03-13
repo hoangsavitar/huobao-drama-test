@@ -12,13 +12,13 @@ interface CustomAxiosInstance extends Omit<AxiosInstance, 'get' | 'post' | 'put'
 
 const request = axios.create({
   baseURL: '/api/v1',
-  timeout: 600000, // 10分钟超时，匹配后端AI生成接口
+  timeout: 600000, // 10-minute timeout to match backend AI generation endpoints
   headers: {
     'Content-Type': 'application/json'
   }
 }) as CustomAxiosInstance
 
-// 开源版本 - 无需认证token
+// Open source version - no auth token required
 request.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     return config
@@ -34,13 +34,12 @@ request.interceptors.response.use(
     if (res.success) {
       return res.data
     } else {
-      // 不在这里显示错误提示，让业务代码自行处理
-      return Promise.reject(new Error(res.error?.message || '请求失败'))
+      // Let business code handle errors directly
+      return Promise.reject(new Error(res.error?.message || 'Request failed'))
     }
   },
   (error: AxiosError<any>) => {
-    // 不在拦截器中自动显示错误提示，让业务代码根据具体情况处理
-    // 只抛出错误供调用者捕获
+    // Let callers handle errors based on their specific context
     return Promise.reject(error)
   }
 )

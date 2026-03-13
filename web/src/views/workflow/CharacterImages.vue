@@ -1,8 +1,8 @@
 <template>
   <div class="character-images-container">
-    <el-page-header @back="goBack" title="返回项目">
+    <el-page-header @back="goBack" title="Back to Project">
       <template #content>
-        <h2>角色形象生成</h2>
+        <h2>Character Image Generation</h2>
       </template>
       <template #extra>
         <el-button
@@ -12,11 +12,11 @@
           :disabled="selectedCharacters.length === 0"
         >
           <el-icon><Picture /></el-icon>
-          批量生成 ({{ selectedCharacters.length }})
+          Batch Generate ({{ selectedCharacters.length }})
         </el-button>
         <el-button @click="goToCharacterManagement">
           <el-icon><Edit /></el-icon>
-          管理角色
+          Manage Characters
         </el-button>
       </template>
     </el-page-header>
@@ -28,11 +28,11 @@
           @change="handleSelectAll"
           :indeterminate="isIndeterminate"
         >
-          全选
+          Select All
         </el-checkbox>
         <span class="selection-info"
-          >已选择 {{ selectedCharacters.length }} /
-          {{ characters.length }} 个角色</span
+          >Selected {{ selectedCharacters.length }} /
+          {{ characters.length }} characters</span
         >
       </div>
 
@@ -81,10 +81,10 @@
                 style="width: 100%"
               >
                 <span v-if="generatingIds.includes(character.id)"
-                  >生成中...</span
+                  >Generating...</span
                 >
                 <span v-else>{{
-                  character.image_url ? "重新生成" : "生成形象"
+                  character.image_url ? "Regenerate" : "Generate Image"
                 }}</span>
               </el-button>
             </el-card>
@@ -99,7 +99,7 @@
           @click="goToNextStep"
           :disabled="!allImagesGenerated"
         >
-          完成并返回项目
+          Done & Back to Project
         </el-button>
       </div>
     </el-card>
@@ -180,16 +180,15 @@ const generateImage = async (character: Character) => {
       character.id as string,
     );
 
-    // 更新角色图片
     const index = characters.value.findIndex((c) => c.id === character.id);
     if (index !== -1) {
       characters.value[index].image_url = result.image_url;
     }
 
-    ElMessage.success(`${character.name}的形象生成成功`);
+    ElMessage.success(`Image generated for ${character.name}`);
   } catch (error: any) {
     ElMessage.error(
-      error.response?.data?.message || `${character.name}生成失败`,
+      error.response?.data?.message || `Failed to generate for ${character.name}`,
     );
   } finally {
     const index = generatingIds.value.indexOf(character.id);
@@ -201,12 +200,12 @@ const generateImage = async (character: Character) => {
 
 const batchGenerate = async () => {
   if (selectedCharacters.value.length === 0) {
-    ElMessage.warning("请选择要生成的角色");
+    ElMessage.warning("Please select characters to generate");
     return;
   }
 
   if (selectedCharacters.value.length > 10) {
-    ElMessage.warning("单次最多生成10个角色");
+    ElMessage.warning("Maximum 10 characters per batch");
     return;
   }
 
@@ -219,13 +218,12 @@ const batchGenerate = async () => {
     );
 
     ElMessage.success(
-      `批量生成任务已提交，正在后台生成 ${selectedCharacters.value.length} 个角色形象`,
+      `Batch generation submitted, generating ${selectedCharacters.value.length} character images in background`,
     );
 
-    // 轮询检查生成状态
     startPolling();
   } catch (error: any) {
-    ElMessage.error(error.response?.data?.message || "批量生成失败");
+    ElMessage.error(error.response?.data?.message || "Batch generation failed");
     batchGenerating.value = false;
     generatingIds.value = [];
   }
@@ -240,10 +238,8 @@ const startPolling = () => {
     try {
       const drama = await dramaAPI.get(dramaId);
       if (drama.characters) {
-        // 更新角色列表
         characters.value = drama.characters;
 
-        // 检查是否所有选中的角色都生成完成
         const allGenerated = selectedCharacters.value.every((id) => {
           const char = characters.value.find((c) => c.id === id);
           return char?.image_url;
@@ -251,13 +247,13 @@ const startPolling = () => {
 
         if (allGenerated) {
           stopPolling();
-          ElMessage.success("批量生成完成");
+          ElMessage.success("Batch generation complete");
         }
       }
     } catch (error) {
-      console.error("轮询错误:", error);
+      console.error("Polling error:", error);
     }
-  }, 5000); // 每5秒检查一次
+  }, 5000);
 };
 
 const stopPolling = () => {
@@ -281,11 +277,11 @@ onMounted(async () => {
     if (drama.characters && drama.characters.length > 0) {
       characters.value = drama.characters;
     } else {
-      ElMessage.warning("未找到角色信息，请先完成剧本生成");
+      ElMessage.warning("No character info found. Please complete script generation first.");
       router.push(`/dramas/${dramaId}`);
     }
   } catch (error: any) {
-    ElMessage.error(error.message || "加载角色失败");
+    ElMessage.error(error.message || "Failed to load characters");
     router.push(`/dramas/${dramaId}`);
   }
 });

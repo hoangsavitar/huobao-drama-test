@@ -773,7 +773,6 @@ func (s *VideoGenerationService) convertImageToBase64(imageURL string) (string, 
 
 		// 1. 检查是否是本地URL（包含 /static/）
 		if strings.Contains(imageURL, "/static/") {
-			// 提取相对路径，例如从 "http://localhost:5678/static/images/xxx.jpg" 提取 "images/xxx.jpg"
 			parts := strings.Split(imageURL, "/static/")
 			if len(parts) == 2 {
 				relativePath = parts[1]

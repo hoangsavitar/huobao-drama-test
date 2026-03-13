@@ -881,7 +881,7 @@ const loadDramaData = async () => {
     drama.value = data;
     loadScenes();
   } catch (error: any) {
-    ElMessage.error(error.message || "加载项目数据失败");
+    ElMessage.error(error.message || "Failed to load project data");
   }
 };
 
@@ -905,11 +905,11 @@ const getStatusType = (status?: string) => {
 
 const getStatusText = (status?: string) => {
   const map: Record<string, string> = {
-    draft: "草稿",
-    in_progress: "制作中",
-    completed: "已完成",
+    draft: "Draft",
+    in_progress: "In Progress",
+    completed: "Completed",
   };
-  return map[status || "draft"] || "草稿";
+  return map[status || "draft"] || "Draft";
 };
 
 const getEpisodeStatusType = (episode: any) => {
@@ -919,14 +919,14 @@ const getEpisodeStatusType = (episode: any) => {
 };
 
 const getEpisodeStatusText = (episode: any) => {
-  if (episode.shots && episode.shots.length > 0) return "已拆分";
-  if (episode.script_content) return "已创建";
-  return "草稿";
+  if (episode.shots && episode.shots.length > 0) return "Split";
+  if (episode.script_content) return "Created";
+  return "Draft";
 };
 
 const formatDate = (date?: string) => {
   if (!date) return "-";
-  return new Date(date).toLocaleString("zh-CN");
+  return new Date(date).toLocaleString("en-US");
 };
 
 const createNewEpisode = () => {
@@ -953,11 +953,11 @@ const enterEpisodeWorkflow = (episode: any) => {
 const deleteEpisode = async (episode: any) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除第${episode.episode_number}章吗？此操作将同时删除该章节的所有相关数据（角色、场景、分镜等）。`,
-      "删除确认",
+      `Delete Episode ${episode.episode_number}? This will also delete all related data (characters, scenes, storyboards, etc.).`,
+      "Confirm Deletion",
       {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        confirmButtonText: "Delete",
+        cancelButtonText: "Cancel",
         type: "warning",
       },
     );
@@ -978,11 +978,11 @@ const deleteEpisode = async (episode: any) => {
     // 保存更新后的章节列表
     await dramaAPI.saveEpisodes(drama.value!.id, updatedEpisodes);
 
-    ElMessage.success(`第${episode.episode_number}章删除成功`);
+    ElMessage.success(`Episode ${episode.episode_number} deleted`);
     await loadDramaData();
   } catch (error: any) {
     if (error !== "cancel") {
-      ElMessage.error(error.message || "删除失败");
+      ElMessage.error(error.message || "Delete failed");
     }
   }
 };
@@ -1019,10 +1019,10 @@ const beforeAvatarUpload = (file: any) => {
   const isLt10M = file.size / 1024 / 1024 < 10;
 
   if (!isImage) {
-    ElMessage.error("只能上传图片文件!");
+    ElMessage.error("Only image files are allowed");
   }
   if (!isLt10M) {
-    ElMessage.error("图片大小不能超过 10MB!");
+    ElMessage.error("Image size cannot exceed 10MB");
   }
   return isImage && isLt10M;
 };
@@ -1030,10 +1030,10 @@ const beforeAvatarUpload = (file: any) => {
 const generateCharacterImage = async (character: any) => {
   try {
     await characterLibraryAPI.generateCharacterImage(character.id);
-    ElMessage.success("图片生成任务已提交");
+    ElMessage.success("Image generation task submitted");
     startPolling(loadDramaData);
   } catch (error: any) {
-    ElMessage.error(error.message || "生成失败");
+    ElMessage.error(error.message || "Generation failed");
   }
 };
 
@@ -1061,17 +1061,17 @@ const handleExtractCharacters = async () => {
       if (checkCount > 10) clearInterval(checkInterval);
     }, 5000);
   } catch (error: any) {
-    ElMessage.error(error.message || "提取失败");
+    ElMessage.error(error.message || "Extraction failed");
   }
 };
 
 const generateSceneImage = async (scene: any) => {
   try {
     await dramaAPI.generateSceneImage({ scene_id: scene.id });
-    ElMessage.success("图片生成任务已提交");
+    ElMessage.success("Image generation task submitted");
     startPolling(loadScenes);
   } catch (error: any) {
-    ElMessage.error(error.message || "生成失败");
+    ElMessage.error(error.message || "Generation failed");
   }
 };
 
@@ -1099,13 +1099,13 @@ const handleExtractScenes = async () => {
       if (checkCount > 10) clearInterval(checkInterval);
     }, 5000);
   } catch (error: any) {
-    ElMessage.error(error.message || "提取失败");
+    ElMessage.error(error.message || "Extraction failed");
   }
 };
 
 const saveCharacter = async () => {
   if (!newCharacter.value.name.trim()) {
-    ElMessage.warning("请输入角色名称");
+    ElMessage.warning("Please enter character name");
     return;
   }
 
@@ -1121,7 +1121,7 @@ const saveCharacter = async () => {
         image_url: newCharacter.value.image_url,
         local_path: newCharacter.value.local_path,
       });
-      ElMessage.success("角色更新成功");
+      ElMessage.success("Character updated");
     } else {
       // Add new character
       const allCharacters = [
@@ -1138,13 +1138,13 @@ const saveCharacter = async () => {
       ];
 
       await dramaAPI.saveCharacters(drama.value!.id, allCharacters);
-      ElMessage.success("角色添加成功");
+      ElMessage.success("Character added");
     }
 
     addCharacterDialogVisible.value = false;
     await loadDramaData();
   } catch (error: any) {
-    ElMessage.error(error.message || "操作失败");
+    ElMessage.error(error.message || "Operation failed");
   }
 };
 
@@ -1164,28 +1164,28 @@ const editCharacter = (character: any) => {
 
 const deleteCharacter = async (character: any) => {
   if (!character.id) {
-    ElMessage.error("角色ID不存在，无法删除");
+    ElMessage.error("Character ID does not exist");
     return;
   }
 
   try {
     await ElMessageBox.confirm(
-      `确定要删除角色"${character.name}"吗？此操作不可恢复。`,
-      "删除确认",
+      `Delete character "${character.name}"? This cannot be undone.`,
+      "Confirm Deletion",
       {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        confirmButtonText: "Delete",
+        cancelButtonText: "Cancel",
         type: "warning",
       },
     );
 
     await characterLibraryAPI.deleteCharacter(character.id);
-    ElMessage.success("角色已删除");
+    ElMessage.success("Character deleted");
     await loadDramaData();
   } catch (error: any) {
     if (error !== "cancel") {
-      console.error("删除角色失败:", error);
-      ElMessage.error(error.message || "删除失败");
+      console.error("Failed to delete character:", error);
+      ElMessage.error(error.message || "Delete failed");
     }
   }
 };
@@ -1202,7 +1202,7 @@ const openAddSceneDialog = () => {
 
 const saveScene = async () => {
   if (!newScene.value.location.trim()) {
-    ElMessage.warning("请输入场景名称");
+    ElMessage.warning("Please enter scene name");
     return;
   }
 
@@ -1263,11 +1263,11 @@ const saveScene = async () => {
       });
     }
 
-    ElMessage.success(editingScene.value ? "场景更新成功" : "场景添加成功");
+    ElMessage.success(editingScene.value ? "Scene updated" : "Scene added");
     addSceneDialogVisible.value = false;
     await loadScenes();
   } catch (error: any) {
-    ElMessage.error(error.message || "操作失败");
+    ElMessage.error(error.message || "Operation failed");
   }
 };
 
@@ -1284,28 +1284,28 @@ const editScene = (scene: any) => {
 
 const deleteScene = async (scene: any) => {
   if (!scene.id) {
-    ElMessage.error("场景ID不存在，无法删除");
+    ElMessage.error("Scene ID does not exist");
     return;
   }
 
   try {
     await ElMessageBox.confirm(
-      `确定要删除场景"${scene.name || scene.location}"吗？此操作不可恢复。`,
-      "删除确认",
+      `Delete scene "${scene.name || scene.location}"? This cannot be undone.`,
+      "Confirm Deletion",
       {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        confirmButtonText: "Delete",
+        cancelButtonText: "Cancel",
         type: "warning",
       },
     );
 
     await dramaAPI.deleteScene(scene.id.toString());
-    ElMessage.success("场景已删除");
+    ElMessage.success("Scene deleted");
     await loadScenes();
   } catch (error: any) {
     if (error !== "cancel") {
-      console.error("删除场景失败:", error);
-      ElMessage.error(error.message || "删除失败");
+      console.error("Failed to delete scene:", error);
+      ElMessage.error(error.message || "Delete failed");
     }
   }
 };
@@ -1325,7 +1325,7 @@ const openAddPropDialog = () => {
 
 const saveProp = async () => {
   if (!newProp.value.name.trim()) {
-    ElMessage.warning("请输入道具名称");
+    ElMessage.warning("Please enter prop name");
     return;
   }
 
@@ -1342,16 +1342,16 @@ const saveProp = async () => {
 
     if (editingProp.value) {
       await propAPI.update(editingProp.value.id, propData);
-      ElMessage.success("道具更新成功");
+      ElMessage.success("Prop updated");
     } else {
       await propAPI.create(propData as any);
-      ElMessage.success("道具添加成功");
+      ElMessage.success("Prop added");
     }
 
     addPropDialogVisible.value = false;
     await loadDramaData();
   } catch (error: any) {
-    ElMessage.error(error.message || "操作失败");
+    ElMessage.error(error.message || "Operation failed");
   }
 };
 
@@ -1371,38 +1371,38 @@ const editProp = (prop: any) => {
 const deleteProp = async (prop: any) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除道具"${prop.name}"吗？此操作不可恢复。`,
-      "删除确认",
+      `Delete prop "${prop.name}"? This cannot be undone.`,
+      "Confirm Deletion",
       {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        confirmButtonText: "Delete",
+        cancelButtonText: "Cancel",
         type: "warning",
       },
     );
 
     await propAPI.delete(prop.id);
-    ElMessage.success("道具已删除");
+    ElMessage.success("Prop deleted");
     await loadDramaData();
   } catch (error: any) {
     if (error !== "cancel") {
-      ElMessage.error(error.message || "删除失败");
+      ElMessage.error(error.message || "Delete failed");
     }
   }
 };
 
 const generatePropImage = async (prop: any) => {
   if (!prop.prompt) {
-    ElMessage.warning("请先设置道具的图片提示词");
+    ElMessage.warning("Please set prop image prompt first");
     editProp(prop);
     return;
   }
 
   try {
     await propAPI.generateImage(prop.id);
-    ElMessage.success("图片生成任务已提交");
+    ElMessage.success("Image generation task submitted");
     startPolling(loadDramaData);
   } catch (error: any) {
-    ElMessage.error(error.message || "生成失败");
+    ElMessage.error(error.message || "Generation failed");
   }
 };
 

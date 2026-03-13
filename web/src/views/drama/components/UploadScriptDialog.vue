@@ -1,52 +1,52 @@
 <template>
   <el-dialog
     v-model="visible"
-    title="上传剧本"
+    title="Upload Script"
     width="800px"
     :close-on-click-modal="false"
     @close="handleClose"
   >
     <el-form :model="form" label-width="100px">
-      <el-form-item label="剧本内容" required>
+      <el-form-item label="Script Content" required>
         <el-input
           v-model="form.script_content"
           type="textarea"
           :rows="15"
-          placeholder="粘贴您的剧本内容&#10;系统将自动识别并拆分为剧集和场景"
+          placeholder="Paste your script content here&#10;The system will automatically identify and split it into episodes and scenes"
           maxlength="50000"
           show-word-limit
         />
         <div class="form-tip">
-          支持多种剧本格式，系统会智能识别剧集、场景、对话等内容
+          Supports multiple script formats. The system will intelligently identify episodes, scenes, dialogue, and more.
         </div>
       </el-form-item>
 
-      <el-form-item label="拆分选项">
-        <el-checkbox v-model="form.auto_split">自动拆分剧集</el-checkbox>
+      <el-form-item label="Split Options">
+        <el-checkbox v-model="form.auto_split">Auto-split episodes</el-checkbox>
         <div class="form-tip">
-          启用后将自动识别剧集分界点，否则作为单集处理
+          When enabled, episode boundaries will be automatically detected; otherwise treated as a single episode.
         </div>
       </el-form-item>
     </el-form>
 
     <template v-if="parseResult">
-      <el-divider>解析结果</el-divider>
+      <el-divider>Parse Result</el-divider>
       
       <div class="parse-result">
         <el-alert
-          title="解析完成"
+          title="Parsing complete"
           type="success"
           :closable="false"
           show-icon
         >
           <template #default>
-            共识别 {{ parseResult.episodes.length }} 个剧集，
-            {{ totalScenes }} 个场景
+            Identified {{ parseResult.episodes.length }} episode(s),
+            {{ totalScenes }} scene(s)
           </template>
         </el-alert>
 
         <div class="summary-box" v-if="parseResult.summary">
-          <h4>剧本概要</h4>
+          <h4>Script Summary</h4>
           <p>{{ parseResult.summary }}</p>
         </div>
 
@@ -54,19 +54,19 @@
           <el-collapse-item
             v-for="episode in parseResult.episodes"
             :key="episode.episode_number"
-            :title="`第${episode.episode_number}集: ${episode.title}`"
+            :title="`Episode ${episode.episode_number}: ${episode.title}`"
             :name="episode.episode_number"
           >
             <div class="episode-info">
-              <p><strong>场景数：</strong>{{ episode.scenes.length }}</p>
+              <p><strong>Scenes: </strong>{{ episode.scenes.length }}</p>
               
               <el-table :data="episode.scenes" size="small" border>
-                <el-table-column prop="storyboard_number" label="场景号" width="80" />
-                <el-table-column prop="title" label="标题" width="150" />
-                <el-table-column prop="location" label="地点" width="120" />
-                <el-table-column prop="time" label="时间" width="100" />
-                <el-table-column prop="characters" label="角色" width="150" />
-                <el-table-column label="对话">
+                <el-table-column prop="storyboard_number" label="Scene #" width="80" />
+                <el-table-column prop="title" label="Title" width="150" />
+                <el-table-column prop="location" label="Location" width="120" />
+                <el-table-column prop="time" label="Time" width="100" />
+                <el-table-column prop="characters" label="Characters" width="150" />
+                <el-table-column label="Dialogue">
                   <template #default="{ row }">
                     <div class="dialogue-preview">{{ row.dialogue }}</div>
                   </template>
@@ -79,12 +79,12 @@
     </template>
 
     <template #footer>
-      <el-button @click="handleClose">取消</el-button>
+      <el-button @click="handleClose">Cancel</el-button>
       <el-button v-if="!parseResult" type="primary" @click="handleParse" :loading="parsing">
-        解析剧本
+        Parse Script
       </el-button>
       <el-button v-else type="success" @click="handleSave" :loading="saving">
-        保存到项目
+        Save to Project
       </el-button>
     </template>
   </el-dialog>
@@ -129,7 +129,7 @@ const totalScenes = computed(() => {
 
 const handleParse = async () => {
   if (!form.script_content.trim()) {
-    ElMessage.warning('请输入剧本内容')
+    ElMessage.warning('Please enter script content')
     return
   }
 
@@ -140,9 +140,9 @@ const handleParse = async () => {
       script_content: form.script_content,
       auto_split: form.auto_split
     })
-    ElMessage.success('剧本解析成功')
+    ElMessage.success('Script parsed successfully')
   } catch (error: any) {
-    ElMessage.error(error.message || '解析失败')
+    ElMessage.error(error.message || 'Parse failed')
   } finally {
     parsing.value = false
   }
@@ -153,12 +153,12 @@ const handleSave = async () => {
 
   saving.value = true
   try {
-    // TODO: 调用保存接口将解析结果保存到数据库
-    ElMessage.success('保存成功')
+    // TODO: Call save API to persist parsed result to database
+    ElMessage.success('Saved successfully')
     emit('success')
     handleClose()
   } catch (error: any) {
-    ElMessage.error(error.message || '保存失败')
+    ElMessage.error(error.message || 'Save failed')
   } finally {
     saving.value = false
   }

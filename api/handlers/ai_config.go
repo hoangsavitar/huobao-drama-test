@@ -32,7 +32,7 @@ func (h *AIConfigHandler) CreateConfig(c *gin.Context) {
 
 	config, err := h.aiService.CreateConfig(&req)
 	if err != nil {
-		response.InternalError(c, "创建失败")
+		response.InternalError(c, "Create failed")
 		return
 	}
 
@@ -43,17 +43,17 @@ func (h *AIConfigHandler) GetConfig(c *gin.Context) {
 
 	configID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		response.BadRequest(c, "无效的配置ID")
+		response.BadRequest(c, "Invalid config ID")
 		return
 	}
 
 	config, err := h.aiService.GetConfig(uint(configID))
 	if err != nil {
 		if err.Error() == "config not found" {
-			response.NotFound(c, "配置不存在")
+			response.NotFound(c, "Config not found")
 			return
 		}
-		response.InternalError(c, "获取失败")
+		response.InternalError(c, "Get failed")
 		return
 	}
 
@@ -66,7 +66,7 @@ func (h *AIConfigHandler) ListConfigs(c *gin.Context) {
 
 	configs, err := h.aiService.ListConfigs(serviceType)
 	if err != nil {
-		response.InternalError(c, "获取列表失败")
+		response.InternalError(c, "List failed")
 		return
 	}
 
@@ -77,7 +77,7 @@ func (h *AIConfigHandler) UpdateConfig(c *gin.Context) {
 
 	configID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		response.BadRequest(c, "无效的配置ID")
+		response.BadRequest(c, "Invalid config ID")
 		return
 	}
 
@@ -90,10 +90,10 @@ func (h *AIConfigHandler) UpdateConfig(c *gin.Context) {
 	config, err := h.aiService.UpdateConfig(uint(configID), &req)
 	if err != nil {
 		if err.Error() == "config not found" {
-			response.NotFound(c, "配置不存在")
+			response.NotFound(c, "Config not found")
 			return
 		}
-		response.InternalError(c, "更新失败")
+		response.InternalError(c, "Update failed")
 		return
 	}
 
@@ -104,20 +104,20 @@ func (h *AIConfigHandler) DeleteConfig(c *gin.Context) {
 
 	configID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		response.BadRequest(c, "无效的配置ID")
+		response.BadRequest(c, "Invalid config ID")
 		return
 	}
 
 	if err := h.aiService.DeleteConfig(uint(configID)); err != nil {
 		if err.Error() == "config not found" {
-			response.NotFound(c, "配置不存在")
+			response.NotFound(c, "Config not found")
 			return
 		}
-		response.InternalError(c, "删除失败")
+		response.InternalError(c, "Delete failed")
 		return
 	}
 
-	response.Success(c, gin.H{"message": "删除成功"})
+	response.Success(c, gin.H{"message": "Deleted successfully"})
 }
 
 func (h *AIConfigHandler) TestConnection(c *gin.Context) {
@@ -128,9 +128,9 @@ func (h *AIConfigHandler) TestConnection(c *gin.Context) {
 	}
 
 	if err := h.aiService.TestConnection(&req); err != nil {
-		response.BadRequest(c, "连接测试失败: "+err.Error())
+		response.BadRequest(c, "Connection test failed: "+err.Error())
 		return
 	}
 
-	response.Success(c, gin.H{"message": "连接测试成功"})
+	response.Success(c, gin.H{"message": "Connection test successful"})
 }
