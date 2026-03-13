@@ -72,20 +72,20 @@ Frames []SingleFramePrompt `json:"frames"`
 
 // GenerateFramePrompt generates a frame prompt of the specified type and saves it to the frame_prompts table
 func (s *FramePromptService) GenerateFramePrompt(req GenerateFramePromptRequest, model string) (string, error) {
-// 查询分镜信息
+// Query storyboard information
 var storyboard models.Storyboard
 if err := s.db.Preload("Characters").First(&storyboard, req.StoryboardID).Error; err != nil {
 return "", fmt.Errorf("storyboard not found: %w", err)
 }
 
-// 创建任务
+// Create task
 task, err := s.taskService.CreateTask("frame_prompt_generation", req.StoryboardID)
 if err != nil {
 s.log.Errorw("Failed to create frame prompt generation task", "error", err, "storyboard_id", req.StoryboardID)
-return "", fmt.Errorf("创建任务失败: %w", err)
+return "", fmt.Errorf("failed to create task: %w", err)
 }
 
-// 异步处理帧提示词生成
+// Asynchronously process frame prompt generation
 go s.processFramePromptGeneration(task.ID, req, model)
 
 s.log.Infow("Frame prompt generation task created", "task_id", task.ID, "storyboard_id", req.StoryboardID, "frame_type", req.FrameType)
@@ -94,18 +94,18 @@ return task.ID, nil
 
 // processFramePromptGeneration asynchronously processes frame prompt generation
 func (s *FramePromptService) processFramePromptGeneration(taskID string, req GenerateFramePromptRequest, model string) {
-// 更新任务状态为处理中
-s.taskService.UpdateTaskStatus(taskID, "processing", 0, "正在生成帧提示词...")
+// Update task status to processing
+s.taskService.UpdateTaskStatus(taskID, "processing", 0, "Generating frame prompts...")
 
-// 查询分镜信息
+// Query storyboard information
 var storyboard models.Storyboard
 if err := s.db.Preload("Characters").First(&storyboard, req.StoryboardID).Error; err != nil {
 s.log.Errorw("Storyboard not found during frame prompt generation", "error", err, "storyboard_id", req.StoryboardID)
-s.taskService.UpdateTaskStatus(taskID, "failed", 0, "分镜信息不存在")
+s.taskService.UpdateTaskStatus(taskID, "failed", 0, "Storyboard not found")
 return
 }
 
-// 获取场景信息
+// Get scene information
 var scene *models.Scene
 if storyboard.SceneID != nil {
 scene = &models.Scene{}
@@ -115,7 +115,7 @@ scene = nil
 }
 }
 
-// 获取 drama 的 style 信息
+// Get drama style information
 var episode models.Episode
 if err := s.db.Preload("Drama").First(&episode, storyboard.EpisodeID).Error; err != nil {
 s.log.Warnw("Failed to load episode and drama", "error", err, "episode_id", storyboard.EpisodeID)
@@ -126,11 +126,11 @@ response := &FramePromptResponse{
 FrameType: req.FrameType,
 }
 
-// 生成提示词
+// Generate prompts
 switch req.FrameType {
 case FrameTypeFirst:
 response.SingleFrame = s.generateFirstFrame(storyboard, scene, dramaStyle, model)
-// 保存单帧提示词
+// Save single frame prompt
 s.saveFramePrompt(req.StoryboardID, string(req.FrameType), response.SingleFrame.Prompt, response.SingleFrame.Description, "")
 case FrameTypeKey:
 response.SingleFrame = s.generateKeyFrame(storyboard, scene, dramaStyle, model)
@@ -144,13 +144,13 @@ if count == 0 {
 count = 3
 }
 response.MultiFrame = s.generatePanelFrames(storyboard, scene, count, dramaStyle, model)
-// 保存多帧提示词（合并为一条记录）
+// Save multi-frame prompts (merged into one record)
 var prompts []string
 for _, frame := range response.MultiFrame.Frames {
 prompts = append(prompts, frame.Prompt)
 }
 combinedPrompt := strings.Join(prompts, "\n---\n")
-s.saveFramePrompt(req.StoryboardID, string(req.FrameType), combinedPrompt, "分镜板组合提示词", response.MultiFrame.Layout)
+s.saveFramePrompt(req.StoryboardID, string(req.FrameType), combinedPrompt, "Panel board combined prompt", response.MultiFrame.Layout)
 case FrameTypeAction:
 response.MultiFrame = s.generateActionSequence(storyboard, scene, dramaStyle, model)
 var prompts []string
@@ -158,14 +158,14 @@ for _, frame := range response.MultiFrame.Frames {
 prompts = append(prompts, frame.Prompt)
 }
 combinedPrompt := strings.Join(prompts, "\n---\n")
-s.saveFramePrompt(req.StoryboardID, string(req.FrameType), combinedPrompt, "动作序列组合提示词", response.MultiFrame.Layout)
+s.saveFramePrompt(req.StoryboardID, string(req.FrameType), combinedPrompt, "Action sequence combined prompt", response.MultiFrame.Layout)
 default:
 s.log.Errorw("Unsupported frame type during frame prompt generation", "frame_type", req.FrameType, "task_id", taskID)
-s.taskService.UpdateTaskStatus(taskID, "failed", 0, "不支持的帧类型")
+s.taskService.UpdateTaskStatus(taskID, "failed", 0, "Unsupported frame type")
 return
 }
 
-// 更新任务状态为完成
+// Update task status to completed
 s.taskService.UpdateTaskResult(taskID, map[string]interface{}{
 "response":      response,
 "storyboard_id": req.StoryboardID,
@@ -190,10 +190,10 @@ if layout != "" {
 framePrompt.Layout = &layout
 }
 
-// 先删除同类型的旧记录（保持最新）
+// Delete old records of the same type (keep latest)
 s.db.Where("storyboard_id = ? AND frame_type = ?", storyboardID, frameType).Delete(&models.FramePrompt{})
 
-// 插入新记录
+// Insert new record
 if err := s.db.Create(&framePrompt).Error; err != nil {
 s.log.Warnw("Failed to save frame prompt", "error", err, "storyboard_id", storyboardID, "frame_type", frameType)
 }
@@ -208,14 +208,14 @@ return result
 
 // generateFirstFrame generates first frame prompt
 func (s *FramePromptService) generateFirstFrame(sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) *SingleFramePrompt {
-// 构建上下文信息
+// Build context information
 contextInfo := s.buildStoryboardContext(sb, scene)
 
-// 使用国际化提示词
+// Use i18n prompts
 systemPrompt := s.promptI18n.GetFirstFramePrompt(dramaStyle)
 userPrompt := s.promptI18n.FormatUserPrompt("frame_info", contextInfo)
 
-// 调用AI生成（如果指定了模型则使用指定的模型）
+// Call AI generation (use specified model if provided)
 var aiResponse string
 var err error
 if model != "" {
@@ -231,23 +231,23 @@ aiResponse, err = s.aiService.GenerateText(userPrompt, systemPrompt)
 }
 if err != nil {
 s.log.Warnw("AI generation failed, using fallback", "error", err)
-// 降级方案：使用简单拼接
+// Fallback: use simple concatenation
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "first frame, static shot")
 return &SingleFramePrompt{
 Prompt:      fallbackPrompt,
-Description: "镜头开始的静态画面，展示初始状态",
+Description: "Static image at shot start, showing initial state",
 }
 }
 
-// 解析AI返回的JSON
+// Parse AI-returned JSON
 result := s.parseFramePromptJSON(aiResponse)
 if result == nil {
-// JSON解析失败，使用降级方案
+// JSON parsing failed, use fallback
 s.log.Warnw("Failed to parse AI JSON response, using fallback", "storyboard_id", sb.ID, "response", aiResponse)
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "first frame, static shot")
 return &SingleFramePrompt{
 Prompt:      fallbackPrompt,
-Description: "镜头开始的静态画面，展示初始状态",
+Description: "Static image at shot start, showing initial state",
 }
 }
 
@@ -256,14 +256,14 @@ return result
 
 // generateKeyFrame generates key frame prompt
 func (s *FramePromptService) generateKeyFrame(sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) *SingleFramePrompt {
-// 构建上下文信息
+// Build context information
 contextInfo := s.buildStoryboardContext(sb, scene)
 
-// 使用国际化提示词
+// Use i18n prompts
 systemPrompt := s.promptI18n.GetKeyFramePrompt(dramaStyle)
 userPrompt := s.promptI18n.FormatUserPrompt("key_frame_info", contextInfo)
 
-// 调用AI生成（如果指定了模型则使用指定的模型）
+// Call AI generation (use specified model if provided)
 var aiResponse string
 var err error
 if model != "" {
@@ -282,35 +282,35 @@ s.log.Warnw("AI generation failed, using fallback", "error", err)
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "key frame, dynamic action")
 return &SingleFramePrompt{
 Prompt:      fallbackPrompt,
-Description: "动作高潮瞬间，展示关键动作",
+Description: "Action climax moment, showing key action",
 }
 }
 
-// 解析AI返回的JSON
+// Parse AI-returned JSON
 result := s.parseFramePromptJSON(aiResponse)
 if result == nil {
-// JSON解析失败，使用降级方案
+// JSON parsing failed, use fallback
 s.log.Warnw("Failed to parse AI JSON response, using fallback", "storyboard_id", sb.ID, "response", aiResponse)
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "key frame, dynamic action")
 return &SingleFramePrompt{
 Prompt:      fallbackPrompt,
-Description: "动作高潮瞬间，展示关键动作",
+Description: "Action climax moment, showing key action",
 }
 }
 
 return result
 }
 
-// generateLastFrame 生成尾帧提示词
+// generateLastFrame generates last frame prompt
 func (s *FramePromptService) generateLastFrame(sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) *SingleFramePrompt {
-// 构建上下文信息
+// Build context information
 contextInfo := s.buildStoryboardContext(sb, scene)
 
-// 使用国际化提示词
+// Use i18n prompts
 systemPrompt := s.promptI18n.GetLastFramePrompt(dramaStyle)
 userPrompt := s.promptI18n.FormatUserPrompt("last_frame_info", contextInfo)
 
-// 调用AI生成（如果指定了模型则使用指定的模型）
+// Call AI generation (use specified model if provided)
 var aiResponse string
 var err error
 if model != "" {
@@ -329,43 +329,43 @@ s.log.Warnw("AI generation failed, using fallback", "error", err)
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "last frame, final state")
 return &SingleFramePrompt{
 Prompt:      fallbackPrompt,
-Description: "镜头结束画面，展示最终状态和结果",
+Description: "End of shot image, showing final state and result",
 }
 }
 
-// 解析AI返回的JSON
+// Parse AI-returned JSON
 result := s.parseFramePromptJSON(aiResponse)
 if result == nil {
-// JSON解析失败，使用降级方案
+// JSON parsing failed, use fallback
 s.log.Warnw("Failed to parse AI JSON response, using fallback", "storyboard_id", sb.ID, "response", aiResponse)
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "last frame, final state")
 return &SingleFramePrompt{
 Prompt:      fallbackPrompt,
-Description: "镜头结束画面，展示最终状态和结果",
+Description: "End of shot image, showing final state and result",
 }
 }
 
 return result
 }
 
-// generatePanelFrames 生成分镜板提示词（多格组合）
+// generatePanelFrames generates panel board prompts (multi-grid combo)
 func (s *FramePromptService) generatePanelFrames(sb models.Storyboard, scene *models.Scene, count int, dramaStyle string, model string) *MultiFramePrompt {
 layout := fmt.Sprintf("horizontal_%d", count)
 
 frames := make([]SingleFramePrompt, count)
 
-// 固定生成：首帧 -> 关键帧 -> 尾帧
+// Fixed generation: first frame -> key frame -> last frame
 if count == 3 {
 frames[0] = *s.generateFirstFrame(sb, scene, dramaStyle, model)
-frames[0].Description = "第1格：初始状态"
+frames[0].Description = "Grid 1: Initial state"
 
 frames[1] = *s.generateKeyFrame(sb, scene, dramaStyle, model)
-frames[1].Description = "第2格：动作高潮"
+frames[1].Description = "Grid 2: Action climax"
 
 frames[2] = *s.generateLastFrame(sb, scene, dramaStyle, model)
-frames[2].Description = "第3格：最终状态"
+frames[2].Description = "Grid 3: Final state"
 } else if count == 4 {
-// 4格：首帧 -> 中间帧1 -> 中间帧2 -> 尾帧
+// 4 grids: first frame -> middle frame 1 -> middle frame 2 -> last frame
 frames[0] = *s.generateFirstFrame(sb, scene, dramaStyle, model)
 frames[1] = *s.generateKeyFrame(sb, scene, dramaStyle, model)
 frames[2] = *s.generateKeyFrame(sb, scene, dramaStyle, model)
@@ -378,16 +378,16 @@ Frames: frames,
 }
 }
 
-// generateActionSequence 生成动作序列提示词（3x3宫格）
+// generateActionSequence generates action sequence prompts (3x3 grid)
 func (s *FramePromptService) generateActionSequence(sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) *MultiFramePrompt {
-// 构建上下文信息
+// Build context information
 contextInfo := s.buildStoryboardContext(sb, scene)
 
-// 使用国际化提示词 - 专门为动作序列设计的提示词
+// Use i18n prompts - specifically designed for action sequences
 systemPrompt := s.promptI18n.GetActionSequenceFramePrompt(dramaStyle)
 userPrompt := s.promptI18n.FormatUserPrompt("frame_info", contextInfo)
 
-// 调用AI生成（如果指定了模型则使用指定的模型）
+// Call AI generation (use specified model if provided)
 var aiResponse string
 var err error
 if model != "" {
@@ -404,23 +404,23 @@ aiResponse, err = s.aiService.GenerateText(userPrompt, systemPrompt)
 
 if err != nil {
 s.log.Warnw("AI generation failed for action sequence, using fallback", "error", err)
-// 降级方案：使用简单拼接
+// Fallback: use simple concatenation
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "3x3 storyboard grid action sequence, character consistency, continuous movement progression")
 return &MultiFramePrompt{
 Layout: "grid_3x3",
 Frames: []SingleFramePrompt{
 {
 Prompt:      fallbackPrompt,
-Description: "3x3宫格动作序列，展示连贯的动作演进",
+Description: "3x3 grid action sequence, showing continuous movement progression",
 },
 },
 }
 }
 
-// 解析AI返回的JSON
+// Parse AI-returned JSON
 result := s.parseFramePromptJSON(aiResponse)
 if result == nil {
-// JSON解析失败，使用降级方案
+// JSON parsing failed, use fallback
 s.log.Warnw("Failed to parse AI JSON response for action sequence, using fallback", "storyboard_id", sb.ID, "response", aiResponse)
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "3x3 storyboard grid action sequence, character consistency, continuous movement progression")
 return &MultiFramePrompt{
@@ -428,36 +428,36 @@ Layout: "grid_3x3",
 Frames: []SingleFramePrompt{
 {
 Prompt:      fallbackPrompt,
-Description: "3x3宫格动作序列，展示连贯的动作演进",
+Description: "3x3 grid action sequence, showing continuous movement progression",
 },
 },
 }
 }
 
-// 动作序列是一个整体的3x3宫格图片，所以只返回一个prompt
+// Action sequence is a single 3x3 grid image, so only one prompt is returned
 return &MultiFramePrompt{
 Layout: "grid_3x3",
 Frames: []SingleFramePrompt{*result},
 }
 }
 
-// buildStoryboardContext 构建镜头上下文信息
+// buildStoryboardContext builds shot context information
 func (s *FramePromptService) buildStoryboardContext(sb models.Storyboard, scene *models.Scene) string {
 var parts []string
 
-// 镜头描述（最重要）
+// Shot description (most important)
 if sb.Description != nil && *sb.Description != "" {
 parts = append(parts, s.promptI18n.FormatUserPrompt("shot_description_label", *sb.Description))
 }
 
-// 场景信息
+// Scene information
 if scene != nil {
 parts = append(parts, s.promptI18n.FormatUserPrompt("scene_label", scene.Location, scene.Time))
 } else if sb.Location != nil && sb.Time != nil {
 parts = append(parts, s.promptI18n.FormatUserPrompt("scene_label", *sb.Location, *sb.Time))
 }
 
-// 角色
+// Characters
 if len(sb.Characters) > 0 {
 var charNames []string
 for _, char := range sb.Characters {
@@ -466,27 +466,27 @@ charNames = append(charNames, char.Name)
 parts = append(parts, s.promptI18n.FormatUserPrompt("characters_label", strings.Join(charNames, ", ")))
 }
 
-// 动作
+// Action
 if sb.Action != nil && *sb.Action != "" {
 parts = append(parts, s.promptI18n.FormatUserPrompt("action_label", *sb.Action))
 }
 
-// 结果
+// Result
 if sb.Result != nil && *sb.Result != "" {
 parts = append(parts, s.promptI18n.FormatUserPrompt("result_label", *sb.Result))
 }
 
-// 对白
+// Dialogue
 if sb.Dialogue != nil && *sb.Dialogue != "" {
 parts = append(parts, s.promptI18n.FormatUserPrompt("dialogue_label", *sb.Dialogue))
 }
 
-// 氛围
+// Atmosphere
 if sb.Atmosphere != nil && *sb.Atmosphere != "" {
 parts = append(parts, s.promptI18n.FormatUserPrompt("atmosphere_label", *sb.Atmosphere))
 }
 
-// 镜头参数
+// Shot parameters
 if sb.ShotType != nil {
 parts = append(parts, s.promptI18n.FormatUserPrompt("shot_type_label", *sb.ShotType))
 }
@@ -500,23 +500,23 @@ parts = append(parts, s.promptI18n.FormatUserPrompt("movement_label", *sb.Moveme
 return strings.Join(parts, "\n")
 }
 
-// buildFallbackPrompt 构建降级提示词（AI失败时使用）
+// buildFallbackPrompt builds fallback prompt (used when AI fails)
 func (s *FramePromptService) buildFallbackPrompt(sb models.Storyboard, scene *models.Scene, suffix string) string {
 var parts []string
 
-// 场景
+// Scene
 if scene != nil {
 parts = append(parts, fmt.Sprintf("%s, %s", scene.Location, scene.Time))
 }
 
-// 角色
+// Characters
 if len(sb.Characters) > 0 {
 for _, char := range sb.Characters {
 parts = append(parts, char.Name)
 }
 }
 
-// 氛围
+// Atmosphere
 if sb.Atmosphere != nil {
 parts = append(parts, *sb.Atmosphere)
 }

@@ -6,20 +6,20 @@ import (
 	"github.com/drama-generator/backend/domain/models"
 )
 
-// UpdateStoryboard 更新分镜的所有字段，并重新生成提示词
+// UpdateStoryboard updates all storyboard fields and regenerates prompts
 func (s *StoryboardService) UpdateStoryboard(storyboardID string, updates map[string]interface{}) error {
-	// 查找分镜
+	// Find storyboard
 	var storyboard models.Storyboard
 	if err := s.db.First(&storyboard, storyboardID).Error; err != nil {
 		return fmt.Errorf("storyboard not found: %w", err)
 	}
 
-	// 构建用于重新生成提示词的Storyboard结构
+	// Build Storyboard struct for prompt regeneration
 	sb := Storyboard{
 		ShotNumber: storyboard.StoryboardNumber,
 	}
 
-	// 从updates中提取字段并更新
+	// Extract fields from updates and apply
 	updateData := make(map[string]interface{})
 
 	if val, ok := updates["title"].(string); ok && val != "" {
@@ -82,7 +82,7 @@ func (s *StoryboardService) UpdateStoryboard(storyboardID string, updates map[st
 		updateData["scene_id"] = sceneID
 	}
 
-	// 使用当前数据库值填充缺失字段（用于生成提示词）
+	// Fill missing fields with current DB values (for prompt generation)
 	if sb.Title == "" && storyboard.Title != nil {
 		sb.Title = *storyboard.Title
 	}
@@ -123,13 +123,13 @@ func (s *StoryboardService) UpdateStoryboard(storyboardID string, updates map[st
 		sb.Duration = storyboard.Duration
 	}
 
-	// 只重新生成video_prompt
-	// image_prompt不自动更新，因为可能对应多张已生成的帧图片
+	// Only regenerate video_prompt
+	// image_prompt is not auto-updated as it may correspond to multiple generated frame images
 	videoPrompt := s.generateVideoPrompt(sb)
 
 	updateData["video_prompt"] = videoPrompt
 
-	// 更新数据库
+	// Update database
 	if err := s.db.Model(&storyboard).Updates(updateData).Error; err != nil {
 		return fmt.Errorf("failed to update storyboard: %w", err)
 	}
