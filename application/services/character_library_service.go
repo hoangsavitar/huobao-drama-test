@@ -51,14 +51,14 @@ type CharacterLibraryQuery struct {
 	Keyword    string `form:"keyword"`
 }
 
-// ListLibraryItems 获取用户角色库列表
+// ListLibraryItems retrieves the user's character library list
 func (s *CharacterLibraryService) ListLibraryItems(query *CharacterLibraryQuery) ([]models.CharacterLibrary, int64, error) {
 	var items []models.CharacterLibrary
 	var total int64
 
 	db := s.db.Model(&models.CharacterLibrary{})
 
-	// 筛选条件
+	// Filter conditions
 	if query.Category != "" {
 		db = db.Where("category = ?", query.Category)
 	}
@@ -71,13 +71,13 @@ func (s *CharacterLibraryService) ListLibraryItems(query *CharacterLibraryQuery)
 		db = db.Where("name LIKE ? OR description LIKE ?", "%"+query.Keyword+"%", "%"+query.Keyword+"%")
 	}
 
-	// 获取总数
+	// Get total count
 	if err := db.Count(&total).Error; err != nil {
 		s.log.Errorw("Failed to count character library", "error", err)
 		return nil, 0, err
 	}
 
-	// 分页查询
+	// Paginated query
 	offset := (query.Page - 1) * query.PageSize
 	err := db.Order("created_at DESC").
 		Offset(offset).
@@ -92,7 +92,7 @@ func (s *CharacterLibraryService) ListLibraryItems(query *CharacterLibraryQuery)
 	return items, total, nil
 }
 
-// CreateLibraryItem 添加到角色库
+// CreateLibraryItem adds an item to the character library
 func (s *CharacterLibraryService) CreateLibraryItem(req *CreateLibraryItemRequest) (*models.CharacterLibrary, error) {
 	sourceType := req.SourceType
 	if sourceType == "" {
@@ -118,7 +118,7 @@ func (s *CharacterLibraryService) CreateLibraryItem(req *CreateLibraryItemReques
 	return item, nil
 }
 
-// GetLibraryItem 获取角色库项
+// GetLibraryItem retrieves a character library item
 func (s *CharacterLibraryService) GetLibraryItem(itemID string) (*models.CharacterLibrary, error) {
 	var item models.CharacterLibrary
 	err := s.db.Where("id = ? ", itemID).First(&item).Error
@@ -134,7 +134,7 @@ func (s *CharacterLibraryService) GetLibraryItem(itemID string) (*models.Charact
 	return &item, nil
 }
 
-// DeleteLibraryItem 删除角色库项
+// DeleteLibraryItem deletes a character library item
 func (s *CharacterLibraryService) DeleteLibraryItem(itemID string) error {
 	result := s.db.Where("id = ? ", itemID).Delete(&models.CharacterLibrary{})
 
@@ -151,9 +151,9 @@ func (s *CharacterLibraryService) DeleteLibraryItem(itemID string) error {
 	return nil
 }
 
-// ApplyLibraryItemToCharacter 将角色库形象应用到角色
+// ApplyLibraryItemToCharacter applies a library item's image to a character
 func (s *CharacterLibraryService) ApplyLibraryItemToCharacter(characterID string, libraryItemID string) error {
-	// 验证角色库项存在且属于该用户
+	// Verify the library item exists and belongs to the user
 	var libraryItem models.CharacterLibrary
 	if err := s.db.Where("id = ? ", libraryItemID).First(&libraryItem).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -162,7 +162,7 @@ func (s *CharacterLibraryService) ApplyLibraryItemToCharacter(characterID string
 		return err
 	}
 
-	// 查找角色
+	// Find the character
 	var character models.Character
 	if err := s.db.Where("id = ?", characterID).First(&character).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -171,7 +171,7 @@ func (s *CharacterLibraryService) ApplyLibraryItemToCharacter(characterID string
 		return err
 	}
 
-	// 查询Drama验证权限
+	// Query Drama to verify permissions
 	var drama models.Drama
 	if err := s.db.Where("id = ? ", character.DramaID).First(&drama).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -180,7 +180,7 @@ func (s *CharacterLibraryService) ApplyLibraryItemToCharacter(characterID string
 		return err
 	}
 
-	// 更新角色的 local_path 和 image_url
+	// Update the character's local_path and image_url
 	updates := map[string]interface{}{}
 	if libraryItem.LocalPath != nil && *libraryItem.LocalPath != "" {
 		updates["local_path"] = libraryItem.LocalPath
@@ -199,9 +199,9 @@ func (s *CharacterLibraryService) ApplyLibraryItemToCharacter(characterID string
 	return nil
 }
 
-// UploadCharacterImage 上传角色图片
+// UploadCharacterImage uploads a character image
 func (s *CharacterLibraryService) UploadCharacterImage(characterID string, imageURL string) error {
-	// 查找角色
+	// Find the character
 	var character models.Character
 	if err := s.db.Where("id = ?", characterID).First(&character).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -210,7 +210,7 @@ func (s *CharacterLibraryService) UploadCharacterImage(characterID string, image
 		return err
 	}
 
-	// 查询Drama验证权限
+	// Query Drama to verify permissions
 	var drama models.Drama
 	if err := s.db.Where("id = ? ", character.DramaID).First(&drama).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -219,7 +219,7 @@ func (s *CharacterLibraryService) UploadCharacterImage(characterID string, image
 		return err
 	}
 
-	// 更新图片URL
+	// Update image URL
 	if err := s.db.Model(&character).Update("image_url", imageURL).Error; err != nil {
 		s.log.Errorw("Failed to update character image", "error", err)
 		return err
@@ -229,9 +229,9 @@ func (s *CharacterLibraryService) UploadCharacterImage(characterID string, image
 	return nil
 }
 
-// AddCharacterToLibrary 将角色添加到角色库
+// AddCharacterToLibrary adds a character to the character library
 func (s *CharacterLibraryService) AddCharacterToLibrary(characterID string, category *string) (*models.CharacterLibrary, error) {
-	// 查找角色
+	// Find the character
 	var character models.Character
 	if err := s.db.Where("id = ?", characterID).First(&character).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -240,7 +240,7 @@ func (s *CharacterLibraryService) AddCharacterToLibrary(characterID string, cate
 		return nil, err
 	}
 
-	// 查询Drama验证权限
+	// Query Drama to verify permissions
 	var drama models.Drama
 	if err := s.db.Where("id = ? ", character.DramaID).First(&drama).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -249,12 +249,12 @@ func (s *CharacterLibraryService) AddCharacterToLibrary(characterID string, cate
 		return nil, err
 	}
 
-	// 检查是否有图片
+	// Check if the character has an image
 	if character.ImageURL == nil || *character.ImageURL == "" {
 		return nil, fmt.Errorf("character does not have an image yet")
 	}
 
-	// 创建角色库项
+	// Create character library item
 	charLibrary := &models.CharacterLibrary{
 		Name:        character.Name,
 		ImageURL:    *character.ImageURL,
@@ -272,9 +272,9 @@ func (s *CharacterLibraryService) AddCharacterToLibrary(characterID string, cate
 	return charLibrary, nil
 }
 
-// DeleteCharacter 删除单个角色
+// DeleteCharacter deletes a single character
 func (s *CharacterLibraryService) DeleteCharacter(characterID uint) error {
-	// 查找角色
+	// Find the character
 	var character models.Character
 	if err := s.db.Where("id = ?", characterID).First(&character).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -283,7 +283,7 @@ func (s *CharacterLibraryService) DeleteCharacter(characterID uint) error {
 		return err
 	}
 
-	// 验证权限：检查角色所属的drama是否属于当前用户
+	// Verify permissions: check if the drama the character belongs to is owned by the current user
 	var drama models.Drama
 	if err := s.db.Where("id = ? ", character.DramaID).First(&drama).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -292,7 +292,7 @@ func (s *CharacterLibraryService) DeleteCharacter(characterID uint) error {
 		return err
 	}
 
-	// 删除角色
+	// Delete the character
 	if err := s.db.Delete(&character).Error; err != nil {
 		s.log.Errorw("Failed to delete character", "error", err, "id", characterID)
 		return err
@@ -302,9 +302,9 @@ func (s *CharacterLibraryService) DeleteCharacter(characterID uint) error {
 	return nil
 }
 
-// GenerateCharacterImage AI生成角色形象
+// GenerateCharacterImage generates a character image using AI
 func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, imageService *ImageGenerationService, modelName string, style string) (*models.ImageGeneration, error) {
-	// 查找角色
+	// Find the character
 	var character models.Character
 	if err := s.db.Where("id = ?", characterID).First(&character).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -313,7 +313,7 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 		return nil, err
 	}
 
-	// 查询Drama验证权限
+	// Query Drama to verify permissions
 	var drama models.Drama
 	if err := s.db.Where("id = ? ", character.DramaID).First(&drama).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -322,10 +322,10 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 		return nil, err
 	}
 
-	// 构建生成提示词 - 使用详细的外貌描述，添加干净背景要求
+	// Build generation prompt - use detailed appearance description, add clean background requirement
 	prompt := ""
 
-	// 优先使用appearance字段，它包含了最详细的外貌描述
+	// Prefer the appearance field as it contains the most detailed appearance description
 	if character.Appearance != nil && *character.Appearance != "" {
 		prompt = *character.Appearance
 	} else if character.Description != nil && *character.Description != "" {
@@ -334,11 +334,11 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 		prompt = character.Name
 	}
 
-	// 使用已经加载的 drama 的 style 信息
+	// Use the already loaded drama's style information
 	if drama.Style != "" && drama.Style != "realistic" {
 		prompt += ", " + drama.Style
 	}
-	// 调用图片生成服务
+	// Call image generation service
 	dramaIDStr := fmt.Sprintf("%d", character.DramaID)
 	imageType := "character"
 	req := &GenerateImageRequest{
@@ -346,9 +346,9 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 		CharacterID: &character.ID,
 		ImageType:   imageType,
 		Prompt:      prompt,
-		Provider:    "openai",    // 或从配置读取
-		Model:       modelName,   // 使用用户指定的模型
-		Size:        "2560x1440", // 3,686,400像素，满足API最低要求（16:9比例）
+		Provider:    "openai",    // or read from config
+		Model:       modelName,   // use user-specified model
+		Size:        "2560x1440", // 3,686,400 pixels, meets API minimum requirements (16:9 ratio)
 		Quality:     "standard",
 	}
 
@@ -358,15 +358,15 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 		return nil, fmt.Errorf("image generation failed: %w", err)
 	}
 
-	// 异步处理：在后台监听图片生成完成，然后更新角色image_url
+	// Async processing: listen in background for image generation completion, then update character image_url
 	go s.waitAndUpdateCharacterImage(character.ID, imageGen.ID)
 
-	// 立即返回ImageGeneration对象，让前端可以轮询状态
+	// Return ImageGeneration object immediately so frontend can poll for status
 	s.log.Infow("Character image generation started", "character_id", characterID, "image_gen_id", imageGen.ID)
 	return imageGen, nil
 }
 
-// waitAndUpdateCharacterImage 后台异步等待图片生成完成并更新角色image_url
+// waitAndUpdateCharacterImage asynchronously waits in background for image generation to complete and updates character image_url
 func (s *CharacterLibraryService) waitAndUpdateCharacterImage(characterID uint, imageGenID uint) {
 	maxAttempts := 60
 	pollInterval := 5 * time.Second
@@ -374,16 +374,16 @@ func (s *CharacterLibraryService) waitAndUpdateCharacterImage(characterID uint, 
 	for i := 0; i < maxAttempts; i++ {
 		time.Sleep(pollInterval)
 
-		// 查询图片生成状态
+		// Query image generation status
 		var imageGen models.ImageGeneration
 		if err := s.db.First(&imageGen, imageGenID).Error; err != nil {
 			s.log.Errorw("Failed to query image generation status", "error", err, "image_gen_id", imageGenID)
 			continue
 		}
 
-		// 检查是否完成
+		// Check if completed
 		if imageGen.Status == models.ImageStatusCompleted && imageGen.ImageURL != nil && *imageGen.ImageURL != "" {
-			// 更新角色的image_url
+			// Update the character's image_url
 			if err := s.db.Model(&models.Character{}).Where("id = ?", characterID).Update("image_url", *imageGen.ImageURL).Error; err != nil {
 				s.log.Errorw("Failed to update character image_url", "error", err, "character_id", characterID)
 				return
@@ -392,7 +392,7 @@ func (s *CharacterLibraryService) waitAndUpdateCharacterImage(characterID uint, 
 			return
 		}
 
-		// 检查是否失败
+		// Check if failed
 		if imageGen.Status == models.ImageStatusFailed {
 			s.log.Errorw("Character image generation failed", "character_id", characterID, "image_gen_id", imageGenID, "error", imageGen.ErrorMsg)
 			return
@@ -412,9 +412,9 @@ type UpdateCharacterRequest struct {
 	LocalPath   *string `json:"local_path"`
 }
 
-// UpdateCharacter 更新角色信息
+// UpdateCharacter updates character information
 func (s *CharacterLibraryService) UpdateCharacter(characterID string, req *UpdateCharacterRequest) error {
-	// 查找角色
+	// Find the character
 	var character models.Character
 	if err := s.db.Where("id = ?", characterID).First(&character).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -423,7 +423,7 @@ func (s *CharacterLibraryService) UpdateCharacter(characterID string, req *Updat
 		return err
 	}
 
-	// 验证权限：查询角色所属的drama是否属于该用户
+	// Verify permissions: check if the drama the character belongs to is owned by the user
 	var drama models.Drama
 	if err := s.db.Where("id = ? ", character.DramaID).First(&drama).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -432,7 +432,7 @@ func (s *CharacterLibraryService) UpdateCharacter(characterID string, req *Updat
 		return err
 	}
 
-	// 构建更新数据
+	// Build update data
 	updates := make(map[string]interface{})
 
 	if req.Name != nil && *req.Name != "" {
@@ -461,7 +461,7 @@ func (s *CharacterLibraryService) UpdateCharacter(characterID string, req *Updat
 		return errors.New("no fields to update")
 	}
 
-	// 更新角色信息
+	// Update character information
 	if err := s.db.Model(&character).Updates(updates).Error; err != nil {
 		s.log.Errorw("Failed to update character", "error", err, "character_id", characterID)
 		return err
@@ -471,17 +471,17 @@ func (s *CharacterLibraryService) UpdateCharacter(characterID string, req *Updat
 	return nil
 }
 
-// BatchGenerateCharacterImages 批量生成角色图片（并发执行）
+// BatchGenerateCharacterImages batch generates character images (executed concurrently)
 func (s *CharacterLibraryService) BatchGenerateCharacterImages(characterIDs []string, imageService *ImageGenerationService, modelName string) {
 	s.log.Infow("Starting batch character image generation",
 		"count", len(characterIDs),
 		"model", modelName)
 
-	// 使用 goroutine 并发生成所有角色图片
+	// Use goroutines to concurrently generate all character images
 	for _, characterID := range characterIDs {
-		// 为每个角色启动单独的 goroutine
+		// Start a separate goroutine for each character
 		go func(charID string) {
-			imageGen, err := s.GenerateCharacterImage(charID, imageService, modelName, "") // 批量生成暂不支持自定义风格，使用默认值
+			imageGen, err := s.GenerateCharacterImage(charID, imageService, modelName, "") // Batch generation does not support custom styles yet, using default
 			if err != nil {
 				s.log.Errorw("Failed to generate character image in batch",
 					"character_id", charID,
@@ -499,7 +499,7 @@ func (s *CharacterLibraryService) BatchGenerateCharacterImages(characterIDs []st
 		"total", len(characterIDs))
 }
 
-// ExtractCharactersFromScript 从分集剧本中提取角色
+// ExtractCharactersFromScript extracts characters from an episode script
 func (s *CharacterLibraryService) ExtractCharactersFromScript(episodeID uint) (string, error) {
 	var episode models.Episode
 	if err := s.db.First(&episode, episodeID).Error; err != nil {
@@ -528,7 +528,7 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 		script = *episode.ScriptContent
 	}
 
-	// 获取 drama 的 style 信息
+	// Get drama's style information
 	var drama models.Drama
 	if err := s.db.First(&drama, episode.DramaID).Error; err != nil {
 		s.log.Warnw("Failed to load drama", "error", err, "drama_id", episode.DramaID)
@@ -561,18 +561,18 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 
 	var savedCharacters []models.Character
 	for _, charData := range extractedCharacters {
-		// 检查是否已存在同名角色
+		// Check if a character with the same name already exists
 		var existingCharacter models.Character
 		err := s.db.Where("drama_id = ? AND name = ?", episode.DramaID, charData.Name).First(&existingCharacter).Error
 
 		if err == nil {
-			// 如果存在，只关联，不更新（或者可以选更新，这里暂不更新）
+			// If exists, only associate without updating (could update, but skipping for now)
 			if err := s.db.Model(&episode).Association("Characters").Append(&existingCharacter); err != nil {
 				s.log.Warnw("Failed to associate existing character", "error", err)
 			}
 			savedCharacters = append(savedCharacters, existingCharacter)
 		} else {
-			// 创建新角色
+			// Create new character
 			newCharacter := models.Character{
 				DramaID:     episode.DramaID,
 				Name:        charData.Name,
@@ -586,7 +586,7 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 				continue
 			}
 
-			// 关联到分集
+			// Associate with episode
 			if err := s.db.Model(&episode).Association("Characters").Append(&newCharacter); err != nil {
 				s.log.Warnw("Failed to associate new character", "error", err)
 			}
