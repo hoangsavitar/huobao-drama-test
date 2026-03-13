@@ -48,11 +48,13 @@ type MergeVideoRequest struct {
 }
 
 func (s *VideoMergeService) MergeVideos(req *MergeVideoRequest) (*models.VideoMerge, error) {
+	// 验证episode权限
 	var episode models.Episode
 	if err := s.db.Preload("Drama").Where("id = ?", req.EpisodeID).First(&episode).Error; err != nil {
 		return nil, fmt.Errorf("episode not found")
 	}
 
+	// 验证所有场景都有视频
 	for i, scene := range req.Scenes {
 		if scene.VideoURL == "" {
 			return nil, fmt.Errorf("scene %d has no video", i+1)
@@ -64,6 +66,7 @@ func (s *VideoMergeService) MergeVideos(req *MergeVideoRequest) (*models.VideoMe
 		provider = "doubao"
 	}
 
+	// 序列化场景列表
 	scenesJSON, err := json.Marshal(req.Scenes)
 	if err != nil {
 		return nil, fmt.Errorf("failed to serialize scenes: %w", err)
@@ -110,12 +113,14 @@ func (s *VideoMergeService) processMergeVideo(mergeID uint) {
 		return
 	}
 
+	// 解析场景列表
 	var scenes []models.SceneClip
 	if err := json.Unmarshal(videoMerge.Scenes, &scenes); err != nil {
 		s.updateMergeError(mergeID, fmt.Sprintf("failed to parse scenes: %v", err))
 		return
 	}
 
+	// 调用视频合并API
 	result, err := s.mergeVideoClips(client, scenes)
 	if err != nil {
 		s.updateMergeError(mergeID, err.Error())
@@ -139,19 +144,25 @@ func (s *VideoMergeService) mergeVideoClips(client video.VideoClient, scenes []m
 		return nil, fmt.Errorf("no scenes to merge")
 	}
 
+	// 按Order字段排序场景
 	sort.Slice(scenes, func(i, j int) bool {
 		return scenes[i].Order < scenes[j].Order
 	})
 
 	s.log.Infow("Merging video clips with FFmpeg", "scene_count", len(scenes))
 
+	// 计算总时长
 	var totalDuration float64
 	for _, scene := range scenes {
 		totalDuration += scene.Duration
 	}
 
+	// 准备FFmpeg合成选项
 	clips := make([]ffmpeg.VideoClip, len(scenes))
 	for i, scene := range scenes {
+		// 使用 scene.VideoURL，它已经在前面的代码中被正确处理
+		// 如果是本地文件，已经包含了完整路径（storagePath + LocalPath）
+		// 如果是 HTTP URL，则直接使用
 		videoPath := scene.VideoURL
 
 		clips[i] = ffmpeg.VideoClip{
@@ -171,14 +182,17 @@ func (s *VideoMergeService) mergeVideoClips(client video.VideoClient, scenes []m
 			"end_time", scene.EndTime)
 	}
 
+	// 创建视频输出目录
 	videoDir := filepath.Join(s.storagePath, "videos", "merged")
 	if err := os.MkdirAll(videoDir, 0755); err != nil {
 		return nil, fmt.Errorf("failed to create video directory: %w", err)
 	}
 
+	// 生成输出文件名
 	fileName := fmt.Sprintf("merged_%d.mp4", time.Now().Unix())
 	outputPath := filepath.Join(videoDir, fileName)
 
+	// 使用FFmpeg合成视频
 	mergedPath, err := s.ffmpeg.MergeVideos(&ffmpeg.MergeOptions{
 		OutputPath: outputPath,
 		Clips:      clips,
@@ -189,10 +203,11 @@ func (s *VideoMergeService) mergeVideoClips(client video.VideoClient, scenes []m
 
 	s.log.Infow("Video merged successfully", "path", mergedPath)
 
+	// 生成相对路径（不包含协议、IP、端口）
 	relPath := filepath.Join("videos", "merged", fileName)
 
 	result := &video.VideoResult{
-		VideoURL:  relPath,
+		VideoURL:  relPath, // 只保存相对路径
 		Duration:  int(totalDuration),
 		Completed: true,
 		Status:    "completed",
@@ -231,6 +246,7 @@ func (s *VideoMergeService) pollMergeStatus(mergeID uint, client video.VideoClie
 func (s *VideoMergeService) completeMerge(mergeID uint, result *video.VideoResult) {
 	now := time.Now()
 
+	// 获取merge记录
 	var videoMerge models.VideoMerge
 	if err := s.db.First(&videoMerge, mergeID).Error; err != nil {
 		s.log.Errorw("Failed to load video merge for completion", "error", err, "id", mergeID)
@@ -239,6 +255,7 @@ func (s *VideoMergeService) completeMerge(mergeID uint, result *video.VideoResul
 
 	finalVideoURL := result.VideoURL
 
+	// 使用本地存储，不再使用MinIO
 	s.log.Infow("Video merge completed, using local storage", "merge_id", mergeID, "local_path", result.VideoURL)
 
 	updates := map[string]interface{}{
@@ -253,6 +270,7 @@ func (s *VideoMergeService) completeMerge(mergeID uint, result *video.VideoResul
 
 	s.db.Model(&models.VideoMerge{}).Where("id = ?", mergeID).Updates(updates)
 
+	// 更新episode的状态和最终视频URL
 	if videoMerge.EpisodeID != 0 {
 		s.db.Model(&models.Episode{}).Where("id = ?", videoMerge.EpisodeID).Updates(map[string]interface{}{
 			"status":    "completed",
@@ -278,11 +296,13 @@ func (s *VideoMergeService) getVideoClient(provider string) (video.VideoClient, 
 		return nil, fmt.Errorf("failed to get video config: %w", err)
 	}
 
+	// 使用第一个模型
 	model := ""
 	if len(config.Model) > 0 {
 		model = config.Model[0]
 	}
 
+	// 根据配置中的 provider 创建对应的客户端
 	var endpoint string
 	var queryEndpoint string
 
@@ -354,9 +374,10 @@ func (s *VideoMergeService) DeleteMerge(mergeID uint) error {
 	return nil
 }
 
+// TimelineClip 时间线片段数据
 type TimelineClip struct {
-	AssetID      interface{}            `json:"asset_id"`
-	StoryboardID string                 `json:"storyboard_id"`
+	AssetID      interface{}            `json:"asset_id"`      // 素材库视频ID（优先使用，可以是数字或字符串）
+	StoryboardID string                 `json:"storyboard_id"` // 分镜ID（fallback）
 	Order        int                    `json:"order"`
 	StartTime    float64                `json:"start_time"`
 	EndTime      float64                `json:"end_time"`
@@ -364,6 +385,7 @@ type TimelineClip struct {
 	Transition   map[string]interface{} `json:"transition"`
 }
 
+// getAssetIDString 将 AssetID 转换为字符串
 func getAssetIDString(assetID interface{}) string {
 	if assetID == nil {
 		return ""
@@ -380,37 +402,47 @@ func getAssetIDString(assetID interface{}) string {
 	}
 }
 
+// FinalizeEpisodeRequest 完成剧集制作请求
 type FinalizeEpisodeRequest struct {
 	EpisodeID string         `json:"episode_id"`
 	Clips     []TimelineClip `json:"clips"`
 }
 
+// FinalizeEpisode 完成集数制作，根据时间线场景顺序合成最终视频
 func (s *VideoMergeService) FinalizeEpisode(episodeID string, timelineData *FinalizeEpisodeRequest) (map[string]interface{}, error) {
+	// 验证episode存在且属于该用户
 	var episode models.Episode
 	if err := s.db.Preload("Drama").Preload("Storyboards").Where("id = ?", episodeID).First(&episode).Error; err != nil {
 		return nil, fmt.Errorf("episode not found")
 	}
 
+	// 构建分镜ID映射
 	sceneMap := make(map[string]models.Storyboard)
 	for _, scene := range episode.Storyboards {
 		sceneMap[fmt.Sprintf("%d", scene.ID)] = scene
 	}
 
+	// 根据时间线数据构建场景片段
 	var sceneClips []models.SceneClip
 	var skippedScenes []int
 
 	if timelineData != nil && len(timelineData.Clips) > 0 {
 		s.log.Infow("Processing timeline data", "clips_count", len(timelineData.Clips))
+		// 使用前端提供的时间线数据
 		for i, clip := range timelineData.Clips {
 			assetIDStr := getAssetIDString(clip.AssetID)
 			s.log.Infow("Processing clip", "index", i, "storyboard_id", clip.StoryboardID, "asset_id", assetIDStr, "order", clip.Order)
+			// 优先使用素材库中的视频（通过AssetID）
 			var videoURL string
 			var sceneID uint
 
 			if assetIDStr != "" {
+				// 从素材库获取视频，优先使用 local_path
 				var asset models.Asset
 				if err := s.db.Where("id = ? AND type = ?", assetIDStr, models.AssetTypeVideo).First(&asset).Error; err == nil {
+					// 优先使用 local_path
 					if asset.LocalPath != nil && *asset.LocalPath != "" {
+						// 检查是否已经是完整路径
 						if filepath.IsAbs(*asset.LocalPath) || filepath.HasPrefix(*asset.LocalPath, s.storagePath) {
 							videoURL = *asset.LocalPath
 						} else {
@@ -418,9 +450,11 @@ func (s *VideoMergeService) FinalizeEpisode(episodeID string, timelineData *Fina
 						}
 						s.log.Infow("Using local video from asset library", "asset_id", assetIDStr, "local_path", videoURL)
 					} else {
+						// 回退到远程 URL
 						videoURL = asset.URL
 						s.log.Infow("Using remote video from asset library", "asset_id", assetIDStr, "video_url", videoURL)
 					}
+					// 如果asset关联了storyboard，使用关联的storyboard_id
 					if asset.StoryboardID != nil {
 						sceneID = *asset.StoryboardID
 					}
@@ -429,6 +463,7 @@ func (s *VideoMergeService) FinalizeEpisode(episodeID string, timelineData *Fina
 				}
 			}
 
+			// 如果没有从素材库获取到视频，尝试从storyboard获取
 			if videoURL == "" && clip.StoryboardID != "" {
 				scene, exists := sceneMap[clip.StoryboardID]
 				if !exists {
@@ -436,9 +471,11 @@ func (s *VideoMergeService) FinalizeEpisode(episodeID string, timelineData *Fina
 					continue
 				}
 
+				// 查找关联的 video_generation 记录以获取 local_path
 				var videoGen models.VideoGeneration
 				if err := s.db.Where("storyboard_id = ? AND status = ?", scene.ID, "completed").Order("created_at DESC").First(&videoGen).Error; err == nil {
 					if videoGen.LocalPath != nil && *videoGen.LocalPath != "" {
+						// 检查是否已经是完整路径
 						if filepath.IsAbs(*videoGen.LocalPath) || filepath.HasPrefix(*videoGen.LocalPath, s.storagePath) {
 							videoURL = *videoGen.LocalPath
 						} else {
@@ -447,17 +484,20 @@ func (s *VideoMergeService) FinalizeEpisode(episodeID string, timelineData *Fina
 						sceneID = scene.ID
 						s.log.Infow("Using local video from video_generation", "storyboard_id", clip.StoryboardID, "local_path", videoURL)
 					} else if scene.VideoURL != nil && *scene.VideoURL != "" {
+						// 回退到远程 URL
 						videoURL = *scene.VideoURL
 						sceneID = scene.ID
 						s.log.Infow("Using remote video from storyboard", "storyboard_id", clip.StoryboardID, "video_url", videoURL)
 					}
 				} else if scene.VideoURL != nil && *scene.VideoURL != "" {
+					// 如果没有找到 video_generation，直接使用 storyboard 的 video_url
 					videoURL = *scene.VideoURL
 					sceneID = scene.ID
 					s.log.Infow("Using video from storyboard (no video_generation found)", "storyboard_id", clip.StoryboardID, "video_url", videoURL)
 				}
 			}
 
+			// 如果仍然没有视频URL，跳过该片段
 			if videoURL == "" {
 				s.log.Warnw("No video available for clip, skipping", "clip", clip)
 				if clip.StoryboardID != "" {
@@ -486,19 +526,23 @@ func (s *VideoMergeService) FinalizeEpisode(episodeID string, timelineData *Fina
 			s.log.Infow("Scene clip added", "total_clips", len(sceneClips))
 		}
 	} else {
+		// 没有时间线数据，使用默认场景顺序
 		if len(episode.Storyboards) == 0 {
 			return nil, fmt.Errorf("no scenes found for this episode")
 		}
 
 		order := 0
 		for _, scene := range episode.Storyboards {
+			// 优先从素材库查找该分镜关联的视频
 			var videoURL string
 			var asset models.Asset
 			if err := s.db.Where("storyboard_id = ? AND type = ? AND episode_id = ?",
 				scene.ID, models.AssetTypeVideo, episode.ID).
 				Order("created_at DESC").
 				First(&asset).Error; err == nil {
+				// 优先使用 local_path
 				if asset.LocalPath != nil && *asset.LocalPath != "" {
+					// 检查是否已经是完整路径
 					if filepath.IsAbs(*asset.LocalPath) || filepath.HasPrefix(*asset.LocalPath, s.storagePath) {
 						videoURL = *asset.LocalPath
 					} else {
@@ -516,9 +560,11 @@ func (s *VideoMergeService) FinalizeEpisode(episodeID string, timelineData *Fina
 						"video_url", videoURL)
 				}
 			} else {
+				// 如果素材库没有，查找 video_generation 记录
 				var videoGen models.VideoGeneration
 				if err := s.db.Where("storyboard_id = ? AND status = ?", scene.ID, "completed").Order("created_at DESC").First(&videoGen).Error; err == nil {
 					if videoGen.LocalPath != nil && *videoGen.LocalPath != "" {
+						// 检查是否已经是完整路径
 						if filepath.IsAbs(*videoGen.LocalPath) || filepath.HasPrefix(*videoGen.LocalPath, s.storagePath) {
 							videoURL = *videoGen.LocalPath
 						} else {
@@ -534,6 +580,7 @@ func (s *VideoMergeService) FinalizeEpisode(episodeID string, timelineData *Fina
 							"video_url", videoURL)
 					}
 				} else if scene.VideoURL != nil && *scene.VideoURL != "" {
+					// 最后回退到 storyboard 的 video_url
 					videoURL = *scene.VideoURL
 					s.log.Infow("Using fallback video from storyboard",
 						"storyboard_id", scene.ID,
@@ -541,6 +588,7 @@ func (s *VideoMergeService) FinalizeEpisode(episodeID string, timelineData *Fina
 				}
 			}
 
+			// 跳过没有视频的场景
 			if videoURL == "" {
 				s.log.Warnw("Scene has no video, skipping", "storyboard_number", scene.StoryboardNumber)
 				skippedScenes = append(skippedScenes, scene.StoryboardNumber)
@@ -558,10 +606,12 @@ func (s *VideoMergeService) FinalizeEpisode(episodeID string, timelineData *Fina
 		}
 	}
 
+	// 检查是否至少有一个场景可以合成
 	if len(sceneClips) == 0 {
 		return nil, fmt.Errorf("no scenes with videos available for merging")
 	}
 
+	// 创建视频合成任务
 	title := fmt.Sprintf("%s - Episode %d", episode.Drama.Title, episode.EpisodeNum)
 
 	finalReq := &MergeVideoRequest{
@@ -569,14 +619,16 @@ func (s *VideoMergeService) FinalizeEpisode(episodeID string, timelineData *Fina
 		DramaID:   fmt.Sprintf("%d", episode.DramaID),
 		Title:     title,
 		Scenes:    sceneClips,
-		Provider:  "doubao",
+		Provider:  "doubao", // 默认使用doubao
 	}
 
+	// 执行视频合成
 	videoMerge, err := s.MergeVideos(finalReq)
 	if err != nil {
 		return nil, fmt.Errorf("failed to start video merge: %w", err)
 	}
 
+	// 更新episode状态为processing
 	s.db.Model(&episode).Updates(map[string]interface{}{
 		"status": "processing",
 	})
@@ -588,6 +640,7 @@ func (s *VideoMergeService) FinalizeEpisode(episodeID string, timelineData *Fina
 		"scenes_count": len(sceneClips),
 	}
 
+	// 如果有跳过的场景，添加提示信息
 	if len(skippedScenes) > 0 {
 		result["skipped_scenes"] = skippedScenes
 		result["warning"] = fmt.Sprintf("Skipped %d scenes without generated videos (scene numbers: %v)", len(skippedScenes), skippedScenes)
