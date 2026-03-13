@@ -6,17 +6,17 @@ import (
 	"github.com/drama-generator/backend/pkg/config"
 )
 
-// PromptI18n 提示词国际化工具
+// PromptI18n is a prompt internationalization utility
 type PromptI18n struct {
 	config *config.Config
 }
 
-// NewPromptI18n 创建提示词国际化工具
+// NewPromptI18n creates a prompt internationalization utility
 func NewPromptI18n(cfg *config.Config) *PromptI18n {
 	return &PromptI18n{config: cfg}
 }
 
-// GetLanguage 获取当前语言设置
+// GetLanguage gets the current language setting
 func (p *PromptI18n) GetLanguage() string {
 	lang := p.config.App.Language
 	if lang == "" {
@@ -25,12 +25,12 @@ func (p *PromptI18n) GetLanguage() string {
 	return lang
 }
 
-// IsEnglish 判断是否为英文模式（动态读取配置）
+// IsEnglish checks if the current mode is English (dynamically reads config)
 func (p *PromptI18n) IsEnglish() bool {
 	return p.GetLanguage() == "en"
 }
 
-// GetStoryboardSystemPrompt 获取分镜生成系统提示词
+// GetStoryboardSystemPrompt gets the storyboard generation system prompt
 func (p *PromptI18n) GetStoryboardSystemPrompt() string {
 	if p.IsEnglish() {
 		return `[Role] You are a senior film storyboard artist, proficient in Robert McKee's shot breakdown theory, skilled at building emotional rhythm.
@@ -143,9 +143,9 @@ func (p *PromptI18n) GetStoryboardSystemPrompt() string {
 - 情绪强度必须准确反映剧本氛围变化`
 }
 
-// GetSceneExtractionPrompt 获取场景提取提示词
+// GetSceneExtractionPrompt gets the scene extraction prompt
 func (p *PromptI18n) GetSceneExtractionPrompt(style string) string {
-	// 默认图片比例
+	// default image ratio
 	imageRatio := "16:9"
 
 	if p.IsEnglish() {
@@ -196,7 +196,7 @@ Each element containing:
 - prompt：完整的中文图片生成提示词（纯背景，明确说明无人物）`, style, imageRatio)
 }
 
-// GetFirstFramePrompt 获取首帧提示词
+// GetFirstFramePrompt gets the first frame prompt
 func (p *PromptI18n) GetFirstFramePrompt(style string) string {
 	imageRatio := "16:9"
 	if p.IsEnglish() {
@@ -236,7 +236,7 @@ Return a JSON object containing:
 - description：简化的中文描述（供参考）`, style, imageRatio)
 }
 
-// GetKeyFramePrompt 获取关键帧提示词
+// GetKeyFramePrompt gets the key frame prompt
 func (p *PromptI18n) GetKeyFramePrompt(style string) string {
 	imageRatio := "16:9"
 	if p.IsEnglish() {
@@ -276,7 +276,7 @@ Return a JSON object containing:
 - description：简化的中文描述（供参考）`, style, imageRatio)
 }
 
-// GetActionSequenceFramePrompt 获取动作序列提示词
+// GetActionSequenceFramePrompt gets the action sequence frame prompt
 func (p *PromptI18n) GetActionSequenceFramePrompt(style string) string {
 	imageRatio := "16:9"
 	if p.IsEnglish() {
@@ -361,7 +361,7 @@ You must return a **JSON object** with the following structure:
 }`, imageRatio)
 }
 
-// GetLastFramePrompt 获取尾帧提示词
+// GetLastFramePrompt gets the last frame prompt
 func (p *PromptI18n) GetLastFramePrompt(style string) string {
 	imageRatio := "16:9"
 	if p.IsEnglish() {
@@ -401,7 +401,7 @@ Return a JSON object containing:
 - description：简化的中文描述（供参考）`, style, imageRatio)
 }
 
-// GetOutlineGenerationPrompt 获取大纲生成提示词
+// GetOutlineGenerationPrompt gets the outline generation prompt
 func (p *PromptI18n) GetOutlineGenerationPrompt() string {
 	if p.IsEnglish() {
 		return `You are a professional short drama screenwriter. Based on the theme and number of episodes, create a complete short drama outline and plan the plot direction for each episode.
@@ -444,7 +444,7 @@ Return a JSON object containing:
   - cliffhanger: 悬念结尾（如有）`
 }
 
-// GetCharacterExtractionPrompt 获取角色提取提示词
+// GetCharacterExtractionPrompt gets the character extraction prompt
 func (p *PromptI18n) GetCharacterExtractionPrompt(style string) string {
 	imageRatio := "16:9"
 	if p.IsEnglish() {
@@ -490,7 +490,7 @@ Each element is a character object containing the above fields.`, style, imageRa
 每个元素是一个角色对象，包含上述字段。`, style, imageRatio)
 }
 
-// GetPropExtractionPrompt 获取道具提取提示词
+// GetPropExtractionPrompt gets the prop extraction prompt
 func (p *PromptI18n) GetPropExtractionPrompt(style string) string {
 	imageRatio := "1:1"
 
@@ -541,7 +541,7 @@ JSON数组，每个对象包含：
 请直接返回JSON数组。`, style, imageRatio)
 }
 
-// GetEpisodeScriptPrompt 获取分集剧本生成提示词
+// GetEpisodeScriptPrompt gets the episode script generation prompt
 func (p *PromptI18n) GetEpisodeScriptPrompt() string {
 	if p.IsEnglish() {
 		return `You are a professional short drama screenwriter. You excel at creating detailed plot content based on episode plans.
@@ -588,7 +588,7 @@ Output Format:
   - script_content: 详细剧本内容（800-1200字）`
 }
 
-// FormatUserPrompt 格式化用户提示词的通用文本
+// FormatUserPrompt formats common text for user prompts
 func (p *PromptI18n) FormatUserPrompt(key string, args ...interface{}) string {
 	templates := map[string]map[string]string{
 		"en": {
@@ -672,7 +672,7 @@ func (p *PromptI18n) FormatUserPrompt(key string, args ...interface{}) string {
 	return template
 }
 
-// GetStylePrompt 获取风格提示词
+// GetStylePrompt gets the style prompt
 func (p *PromptI18n) GetStylePrompt(style string) string {
 	if style == "" {
 		return ""
@@ -841,10 +841,10 @@ You are a top-tier **3D Toy Designer and Rendering Artist**, specializing in hig
 	return ""
 }
 
-// GetVideoConstraintPrompt 获取视频生成的约束提示词
-// referenceMode: "single" (单图), "first_last" (首尾帧), "multiple" (多图), "action_sequence" (动作序列)
+// GetVideoConstraintPrompt gets the constraint prompt for video generation
+// referenceMode: "single" (single image), "first_last" (first and last frames), "multiple" (multiple images), "action_sequence" (action sequence)
 func (p *PromptI18n) GetVideoConstraintPrompt(referenceMode string) string {
-	// 动作序列图（九宫格）的约束提示词
+	// constraint prompt for action sequence (3x3 grid) images
 	actionSequencePrompts := map[string]string{
 		"zh": `### 角色定义
 
@@ -881,7 +881,7 @@ You are an ultra-high-precision video generation expert, specializing in transfo
 * **Hallucination Prohibition:** Do not introduce new elements or background switches not mentioned in the 9-grid and prompt.`,
 	}
 
-	// 通用约束提示词（单图、首尾帧、多图）
+	// general constraint prompt (single image, first and last frames, multiple images)
 	generalPrompts := map[string]string{
 		"zh": `### 角色定义
 
@@ -921,14 +921,14 @@ You are a top-tier video dynamics analyst and synthesis expert. You can accurate
 		lang = "en"
 	}
 
-	// 如果是动作序列模式，返回九宫格约束提示词
+	// if action sequence mode, return 3x3 grid constraint prompt
 	if referenceMode == "action_sequence" {
 		if prompt, ok := actionSequencePrompts[lang]; ok {
 			return prompt
 		}
 	}
 
-	// 其他模式返回通用约束提示词
+	// other modes return general constraint prompt
 	if prompt, ok := generalPrompts[lang]; ok {
 		return prompt
 	}
