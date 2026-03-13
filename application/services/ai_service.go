@@ -59,7 +59,7 @@ Endpoint string            `json:"endpoint"`
 }
 
 func (s *AIService) CreateConfig(req *CreateAIConfigRequest) (*models.AIServiceConfig, error) {
-// 根据 provider 和 service_type 自动设置 endpoint
+// Automatically set endpoint based on provider and service_type
 endpoint := req.Endpoint
 queryEndpoint := req.QueryEndpoint
 
@@ -101,7 +101,7 @@ queryEndpoint = "/generations/tasks/{taskId}"
 }
 }
 default:
-// 默认使用 OpenAI 格式
+// Default to OpenAI format
 if req.ServiceType == "text" {
 endpoint = "/chat/completions"
 } else if req.ServiceType == "image" {
@@ -174,7 +174,7 @@ return nil, err
 
 tx := s.db.Begin()
 
-// 不再需要is_default独占逻辑
+// No longer need is_default exclusive logic
 
 updates := make(map[string]interface{})
 if req.Name != "" {
@@ -196,7 +196,7 @@ if req.Priority != nil {
 updates["priority"] = *req.Priority
 }
 
-// 如果提供了 provider，根据 provider 和 service_type 自动设置 endpoint
+// If provider is specified, automatically set endpoint based on provider and service_type
 if req.Provider != "" && req.Endpoint == "" {
 provider := req.Provider
 serviceType := config.ServiceType
@@ -229,7 +229,7 @@ updates["query_endpoint"] = "/video/task/{taskId}"
 updates["endpoint"] = req.Endpoint
 }
 
-// 允许清空query_endpoint，所以不检查是否为空
+// Allow clearing query_endpoint, so do not check if empty
 updates["query_endpoint"] = req.QueryEndpoint
 if req.Settings != "" {
 updates["settings"] = req.Settings
@@ -270,14 +270,14 @@ return nil
 func (s *AIService) TestConnection(req *TestConnectionRequest) error {
 s.log.Infow("TestConnection called", "baseURL", req.BaseURL, "provider", req.Provider, "endpoint", req.Endpoint, "modelCount", len(req.Model))
 
-// 使用第一个模型进行测试
+// Use the first model for testing
 model := ""
 if len(req.Model) > 0 {
 model = req.Model[0]
 }
 s.log.Infow("Using model for test", "model", model, "provider", req.Provider)
 
-// 根据 provider 参数选择客户端
+// Select client based on provider parameter
 var client ai.AIClient
 var endpoint string
 
@@ -288,7 +288,7 @@ s.log.Infow("Using Gemini client", "baseURL", req.BaseURL)
 endpoint = "/v1beta/models/{model}:generateContent"
 client = ai.NewGeminiClient(req.BaseURL, req.APIKey, model, endpoint)
 case "openai", "chatfire":
-// OpenAI 格式（包括 chatfire 等）
+// OpenAI format (including chatfire, etc.)
 s.log.Infow("Using OpenAI-compatible client", "baseURL", req.BaseURL, "provider", req.Provider)
 endpoint = req.Endpoint
 if endpoint == "" {
@@ -296,7 +296,7 @@ endpoint = "/chat/completions"
 }
 client = ai.NewOpenAIClient(req.BaseURL, req.APIKey, model, endpoint)
 default:
-// 默认使用 OpenAI 格式
+// Default to OpenAI format
 s.log.Infow("Using default OpenAI-compatible client", "baseURL", req.BaseURL)
 endpoint = req.Endpoint
 if endpoint == "" {
@@ -317,7 +317,7 @@ return err
 
 func (s *AIService) GetDefaultConfig(serviceType string) (*models.AIServiceConfig, error) {
 var config models.AIServiceConfig
-// 按优先级降序获取第一个激活的配置
+// Get the first active config in descending priority order
 err := s.db.Where("service_type = ? AND is_active = ?", serviceType, true).
 Order("priority DESC, created_at DESC").
 First(&config).Error
@@ -332,7 +332,7 @@ return nil, err
 return &config, nil
 }
 
-// GetConfigForModel 根据服务类型和模型名称获取优先级最高的激活配置
+// GetConfigForModel retrieves the highest priority active config by service type and model name
 func (s *AIService) GetConfigForModel(serviceType string, modelName string) (*models.AIServiceConfig, error) {
 var configs []models.AIServiceConfig
 err := s.db.Where("service_type = ? AND is_active = ?", serviceType, true).
@@ -343,7 +343,7 @@ if err != nil {
 return nil, err
 }
 
-// 查找包含指定模型的配置
+// Find config containing the specified model
 for _, config := range configs {
 for _, model := range config.Model {
 if model == modelName {
@@ -361,13 +361,13 @@ if err != nil {
 return nil, err
 }
 
-// 使用第一个模型
+// Use the first model
 model := ""
 if len(config.Model) > 0 {
 model = config.Model[0]
 }
 
-// 使用数据库配置中的 endpoint，如果为空则根据 provider 设置默认值
+// Use endpoint from database config, set default based on provider if empty
 endpoint := config.Endpoint
 if endpoint == "" {
 switch config.Provider {
@@ -378,24 +378,24 @@ endpoint = "/chat/completions"
 }
 }
 
-// 根据 provider 创建对应的客户端
+// Create corresponding client based on provider
 switch config.Provider {
 case "gemini", "google":
 return ai.NewGeminiClient(config.BaseURL, config.APIKey, model, endpoint), nil
 default:
-// openai, chatfire 等其他厂商都使用 OpenAI 格式
+// openai, chatfire and other providers all use OpenAI format
 return ai.NewOpenAIClient(config.BaseURL, config.APIKey, model, endpoint), nil
 }
 }
 
-// GetAIClientForModel 根据服务类型和模型名称获取对应的AI客户端
+// GetAIClientForModel retrieves the AI client by service type and model name
 func (s *AIService) GetAIClientForModel(serviceType string, modelName string) (ai.AIClient, error) {
 config, err := s.GetConfigForModel(serviceType, modelName)
 if err != nil {
 return nil, err
 }
 
-// 使用数据库配置中的 endpoint，如果为空则根据 provider 设置默认值
+// Use endpoint from database config, set default based on provider if empty
 endpoint := config.Endpoint
 if endpoint == "" {
 switch config.Provider {
@@ -406,12 +406,12 @@ endpoint = "/chat/completions"
 }
 }
 
-// 根据 provider 创建对应的客户端
+// Create corresponding client based on provider
 switch config.Provider {
 case "gemini", "google":
 return ai.NewGeminiClient(config.BaseURL, config.APIKey, modelName, endpoint), nil
 default:
-// openai, chatfire 等其他厂商都使用 OpenAI 格式
+// openai, chatfire and other providers all use OpenAI format
 return ai.NewOpenAIClient(config.BaseURL, config.APIKey, modelName, endpoint), nil
 }
 }
