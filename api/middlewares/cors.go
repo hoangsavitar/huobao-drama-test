@@ -9,7 +9,7 @@ func CORSMiddleware(allowedOrigins []string) gin.HandlerFunc {
 		origin := c.Request.Header.Get("Origin")
 		path := c.Request.URL.Path
 
-		// 检查是否是静态文件路径（/static 或 /assets）
+		// Check if this is a static file path (/static or /assets)
 		isStaticPath := len(path) >= 7 && (path[:7] == "/static" || path[:7] == "/assets")
 
 		allowed := false
@@ -20,7 +20,7 @@ func CORSMiddleware(allowedOrigins []string) gin.HandlerFunc {
 			}
 		}
 
-		// 对于静态文件，如果有 Origin 头，总是允许跨域访问
+		// For static files, if Origin header exists, always allow cross-origin access
 		if isStaticPath && origin != "" {
 			allowed = true
 		}
@@ -28,7 +28,7 @@ func CORSMiddleware(allowedOrigins []string) gin.HandlerFunc {
 		if allowed && origin != "" {
 			c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
 		} else if allowed && origin == "" {
-			// 如果没有 Origin 头但是允许的请求，设置为 *
+			// If no Origin header but the request is allowed, set to *
 			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		}
 

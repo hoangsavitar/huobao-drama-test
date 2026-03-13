@@ -7,13 +7,13 @@ import (
 "github.com/gin-gonic/gin"
 )
 
-// FramePromptHandler 处理帧提示词生成请求
+// FramePromptHandler handles frame prompt generation requests
 type FramePromptHandler struct {
 framePromptService *services.FramePromptService
 log                *logger.Logger
 }
 
-// NewFramePromptHandler 创建帧提示词处理器
+// NewFramePromptHandler creates a frame prompt handler
 func NewFramePromptHandler(framePromptService *services.FramePromptService, log *logger.Logger) *FramePromptHandler {
 return &FramePromptHandler{
 framePromptService: framePromptService,
@@ -21,7 +21,7 @@ log:                log,
 }
 }
 
-// GenerateFramePrompt 生成指定类型的帧提示词
+// GenerateFramePrompt generates frame prompts of the specified type
 // POST /api/v1/storyboards/:id/frame-prompt
 func (h *FramePromptHandler) GenerateFramePrompt(c *gin.Context) {
 storyboardID := c.Param("id")
@@ -42,7 +42,7 @@ FrameType:    services.FrameType(req.FrameType),
 PanelCount:   req.PanelCount,
 }
 
-// 直接调用服务层的异步方法，该方法会创建任务并返回任务ID
+// Directly call the async service method, which creates a task and returns a task ID
 taskID, err := h.framePromptService.GenerateFramePrompt(serviceReq, req.Model)
 if err != nil {
 h.log.Errorw("Failed to generate frame prompt", "error", err)
@@ -50,10 +50,10 @@ response.InternalError(c, err.Error())
 return
 }
 
-// 立即返回任务ID
+// Return task ID immediately
 response.Success(c, gin.H{
 "task_id": taskID,
 "status":  "pending",
-"message": "帧提示词生成任务已创建，正在后台处理...",
+"message": "Frame prompt generation task created, processing in background...",
 })
 }

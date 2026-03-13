@@ -18,7 +18,7 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 	r.Use(middlewares2.LoggerMiddleware(log))
 	r.Use(middlewares2.CORSMiddleware(cfg.Server.CORSOrigins))
 
-	// 静态文件服务（用户上传的文件）
+	// Static file serving (user uploaded files)
 	r.Static("/static", cfg.Storage.LocalPath)
 
 	r.GET("/health", func(c *gin.Context) {
@@ -64,7 +64,7 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 		{
 			dramas.GET("", dramaHandler.ListDramas)
 			dramas.POST("", dramaHandler.CreateDrama)
-			dramas.GET("/stats", dramaHandler.GetDramaStats) // 统计接口放在/:id之前
+			dramas.GET("/stats", dramaHandler.GetDramaStats) // Stats endpoint must be before /:id
 			dramas.GET("/:id", dramaHandler.GetDrama)
 			dramas.PUT("/:id", dramaHandler.UpdateDrama)
 			dramas.DELETE("/:id", dramaHandler.DeleteDrama)
@@ -92,7 +92,7 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 			generation.POST("/characters", scriptGenHandler.GenerateCharacters)
 		}
 
-		// 角色库路由
+		// Character library routes
 		characterLibrary := api.Group("/character-library")
 		{
 			characterLibrary.GET("", characterLibraryHandler.ListLibraryItems)
@@ -101,7 +101,7 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 			characterLibrary.DELETE("/:id", characterLibraryHandler.DeleteLibraryItem)
 		}
 
-		// 角色图片相关路由
+		// Character image related routes
 		characters := api.Group("/characters")
 		{
 			characters.PUT("/:id", characterLibraryHandler.UpdateCharacter)
@@ -122,16 +122,16 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 			props.POST("/:id/generate", propHandler.GenerateImage)
 		}
 
-		// 文件上传路由
+		// File upload routes
 		upload := api.Group("/upload")
 		{
 			upload.POST("/image", uploadHandler.UploadImage)
 		}
 
-		// 分镜头路由
+		// Storyboard routes
 		episodes := api.Group("/episodes")
 		{
-			// 分镜头
+			// Storyboards
 			episodes.POST("/:episode_id/storyboards", storyboardHandler.GenerateStoryboard)
 			episodes.POST("/:episode_id/props/extract", propHandler.ExtractProps)
 			episodes.POST("/:episode_id/characters/extract", characterLibraryHandler.ExtractCharacters)
@@ -140,14 +140,14 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 			episodes.GET("/:episode_id/download", dramaHandler.DownloadEpisodeVideo)
 		}
 
-		// 任务路由
+		// Task routes
 		tasks := api.Group("/tasks")
 		{
 			tasks.GET("/:task_id", taskHandler.GetTaskStatus)
 			tasks.GET("", taskHandler.GetResourceTasks)
 		}
 
-		// 场景路由
+		// Scene routes
 		scenes := api.Group("/scenes")
 		{
 			scenes.PUT("/:scene_id", sceneHandler.UpdateScene)
@@ -224,22 +224,22 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 		}
 	}
 
-	// 前端静态文件服务（放在API路由之后，避免冲突）
-	// 服务前端构建产物
+	// Frontend static file serving (placed after API routes to avoid conflicts)
+	// Serve frontend build artifacts
 	r.Static("/assets", "./web/dist/assets")
 	r.StaticFile("/favicon.ico", "./web/dist/favicon.ico")
 
-	// NoRoute处理：对于所有未匹配的路由
+	// NoRoute handler: for all unmatched routes
 	r.NoRoute(func(c *gin.Context) {
 		path := c.Request.URL.Path
 
-		// 如果是API路径，返回404
+		// If it is an API path, return 404
 		if len(path) >= 4 && path[:4] == "/api" {
 			c.JSON(404, gin.H{"error": "API endpoint not found"})
 			return
 		}
 
-		// SPA fallback - 返回index.html
+		// SPA fallback - return index.html
 		c.File("./web/dist/index.html")
 	})
 

@@ -30,7 +30,7 @@ response.BadRequest(c, err.Error())
 return
 }
 
-// 直接调用服务层的异步方法，该方法会创建任务并返回任务ID
+// Directly call the async service method, which creates a task and returns a task ID
 taskID, err := h.scriptService.GenerateCharacters(&req)
 if err != nil {
 h.log.Errorw("Failed to generate characters", "error", err, "drama_id", req.DramaID)
@@ -38,10 +38,10 @@ response.InternalError(c, err.Error())
 return
 }
 
-// 立即返回任务ID
+// Return task ID immediately
 response.Success(c, gin.H{
 "task_id": taskID,
 "status":  "pending",
-"message": "角色生成任务已创建，正在后台处理...",
+"message": "Character generation task created, processing in background...",
 })
 }

@@ -47,7 +47,7 @@ func (h *AssetHandler) UpdateAsset(c *gin.Context) {
 
 assetID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 if err != nil {
-response.BadRequest(c, "无效的ID")
+response.BadRequest(c, "Invalid ID")
 return
 }
 
@@ -71,13 +71,13 @@ func (h *AssetHandler) GetAsset(c *gin.Context) {
 
 assetID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 if err != nil {
-response.BadRequest(c, "无效的ID")
+response.BadRequest(c, "Invalid ID")
 return
 }
 
 asset, err := h.assetService.GetAsset(uint(assetID))
 if err != nil {
-response.NotFound(c, "素材不存在")
+response.NotFound(c, "Asset not found")
 return
 }
 
@@ -170,7 +170,7 @@ func (h *AssetHandler) DeleteAsset(c *gin.Context) {
 
 assetID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 if err != nil {
-response.BadRequest(c, "无效的ID")
+response.BadRequest(c, "Invalid ID")
 return
 }
 
@@ -187,7 +187,7 @@ func (h *AssetHandler) ImportFromImageGen(c *gin.Context) {
 
 imageGenID, err := strconv.ParseUint(c.Param("image_gen_id"), 10, 32)
 if err != nil {
-response.BadRequest(c, "无效的ID")
+response.BadRequest(c, "Invalid ID")
 return
 }
 
@@ -205,7 +205,7 @@ func (h *AssetHandler) ImportFromVideoGen(c *gin.Context) {
 
 videoGenID, err := strconv.ParseUint(c.Param("video_gen_id"), 10, 32)
 if err != nil {
-response.BadRequest(c, "无效的ID")
+response.BadRequest(c, "Invalid ID")
 return
 }
 

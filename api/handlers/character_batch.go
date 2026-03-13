@@ -5,7 +5,7 @@ import (
 "github.com/gin-gonic/gin"
 )
 
-// BatchGenerateCharacterImages 批量生成角色图片
+// BatchGenerateCharacterImages batch generates character images
 func (h *CharacterLibraryHandler) BatchGenerateCharacterImages(c *gin.Context) {
 
 var req struct {
@@ -18,17 +18,17 @@ response.BadRequest(c, err.Error())
 return
 }
 
-// 限制批量生成数量
+// Limit batch generation count
 if len(req.CharacterIDs) > 10 {
-response.BadRequest(c, "单次最多生成10个角色")
+response.BadRequest(c, "Maximum of 10 characters per batch")
 return
 }
 
-// 异步批量生成
+// Async batch generation
 go h.libraryService.BatchGenerateCharacterImages(req.CharacterIDs, h.imageService, req.Model)
 
 response.Success(c, gin.H{
-"message": "批量生成任务已提交",
+"message": "Batch generation task submitted",
 "count":   len(req.CharacterIDs),
 })
 }

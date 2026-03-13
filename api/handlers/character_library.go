@@ -26,7 +26,7 @@ log:            log,
 }
 }
 
-// ListLibraryItems 获取角色库列表
+// ListLibraryItems retrieves the character library list
 func (h *CharacterLibraryHandler) ListLibraryItems(c *gin.Context) {
 
 var query services2.CharacterLibraryQuery
@@ -45,14 +45,14 @@ query.PageSize = 20
 items, total, err := h.libraryService.ListLibraryItems(&query)
 if err != nil {
 h.log.Errorw("Failed to list library items", "error", err)
-response.InternalError(c, "获取角色库失败")
+response.InternalError(c, "Failed to retrieve character library")
 return
 }
 
 response.SuccessWithPagination(c, items, total, query.Page, query.PageSize)
 }
 
-// CreateLibraryItem 添加到角色库
+// CreateLibraryItem adds an item to the character library
 func (h *CharacterLibraryHandler) CreateLibraryItem(c *gin.Context) {
 
 var req services2.CreateLibraryItemRequest
@@ -64,14 +64,14 @@ return
 item, err := h.libraryService.CreateLibraryItem(&req)
 if err != nil {
 h.log.Errorw("Failed to create library item", "error", err)
-response.InternalError(c, "添加到角色库失败")
+response.InternalError(c, "Failed to add to character library")
 return
 }
 
 response.Created(c, item)
 }
 
-// GetLibraryItem 获取角色库项详情
+// GetLibraryItem retrieves character library item details
 func (h *CharacterLibraryHandler) GetLibraryItem(c *gin.Context) {
 
 itemID := c.Param("id")
@@ -79,43 +79,43 @@ itemID := c.Param("id")
 item, err := h.libraryService.GetLibraryItem(itemID)
 if err != nil {
 if err.Error() == "library item not found" {
-response.NotFound(c, "角色库项不存在")
+response.NotFound(c, "Character library item not found")
 return
 }
 h.log.Errorw("Failed to get library item", "error", err)
-response.InternalError(c, "获取失败")
+response.InternalError(c, "Failed to retrieve")
 return
 }
 
 response.Success(c, item)
 }
 
-// DeleteLibraryItem 删除角色库项
+// DeleteLibraryItem deletes a character library item
 func (h *CharacterLibraryHandler) DeleteLibraryItem(c *gin.Context) {
 
 itemID := c.Param("id")
 
 if err := h.libraryService.DeleteLibraryItem(itemID); err != nil {
 if err.Error() == "library item not found" {
-response.NotFound(c, "角色库项不存在")
+response.NotFound(c, "Character library item not found")
 return
 }
 h.log.Errorw("Failed to delete library item", "error", err)
-response.InternalError(c, "删除失败")
+response.InternalError(c, "Delete failed")
 return
 }
 
-response.Success(c, gin.H{"message": "删除成功"})
+response.Success(c, gin.H{"message": "Deleted successfully"})
 }
 
-// UploadCharacterImage 上传角色图片
+// UploadCharacterImage uploads a character image
 func (h *CharacterLibraryHandler) UploadCharacterImage(c *gin.Context) {
 
 characterID := c.Param("id")
 
-// TODO: 处理文件上传
-// 这里需要实现文件上传逻辑，保存到OSS或本地
-// 暂时使用简单的实现
+// TODO: Handle file upload
+// File upload logic needs to be implemented here, saving to OSS or local storage
+// Using a simple implementation for now
 var req struct {
 ImageURL string `json:"image_url" binding:"required"`
 }
@@ -127,22 +127,22 @@ return
 
 if err := h.libraryService.UploadCharacterImage(characterID, req.ImageURL); err != nil {
 if err.Error() == "character not found" {
-response.NotFound(c, "角色不存在")
+response.NotFound(c, "Character not found")
 return
 }
 if err.Error() == "unauthorized" {
-response.Forbidden(c, "无权限")
+response.Forbidden(c, "Access denied")
 return
 }
 h.log.Errorw("Failed to upload character image", "error", err)
-response.InternalError(c, "上传失败")
+response.InternalError(c, "Upload failed")
 return
 }
 
-response.Success(c, gin.H{"message": "上传成功"})
+response.Success(c, gin.H{"message": "Upload successful"})
 }
 
-// ApplyLibraryItemToCharacter 从角色库应用形象
+// ApplyLibraryItemToCharacter applies an appearance from the character library
 func (h *CharacterLibraryHandler) ApplyLibraryItemToCharacter(c *gin.Context) {
 
 characterID := c.Param("id")
@@ -158,26 +158,26 @@ return
 
 if err := h.libraryService.ApplyLibraryItemToCharacter(characterID, req.LibraryItemID); err != nil {
 if err.Error() == "library item not found" {
-response.NotFound(c, "角色库项不存在")
+response.NotFound(c, "Character library item not found")
 return
 }
 if err.Error() == "character not found" {
-response.NotFound(c, "角色不存在")
+response.NotFound(c, "Character not found")
 return
 }
 if err.Error() == "unauthorized" {
-response.Forbidden(c, "无权限")
+response.Forbidden(c, "Access denied")
 return
 }
 h.log.Errorw("Failed to apply library item", "error", err)
-response.InternalError(c, "应用失败")
+response.InternalError(c, "Apply failed")
 return
 }
 
-response.Success(c, gin.H{"message": "应用成功"})
+response.Success(c, gin.H{"message": "Applied successfully"})
 }
 
-// AddCharacterToLibrary 将角色添加到角色库
+// AddCharacterToLibrary adds a character to the character library
 func (h *CharacterLibraryHandler) AddCharacterToLibrary(c *gin.Context) {
 
 characterID := c.Param("id")
@@ -187,33 +187,33 @@ Category *string `json:"category"`
 }
 
 if err := c.ShouldBindJSON(&req); err != nil {
-// 允许空body
+// Allow empty body
 req.Category = nil
 }
 
 item, err := h.libraryService.AddCharacterToLibrary(characterID, req.Category)
 if err != nil {
 if err.Error() == "character not found" {
-response.NotFound(c, "角色不存在")
+response.NotFound(c, "Character not found")
 return
 }
 if err.Error() == "unauthorized" {
-response.Forbidden(c, "无权限")
+response.Forbidden(c, "Access denied")
 return
 }
 if err.Error() == "character has no image" {
-response.BadRequest(c, "角色还没有形象图片")
+response.BadRequest(c, "Character has no appearance image yet")
 return
 }
 h.log.Errorw("Failed to add character to library", "error", err)
-response.InternalError(c, "添加失败")
+response.InternalError(c, "Failed to add")
 return
 }
 
 response.Created(c, item)
 }
 
-// UpdateCharacter 更新角色信息
+// UpdateCharacter updates character information
 func (h *CharacterLibraryHandler) UpdateCharacter(c *gin.Context) {
 
 characterID := c.Param("id")
@@ -226,49 +226,49 @@ return
 
 if err := h.libraryService.UpdateCharacter(characterID, &req); err != nil {
 if err.Error() == "character not found" {
-response.NotFound(c, "角色不存在")
+response.NotFound(c, "Character not found")
 return
 }
 if err.Error() == "unauthorized" {
-response.Forbidden(c, "无权限")
+response.Forbidden(c, "Access denied")
 return
 }
 h.log.Errorw("Failed to update character", "error", err)
-response.InternalError(c, "更新失败")
+response.InternalError(c, "Update failed")
 return
 }
 
-response.Success(c, gin.H{"message": "更新成功"})
+response.Success(c, gin.H{"message": "Updated successfully"})
 }
 
-// DeleteCharacter 删除单个角色
+// DeleteCharacter deletes a single character
 func (h *CharacterLibraryHandler) DeleteCharacter(c *gin.Context) {
 
 characterIDStr := c.Param("id")
 characterID, err := strconv.ParseUint(characterIDStr, 10, 32)
 if err != nil {
-response.BadRequest(c, "无效的角色ID")
+response.BadRequest(c, "Invalid character ID")
 return
 }
 
 if err := h.libraryService.DeleteCharacter(uint(characterID)); err != nil {
 h.log.Errorw("Failed to delete character", "error", err, "id", characterID)
 if err.Error() == "character not found" {
-response.NotFound(c, "角色不存在")
+response.NotFound(c, "Character not found")
 return
 }
 if err.Error() == "unauthorized" {
-response.Forbidden(c, "无权删除此角色")
+response.Forbidden(c, "No permission to delete this character")
 return
 }
-response.InternalError(c, "删除失败")
+response.InternalError(c, "Delete failed")
 return
 }
 
-response.Success(c, gin.H{"message": "角色已删除"})
+response.Success(c, gin.H{"message": "Character deleted"})
 }
 
-// ExtractCharacters 从剧本提取角色
+// ExtractCharacters extracts characters from a script
 func (h *CharacterLibraryHandler) ExtractCharacters(c *gin.Context) {
 episodeIDStr := c.Param("episode_id")
 episodeID, err := strconv.ParseUint(episodeIDStr, 10, 32)
@@ -284,5 +284,5 @@ response.InternalError(c, err.Error())
 return
 }
 
-response.Success(c, gin.H{"task_id": taskID, "message": "角色提取任务已提交"})
+response.Success(c, gin.H{"task_id": taskID, "message": "Character extraction task submitted"})
 }

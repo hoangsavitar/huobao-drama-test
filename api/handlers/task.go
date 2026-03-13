@@ -20,14 +20,14 @@ log:         log,
 }
 }
 
-// GetTaskStatus 获取任务状态
+// GetTaskStatus retrieves task status
 func (h *TaskHandler) GetTaskStatus(c *gin.Context) {
 taskID := c.Param("task_id")
 
 task, err := h.taskService.GetTask(taskID)
 if err != nil {
 if err == gorm.ErrRecordNotFound {
-response.NotFound(c, "任务不存在")
+response.NotFound(c, "Task not found")
 return
 }
 h.log.Errorw("Failed to get task", "error", err, "task_id", taskID)
@@ -38,11 +38,11 @@ return
 response.Success(c, task)
 }
 
-// GetResourceTasks 获取资源相关的所有任务
+// GetResourceTasks retrieves all tasks related to a resource
 func (h *TaskHandler) GetResourceTasks(c *gin.Context) {
 resourceID := c.Query("resource_id")
 if resourceID == "" {
-response.BadRequest(c, "缺少resource_id参数")
+response.BadRequest(c, "Missing resource_id parameter")
 return
 }
 

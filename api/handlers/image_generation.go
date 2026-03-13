@@ -80,17 +80,17 @@ response.Success(c, backgrounds)
 func (h *ImageGenerationHandler) ExtractBackgroundsForEpisode(c *gin.Context) {
 episodeID := c.Param("episode_id")
 
-// 接收可选的 model 和 style 参数
+// Receive optional model and style parameters
 var req struct {
 Model string `json:"model"`
 Style string `json:"style"`
 }
 if err := c.ShouldBindJSON(&req); err != nil {
-// 如果没有提供body或者解析失败，使用空字符串（使用默认模型和风格）
+// If no body provided or parsing fails, use empty strings (default model and style)
 req.Model = ""
 req.Style = ""
 }
-// 如果style为空，从episode获取drama的style
+// If style is empty, get style from the episode's drama
 if req.Style == "" {
 var episode models.Episode
 if err := h.db.Preload("Drama").First(&episode, episodeID).Error; err == nil {
@@ -98,7 +98,7 @@ req.Style = episode.Drama.Style
 }
 }
 
-// 直接调用服务层的异步方法，该方法会创建任务并返回任务ID
+// Directly call the async service method, which creates a task and returns a task ID
 taskID, err := h.imageService.ExtractBackgroundsForEpisode(episodeID, req.Model, req.Style)
 if err != nil {
 h.log.Errorw("Failed to extract backgrounds", "error", err, "episode_id", episodeID)
@@ -106,11 +106,11 @@ response.InternalError(c, err.Error())
 return
 }
 
-// 立即返回任务ID
+// Return task ID immediately
 response.Success(c, gin.H{
 "task_id": taskID,
 "status":  "pending",
-"message": "场景提取任务已创建，正在后台处理...",
+"message": "Scene extraction task created, processing in background...",
 })
 }
 
@@ -132,13 +132,13 @@ func (h *ImageGenerationHandler) GetImageGeneration(c *gin.Context) {
 
 imageGenID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 if err != nil {
-response.BadRequest(c, "无效的ID")
+response.BadRequest(c, "Invalid ID")
 return
 }
 
 imageGen, err := h.imageService.GetImageGeneration(uint(imageGenID))
 if err != nil {
-response.NotFound(c, "图片生成记录不存在")
+response.NotFound(c, "Image generation record not found")
 return
 }
 
@@ -198,7 +198,7 @@ func (h *ImageGenerationHandler) DeleteImageGeneration(c *gin.Context) {
 
 imageGenID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 if err != nil {
-response.BadRequest(c, "无效的ID")
+response.BadRequest(c, "Invalid ID")
 return
 }
 
@@ -211,7 +211,7 @@ return
 response.Success(c, nil)
 }
 
-// UploadImage 上传图片并创建图片生成记录
+// UploadImage uploads an image and creates an image generation record
 func (h *ImageGenerationHandler) UploadImage(c *gin.Context) {
 var req struct {
 StoryboardID uint   `json:"storyboard_id" binding:"required"`

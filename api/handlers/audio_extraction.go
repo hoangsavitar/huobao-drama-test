@@ -22,13 +22,13 @@ dataDir: dataDir,
 }
 }
 
-// ExtractAudio 提取单个视频的音频
-// @Summary 提取视频音频
-// @Description 从视频URL中提取音频轨道
+// ExtractAudio extracts audio from a single video
+// @Summary Extract video audio
+// @Description Extract audio track from video URL
 // @Tags Audio
 // @Accept json
 // @Produce json
-// @Param request body services.ExtractAudioRequest true "提取请求"
+// @Param request body services.ExtractAudioRequest true "Extraction request"
 // @Success 200 {object} services.ExtractAudioResponse
 // @Router /api/audio/extract [post]
 func (h *AudioExtractionHandler) ExtractAudio(c *gin.Context) {
@@ -55,13 +55,13 @@ type BatchExtractAudioRequest struct {
 VideoURLs []string `json:"video_urls" binding:"required,min=1"`
 }
 
-// BatchExtractAudio 批量提取音频
-// @Summary 批量提取视频音频
-// @Description 从多个视频URL中提取音频轨道
+// BatchExtractAudio batch extracts audio from multiple videos
+// @Summary Batch extract video audio
+// @Description Extract audio tracks from multiple video URLs
 // @Tags Audio
 // @Accept json
 // @Produce json
-// @Param request body BatchExtractAudioRequest true "批量提取请求"
+// @Param request body BatchExtractAudioRequest true "Batch extraction request"
 // @Success 200 {array} services.ExtractAudioResponse
 // @Router /api/audio/extract/batch [post]
 func (h *AudioExtractionHandler) BatchExtractAudio(c *gin.Context) {

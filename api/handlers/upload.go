@@ -27,23 +27,23 @@ log:                     log,
 }, nil
 }
 
-// UploadImage 上传图片
+// UploadImage uploads an image
 func (h *UploadHandler) UploadImage(c *gin.Context) {
-// 获取上传的文件
+// Get the uploaded file
 file, header, err := c.Request.FormFile("file")
 if err != nil {
-response.BadRequest(c, "请选择文件")
+response.BadRequest(c, "Please select a file")
 return
 }
 defer file.Close()
 
-// 检查文件类型
+// Check file type
 contentType := header.Header.Get("Content-Type")
 if contentType == "" {
 contentType = "application/octet-stream"
 }
 
-// 验证是图片类型
+// Validate image type
 allowedTypes := map[string]bool{
 "image/jpeg": true,
 "image/jpg":  true,
@@ -53,21 +53,21 @@ allowedTypes := map[string]bool{
 }
 
 if !allowedTypes[contentType] {
-response.BadRequest(c, "只支持图片格式 (jpg, png, gif, webp)")
+response.BadRequest(c, "Only image formats are supported (jpg, png, gif, webp)")
 return
 }
 
-// 检查文件大小 (10MB)
+// Check file size (10MB)
 if header.Size > 10*1024*1024 {
-response.BadRequest(c, "文件大小不能超过10MB")
+response.BadRequest(c, "File size cannot exceed 10MB")
 return
 }
 
-// 上传到本地存储
+// Upload to local storage
 result, err := h.uploadService.UploadCharacterImage(file, header.Filename, contentType)
 if err != nil {
 h.log.Errorw("Failed to upload image", "error", err)
-response.InternalError(c, "上传失败")
+response.InternalError(c, "Upload failed")
 return
 }
 
@@ -79,25 +79,25 @@ response.Success(c, gin.H{
 })
 }
 
-// UploadCharacterImage 上传角色图片（带角色ID）
+// UploadCharacterImage uploads a character image (with character ID)
 func (h *UploadHandler) UploadCharacterImage(c *gin.Context) {
 characterID := c.Param("id")
 
-// 获取上传的文件
+// Get the uploaded file
 file, header, err := c.Request.FormFile("file")
 if err != nil {
-response.BadRequest(c, "请选择文件")
+response.BadRequest(c, "Please select a file")
 return
 }
 defer file.Close()
 
-// 检查文件类型
+// Check file type
 contentType := header.Header.Get("Content-Type")
 if contentType == "" {
 contentType = "application/octet-stream"
 }
 
-// 验证是图片类型
+// Validate image type
 allowedTypes := map[string]bool{
 "image/jpeg": true,
 "image/jpg":  true,
@@ -107,29 +107,29 @@ allowedTypes := map[string]bool{
 }
 
 if !allowedTypes[contentType] {
-response.BadRequest(c, "只支持图片格式 (jpg, png, gif, webp)")
+response.BadRequest(c, "Only image formats are supported (jpg, png, gif, webp)")
 return
 }
 
-// 检查文件大小 (10MB)
+// Check file size (10MB)
 if header.Size > 10*1024*1024 {
-response.BadRequest(c, "文件大小不能超过10MB")
+response.BadRequest(c, "File size cannot exceed 10MB")
 return
 }
 
-// 上传到本地存储
+// Upload to local storage
 result, err := h.uploadService.UploadCharacterImage(file, header.Filename, contentType)
 if err != nil {
 h.log.Errorw("Failed to upload character image", "error", err)
-response.InternalError(c, "上传失败")
+response.InternalError(c, "Upload failed")
 return
 }
 
-// 更新角色的image_url字段到数据库
+// Update the character image_url field in the database
 err = h.characterLibraryService.UploadCharacterImage(characterID, result.URL)
 if err != nil {
 h.log.Errorw("Failed to update character image_url", "error", err, "character_id", characterID)
-response.InternalError(c, "更新角色图片失败")
+response.InternalError(c, "Failed to update character image")
 return
 }
 
