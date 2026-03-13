@@ -37,23 +37,23 @@ func NewStoryboardService(db *gorm.DB, cfg *config.Config, log *logger.Logger) *
 
 type Storyboard struct {
 	ShotNumber  int    `json:"shot_number"`
-	Title       string `json:"title"`        // 镜头标题
-	ShotType    string `json:"shot_type"`    // 景别
-	Angle       string `json:"angle"`        // 镜头角度
-	Time        string `json:"time"`         // 时间
-	Location    string `json:"location"`     // 地点
-	SceneID     *uint  `json:"scene_id"`     // 背景ID（AI直接返回，可为null）
-	Movement    string `json:"movement"`     // 运镜
-	Action      string `json:"action"`       // 动作
-	Dialogue    string `json:"dialogue"`     // 对话/独白
-	Result      string `json:"result"`       // 画面结果
-	Atmosphere  string `json:"atmosphere"`   // 环境氛围
-	Emotion     string `json:"emotion"`      // 情绪
-	Duration    int    `json:"duration"`     // 时长（秒）
-	BgmPrompt   string `json:"bgm_prompt"`   // 配乐提示词
-	SoundEffect string `json:"sound_effect"` // 音效描述
-	Characters  []uint `json:"characters"`   // 涉及的角色ID列表
-	IsPrimary   bool   `json:"is_primary"`   // 是否主镜
+	Title       string `json:"title"`        // Shot title
+	ShotType    string `json:"shot_type"`    // Shot size
+	Angle       string `json:"angle"`        // Camera angle
+	Time        string `json:"time"`         // Time
+	Location    string `json:"location"`     // Location
+	SceneID     *uint  `json:"scene_id"`     // Scene ID (returned directly by AI, can be null)
+	Movement    string `json:"movement"`     // Camera movement
+	Action      string `json:"action"`       // Action
+	Dialogue    string `json:"dialogue"`     // Dialogue/monologue
+	Result      string `json:"result"`       // Visual result
+	Atmosphere  string `json:"atmosphere"`   // Environmental atmosphere
+	Emotion     string `json:"emotion"`      // Emotion
+	Duration    int    `json:"duration"`     // Duration (seconds)
+	BgmPrompt   string `json:"bgm_prompt"`   // Background music prompt
+	SoundEffect string `json:"sound_effect"` // Sound effect description
+	Characters  []uint `json:"characters"`   // List of involved character IDs
+	IsPrimary   bool   `json:"is_primary"`   // Whether this is a primary shot
 }
 
 type GenerateStoryboardResult struct {
@@ -62,7 +62,7 @@ type GenerateStoryboardResult struct {
 }
 
 func (s *StoryboardService) GenerateStoryboard(episodeID string, model string) (string, error) {
-	// 从数据库获取剧集信息
+	// Get episode information from database
 	var episode struct {
 		ID            string
 		ScriptContent *string
@@ -80,7 +80,7 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string) (
 		return "", fmt.Errorf("episode not found or access denied")
 	}
 
-	// 获取剧本内容
+	// Get script content
 	var scriptContent string
 	if episode.ScriptContent != nil && *episode.ScriptContent != "" {
 		scriptContent = *episode.ScriptContent
@@ -90,13 +90,13 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string) (
 		return "", fmt.Errorf("script content is empty, generate episode content first")
 	}
 
-	// 获取该剧本的所有角色
+	// Get all characters for this drama
 	var characters []models.Character
 	if err := s.db.Where("drama_id = ?", episode.DramaID).Order("name ASC").Find(&characters).Error; err != nil {
 		return "", fmt.Errorf("failed to get character list: %w", err)
 	}
 
-	// 构建角色列表字符串（包含ID和名称）
+	// Build character list string (including ID and name)
 	characterList := "No characters"
 	if len(characters) > 0 {
 		var charInfoList []string
@@ -106,13 +106,13 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string) (
 		characterList = fmt.Sprintf("[%s]", strings.Join(charInfoList, ", "))
 	}
 
-	// 获取该项目已提取的场景列表（项目级）
+	// Get extracted scene list for this project (project level)
 	var scenes []models.Scene
 	if err := s.db.Where("drama_id = ?", episode.DramaID).Order("location ASC, time ASC").Find(&scenes).Error; err != nil {
 		s.log.Warnw("Failed to get scenes", "error", err)
 	}
 
-	// 构建场景列表字符串（包含ID、地点、时间）
+	// Build scene list string (including ID, location, time)
 	sceneList := "No scenes"
 	if len(scenes) > 0 {
 		var sceneInfoList []string
@@ -122,7 +122,7 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string) (
 		sceneList = fmt.Sprintf("[%s]", strings.Join(sceneInfoList, ", "))
 	}
 
-	// 使用国际化提示词
+	// Use internationalized prompts
 	systemPrompt := s.promptI18n.GetStoryboardSystemPrompt()
 
 	scriptLabel := s.promptI18n.FormatUserPrompt("script_content_label")
@@ -150,177 +150,177 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string) (
 
 %s
 
-【剧本原文】
+【Original Script】
 %s
 
-【分镜要素】每个镜头聚焦单一动作，描述要详尽具体：
-1. **镜头标题(title)**：用3-5个字概括该镜头的核心内容或情绪
-   - 例如："噩梦惊醒"、"对视沉思"、"逃离现场"、"意外发现"
-2. **时间**：[清晨/午后/深夜/具体时分+详细光线描述]
-   - 例如："深夜22:30·月光从破窗斜射入室内，形成明暗分界"
-3. **地点**：[场景完整描述+空间布局+环境细节]
-   - 例如："废弃码头仓库·锈蚀货架林立，地面积水反射微弱灯光，墙角堆放腐朽木箱"
-4. **镜头设计**：
-   - **景别(shot_type)**：[远景/全景/中景/近景/特写]
-   - **镜头角度(angle)**：[平视/仰视/俯视/侧面/背面]
-   - **运镜方式(movement)**：[固定镜头/推镜/拉镜/摇镜/跟镜/移镜]
-5. **人物行为**：**详细动作描述**，包含[谁+具体怎么做+肢体细节+表情状态]
-   - 例如："陈峥弯腰用撬棍撬动保险箱门，手臂青筋暴起，眉头紧锁，汗水滑落脸颊"
-6. **对话/独白**：提取该镜头中的完整对话或独白内容（如无对话则为空字符串）
-7. **画面结果**：动作的即时后果+视觉细节+氛围变化
-   - 例如："保险箱门弹开发出金属碰撞声，扬起灰尘在光束中飘散，箱内空无一物只有陈旧报纸，陈峥表情从期待转为失望"
-8. **环境氛围**：光线质感+色调+声音环境+整体氛围
-   - 例如："昏暗冷色调，只有手电筒光束晃动，远处传来海浪拍打声，压抑沉闷"
-9. **配乐提示(bgm_prompt)**：描述该镜头配乐的氛围、节奏、情绪（如无特殊要求则为空字符串）
-   - 例如："低沉紧张的弦乐，节奏缓慢，营造压抑氛围"
-10. **音效描述(sound_effect)**：描述该镜头的关键音效（如无特殊音效则为空字符串）
-    - 例如："金属碰撞声、脚步声、海浪拍打声"
-11. **观众情绪**：[情绪类型]（[强度：↑↑↑/↑↑/↑/→/↓] + [落点：悬置/释放/反转]）
+【Storyboard Elements】Each shot focuses on a single action, with thorough and specific descriptions:
+1. **Shot Title (title)**: Summarize the core content or emotion of the shot in 3-5 words
+   - Examples: "Nightmare Awakening", "Silent Eye Contact", "Fleeing the Scene", "Unexpected Discovery"
+2. **Time**: [Dawn/Afternoon/Late night/Specific time + detailed lighting description]
+   - Example: "Late night 22:30 · Moonlight slants through broken windows into the room, creating a boundary between light and shadow"
+3. **Location**: [Complete scene description + spatial layout + environmental details]
+   - Example: "Abandoned dock warehouse · Rows of rusted shelves, standing water on the floor reflecting faint light, rotting wooden crates piled in the corner"
+4. **Shot Design**:
+   - **Shot Size (shot_type)**: [Extreme wide/Wide/Medium/Close-up/Extreme close-up]
+   - **Camera Angle (angle)**: [Eye level/Low angle/High angle/Side view/Rear view]
+   - **Camera Movement (movement)**: [Static/Push in/Pull out/Pan/Tracking/Dolly]
+5. **Character Action**: **Detailed action description**, including [who + specific action + body details + facial expression]
+   - Example: "Chen Zheng bends down using a crowbar to pry open the safe door, veins bulging on his arms, brows furrowed, sweat dripping down his cheeks"
+6. **Dialogue/Monologue**: Extract the complete dialogue or monologue in the shot (empty string if no dialogue)
+7. **Visual Result**: Immediate consequence of the action + visual details + atmosphere change
+   - Example: "The safe door springs open with a metallic clang, dust rises and drifts in the flashlight beam, the safe is empty except for old newspapers, Chen Zheng's expression shifts from anticipation to disappointment"
+8. **Environmental Atmosphere**: Lighting quality + color tone + sound environment + overall mood
+   - Example: "Dim cold tones, only the flashlight beam swaying in the darkness, distant sound of waves crashing, oppressive and heavy"
+9. **BGM Prompt (bgm_prompt)**: Describe the mood, rhythm, and emotion of the background music for this shot (empty string if no special requirement)
+   - Example: "Deep, tense strings, slow rhythm, creating an oppressive atmosphere"
+10. **Sound Effect Description (sound_effect)**: Describe the key sound effects for this shot (empty string if no special effects)
+    - Example: "Metallic clang, footsteps, sound of waves crashing"
+11. **Audience Emotion**: [Emotion type] ([Intensity: ↑↑↑/↑↑/↑/→/↓] + [Resolution: Suspended/Released/Reversed])
 
-【输出格式】请以JSON格式输出，每个镜头包含以下字段（**所有描述性字段都要详细完整**）：
+【Output Format】Please output in JSON format, each shot containing the following fields (**all descriptive fields must be detailed and complete**):
 {
   "storyboards": [
     {
       "shot_number": 1,
-      "title": "噩梦惊醒",
-      "shot_type": "全景",
-      "angle": "俯视45度角",
-      "time": "深夜22:30·月光从破窗斜射入仓库，在地面积水中形成银白色反光，墙角昏暗不清",
-      "location": "废弃码头仓库·锈蚀货架林立，地面积水反射微弱灯光，墙角堆放腐朽木箱和渔网，空气中弥漫潮湿霉味",
+      "title": "Nightmare Awakening",
+      "shot_type": "Wide shot",
+      "angle": "High angle 45 degrees",
+      "time": "Late night 22:30 · Moonlight slants through broken windows into the warehouse, creating silver reflections on the standing water, dark corners barely visible",
+      "location": "Abandoned dock warehouse · Rows of rusted shelves, standing water reflecting faint light, rotting wooden crates and fishing nets piled in the corner, damp musty smell permeating the air",
       "scene_id": 1,
-      "movement": "固定镜头",
-      "action": "陈峥弯腰双手握住撬棍用力撬动保险箱门，手臂青筋暴起，眉头紧锁，汗水从额头滑落脸颊，呼吸急促",
-      "dialogue": "（独白）这么多年了，里面到底藏着什么秘密？",
-      "result": "保险箱门突然弹开发出刺耳金属声，扬起灰尘在手电筒光束中飘散，箱内空无一物只有几张发黄的旧报纸，陈峥表情从期待转为震惊和失望，瞳孔放大",
-      "atmosphere": "昏暗冷色调·青灰色为主，只有手电筒光束在黑暗中晃动，远处传来海浪拍打码头的沉闷声，整体氛围压抑沉重",
-      "emotion": "好奇感↑↑转失望↓（情绪反转）",
+      "movement": "Static shot",
+      "action": "Chen Zheng bends down gripping the crowbar with both hands to pry the safe door open, veins bulging on his arms, brows tightly furrowed, sweat dripping from his forehead down his cheeks, breathing heavily",
+      "dialogue": "(Monologue) After all these years, what secret is hidden inside?",
+      "result": "The safe door suddenly springs open with a sharp metallic sound, dust rises and drifts in the flashlight beam, the safe is empty except for a few yellowed old newspapers, Chen Zheng's expression shifts from anticipation to shock and disappointment, pupils dilating",
+      "atmosphere": "Dim cold tones · Predominantly gray-blue, only the flashlight beam swaying in the darkness, distant sound of waves crashing against the dock, overall oppressive and heavy atmosphere",
+      "emotion": "Curiosity ↑↑ turning to disappointment ↓ (emotional reversal)",
       "duration": 9,
-      "bgm_prompt": "低沉紧张的弦乐，节奏缓慢，营造压抑悬疑氛围",
-      "sound_effect": "金属碰撞声、灰尘飘散声、海浪拍打声",
+      "bgm_prompt": "Deep tense strings, slow rhythm, creating an oppressive suspenseful atmosphere",
+      "sound_effect": "Metallic clang, dust drifting sound, waves crashing",
       "characters": [159],
       "is_primary": true
     },
     {
       "shot_number": 2,
-      "title": "对视沉思",
-      "shot_type": "近景",
-      "angle": "平视",
-      "time": "深夜22:31·仓库内光线昏暗，只有手电筒光从侧面照亮两人脸部轮廓",
-      "location": "废弃码头仓库·保险箱旁，背景是模糊的货架剪影",
+      "title": "Silent Eye Contact",
+      "shot_type": "Close-up",
+      "angle": "Eye level",
+      "time": "Late night 22:31 · Dim lighting inside the warehouse, only the flashlight illuminating the two faces from the side",
+      "location": "Abandoned dock warehouse · Beside the safe, blurred shelf silhouettes in the background",
       "scene_id": 1,
-      "movement": "推镜",
-      "action": "陈峥缓缓转身，目光与身后的李芳对视，李芳手握手电筒，光束在两人之间晃动，眼神中透露疑惑和警惕",
-      "dialogue": "陈峥：\"我们被耍了，这里根本没有我们要找的东西。\" 李芳：\"现在怎么办？我们的时间不多了。\"",
-      "result": "两人站在昏暗中陷入沉思，手电筒光束照在地面形成圆形光斑，背景传来微弱的金属摩擦声，气氛紧张凝重",
-      "atmosphere": "低调光线·暗部占画面70%，侧面硬光勾勒人物轮廓，冷暖光对比强烈，海风吹过产生呼啸声，营造紧迫感",
-      "emotion": "紧张感↑↑·警惕↑↑（悬置）",
+      "movement": "Push in",
+      "action": "Chen Zheng slowly turns around, locking eyes with Li Fang behind him, Li Fang holding the flashlight with its beam swaying between them, her eyes revealing doubt and vigilance",
+      "dialogue": "Chen Zheng: \"We've been played, there's nothing here that we're looking for.\" Li Fang: \"What now? We're running out of time.\"",
+      "result": "The two stand in the darkness lost in thought, the flashlight beam casting a circular spot on the floor, faint metallic scraping sounds in the background, tense and heavy atmosphere",
+      "atmosphere": "Low-key lighting · Shadows cover 70%% of the frame, hard side lighting outlines the characters, strong warm-cool contrast, howling sea wind creating a sense of urgency",
+      "emotion": "Tension ↑↑ · Vigilance ↑↑ (Suspended)",
       "duration": 7,
-      "bgm_prompt": "紧张感逐渐升级的音效，低频持续音",
-      "sound_effect": "呼吸声、金属摩擦声、海风呼啸声",
+      "bgm_prompt": "Gradually escalating tension sounds, low-frequency sustained tone",
+      "sound_effect": "Breathing sounds, metallic scraping, howling sea wind",
       "characters": [159, 160],
       "is_primary": true
     }
   ]
 }
 
-**dialogue字段说明**：
-- 如果有对话，格式为：角色名："台词内容"
-- 多人对话用空格分隔：角色A："..." 角色B："..."
-- 独白格式为：（独白）内容
-- 旁白格式为：（旁白）内容
-- 无对话时填写空字符串：""
-- **对话内容必须从原剧本中提取，保持原汁原味**
+**Dialogue Field Instructions**:
+- If there is dialogue, format as: Character Name: "Line content"
+- Multiple character dialogue separated by spaces: Character A: "..." Character B: "..."
+- Monologue format: (Monologue) Content
+- Narration format: (Narration) Content
+- Empty string when there is no dialogue: ""
+- **Dialogue content must be extracted from the original script, preserving the original wording**
 
-**角色和背景要求**：
-- characters字段必须包含该镜头中出现的所有角色ID（数字数组格式）
-- 只提取实际出现的角色ID，不出现角色则为空数组[]
-- **角色ID必须严格使用【本剧可用角色列表】中的id字段（数字），不得使用其他ID或自创角色**
-- 例如：如果镜头中出现李明(id:159)和王芳(id:160)，则characters字段应为[159, 160]
-- scene_id字段必须从【本剧已提取的场景背景列表】中选择最匹配的背景ID（数字）
-- 如果列表中没有合适的背景，则scene_id填null
-- 例如：如果镜头发生在"城市公寓卧室·凌晨"，应选择id为1的场景背景
+**Character and Scene Requirements**:
+- The characters field must include all character IDs appearing in the shot (numeric array format)
+- Only extract IDs of characters that actually appear; use empty array [] if no characters appear
+- **Character IDs must strictly use the id field (numeric) from the 【Available Character List】, no other IDs or made-up characters allowed**
+- Example: If Li Ming (id:159) and Wang Fang (id:160) appear in the shot, the characters field should be [159, 160]
+- The scene_id field must select the best matching scene ID (numeric) from the 【Extracted Scene List】
+- If no suitable scene exists in the list, set scene_id to null
+- Example: If the shot takes place in "City apartment bedroom · Early morning", select the scene with id 1
 
-**duration时长估算规则（秒）**：
-- **所有镜头时长必须在4-12秒范围内**，确保节奏合理流畅
-- **综合估算原则**：时长由对话内容、动作复杂度、情绪节奏三方面综合决定
+**Duration Estimation Rules (seconds)**:
+- **All shot durations must be within the 4-12 second range** to ensure smooth and reasonable pacing
+- **Comprehensive estimation principle**: Duration is determined by dialogue content, action complexity, and emotional pacing combined
 
-**估算步骤**：
-1. **基础时长**（从场景内容判断）：
-   - 纯对话场景（无明显动作）：基础4秒
-   - 纯动作场景（无对话）：基础5秒
-   - 对话+动作混合场景：基础6秒
+**Estimation Steps**:
+1. **Base Duration** (determined by scene content):
+   - Pure dialogue scene (no significant action): Base 4 seconds
+   - Pure action scene (no dialogue): Base 5 seconds
+   - Mixed dialogue + action scene: Base 6 seconds
 
-2. **对话调整**（根据台词字数增加时长）：
-   - 无对话：+0秒
-   - 短对话（1-20字）：+1-2秒
-   - 中等对话（21-50字）：+2-4秒
-   - 长对话（51字以上）：+4-6秒
+2. **Dialogue Adjustment** (add time based on line word count):
+   - No dialogue: +0 seconds
+   - Short dialogue (1-20 characters): +1-2 seconds
+   - Medium dialogue (21-50 characters): +2-4 seconds
+   - Long dialogue (51+ characters): +4-6 seconds
 
-3. **动作调整**（根据动作复杂度增加时长）：
-   - 无动作/静态：+0秒
-   - 简单动作（表情、转身、拿物品）：+0-1秒
-   - 一般动作（走动、开门、坐下）：+1-2秒
-   - 复杂动作（打斗、追逐、大幅度移动）：+2-4秒
-   - 环境展示（全景扫描、氛围营造）：+2-5秒
+3. **Action Adjustment** (add time based on action complexity):
+   - No action/static: +0 seconds
+   - Simple action (expression, turning, picking up object): +0-1 seconds
+   - Normal action (walking, opening door, sitting down): +1-2 seconds
+   - Complex action (fighting, chasing, large movements): +2-4 seconds
+   - Environment showcase (panoramic scan, atmosphere building): +2-5 seconds
 
-4. **最终时长** = 基础时长 + 对话调整 + 动作调整，确保结果在4-12秒范围内
+4. **Final Duration** = Base duration + Dialogue adjustment + Action adjustment, ensuring result is within 4-12 second range
 
-**示例**：
-- "陈峥转身离开"（简单动作，无对话）：5 + 0 + 1 = 6秒
-- "李芳：\"你要去哪里？\""（短对话，无动作）：4 + 2 + 0 = 6秒  
-- "陈峥推开房门，李芳：\"终于找到你了，这些年你去哪了？\""（一般动作+中等对话）：6 + 3 + 2 = 11秒
-- "两人在雨中激烈搏斗，陈峥：\"住手！\""（复杂动作+短对话）：6 + 2 + 4 = 12秒
+**Examples**:
+- "Chen Zheng turns and leaves" (simple action, no dialogue): 5 + 0 + 1 = 6 seconds
+- "Li Fang: 'Where are you going?'" (short dialogue, no action): 4 + 2 + 0 = 6 seconds  
+- "Chen Zheng pushes open the door, Li Fang: 'Finally found you, where have you been all these years?'" (normal action + medium dialogue): 6 + 3 + 2 = 11 seconds
+- "The two fight intensely in the rain, Chen Zheng: 'Stop!'" (complex action + short dialogue): 6 + 2 + 4 = 12 seconds
 
-**重要**：准确估算每个镜头时长，所有分镜时长之和将作为剧集总时长
+**Important**: Accurately estimate each shot's duration; the sum of all storyboard durations will be used as the total episode duration
 
-**特别要求**：
-- **【极其重要】必须100%%完整拆解整个剧本，不得省略、跳过、压缩任何剧情内容**
-- **从剧本第一个字到最后一个字，逐句逐段转换为分镜**
-- **每个对话、每个动作、每个场景转换都必须有对应的分镜**
-- 剧本越长，分镜数量越多（短剧本15-30个，中等剧本30-60个，长剧本60-100个甚至更多）
-- **宁可分镜多，也不要遗漏剧情**：一个长场景可拆分为多个连续分镜
-- 每个镜头只描述一个主要动作
-- 区分主镜（is_primary: true）和链接镜（is_primary: false）
-- 确保情绪节奏有变化
-- **duration字段至关重要**：准确估算每个镜头时长，这将用于计算整集时长
-- 严格按照JSON格式输出
+**Special Requirements**:
+- **【Extremely Important】Must completely break down the entire script 100%%, no omitting, skipping, or compressing any plot content**
+- **Convert every sentence and paragraph from the first word to the last word of the script into storyboard shots**
+- **Every dialogue, every action, every scene transition must have a corresponding storyboard shot**
+- The longer the script, the more storyboard shots (short scripts 15-30, medium scripts 30-60, long scripts 60-100 or more)
+- **Better to have more shots than to miss any plot**: A long scene can be split into multiple consecutive shots
+- Each shot describes only one main action
+- Distinguish between primary shots (is_primary: true) and linking shots (is_primary: false)
+- Ensure emotional pacing has variation
+- **The duration field is crucial**: Accurately estimate each shot's duration, which will be used to calculate the total episode duration
+- Strictly output in JSON format
 
-**【禁止行为】**：
-- ❌ 禁止用一个镜头概括多个场景
-- ❌ 禁止跳过任何对话或独白
-- ❌ 禁止省略剧情发展过程
-- ❌ 禁止合并本应分开的镜头
-- ✅ 正确做法：剧本有多少内容，就拆解出对应数量的分镜，确保观众看完所有分镜能完整了解剧情
+**【Prohibited Actions】**:
+- ❌ Do not summarize multiple scenes in one shot
+- ❌ Do not skip any dialogue or monologue
+- ❌ Do not omit plot development
+- ❌ Do not merge shots that should be separate
+- ✅ Correct approach: Break down the script into a corresponding number of shots so that viewers can fully understand the plot after watching all shots
 
-**【关键】场景描述详细度要求**（这些描述将直接用于视频生成模型）：
-1. **时间(time)字段**：必须包含≥15字的详细描述
-   - ✓ 好例子："深夜22:30·月光从破窗斜射入仓库，在地面积水中形成银白色反光，墙角昏暗不清"
-   - ✗ 差例子："深夜"
+**【Key】Scene Description Detail Requirements** (these descriptions will be directly used for video generation models):
+1. **Time field**: Must contain ≥15 characters of detailed description
+   - ✓ Good example: "Late night 22:30 · Moonlight slants through broken windows into the warehouse, creating silver reflections on the standing water, dark corners barely visible"
+   - ✗ Bad example: "Late night"
 
-2. **地点(location)字段**：必须包含≥20字的详细场景描述
-   - ✓ 好例子："废弃码头仓库·锈蚀货架林立，地面积水反射微弱灯光，墙角堆放腐朽木箱和渔网，空气中弥漫潮湿霉味"
-   - ✗ 差例子："仓库"
+2. **Location field**: Must contain ≥20 characters of detailed scene description
+   - ✓ Good example: "Abandoned dock warehouse · Rows of rusted shelves, standing water reflecting faint light, rotting wooden crates and fishing nets in the corner, damp musty smell in the air"
+   - ✗ Bad example: "Warehouse"
 
-3. **动作(action)字段**：必须包含≥25字的详细动作描述，包括肢体细节和表情
-   - ✓ 好例子："陈峥弯腰双手握住撬棍用力撬动保险箱门，手臂青筋暴起，眉头紧锁，汗水从额头滑落脸颊，呼吸急促"
-   - ✗ 差例子："陈峥打开保险箱"
+3. **Action field**: Must contain ≥25 characters of detailed action description, including body details and expressions
+   - ✓ Good example: "Chen Zheng bends down gripping the crowbar with both hands to pry the safe door open, veins bulging on his arms, brows furrowed, sweat dripping from his forehead, breathing heavily"
+   - ✗ Bad example: "Chen Zheng opens the safe"
 
-4. **结果(result)字段**：必须包含≥25字的详细视觉结果描述
-   - ✓ 好例子："保险箱门突然弹开发出刺耳金属声，扬起灰尘在手电筒光束中飘散，箱内空无一物只有几张发黄的旧报纸，陈峥表情从期待转为震惊和失望，瞳孔放大"
-   - ✗ 差例子："门打开了"
+4. **Result field**: Must contain ≥25 characters of detailed visual result description
+   - ✓ Good example: "The safe door suddenly springs open with a sharp metallic sound, dust rises and drifts in the flashlight beam, the safe is empty except for a few yellowed old newspapers, Chen Zheng's expression shifts from anticipation to shock and disappointment, pupils dilating"
+   - ✗ Bad example: "The door opened"
 
-5. **氛围(atmosphere)字段**：必须包含≥20字的环境氛围描述，包括光线、色调、声音
-   - ✓ 好例子："昏暗冷色调·青灰色为主，只有手电筒光束在黑暗中晃动，远处传来海浪拍打码头的沉闷声，整体氛围压抑沉重"
-   - ✗ 差例子："昏暗"
+5. **Atmosphere field**: Must contain ≥20 characters of environmental atmosphere description, including lighting, color tone, and sound
+   - ✓ Good example: "Dim cold tones · Predominantly gray-blue, only the flashlight beam swaying in the darkness, distant sound of waves crashing against the dock, overall oppressive and heavy atmosphere"
+   - ✗ Bad example: "Dim"
 
-**描述原则**：
-- 所有描述性字段要像为盲人讲述画面一样详细
-- 包含感官细节：视觉、听觉、触觉、嗅觉
-- 描述光线、色彩、质感、动态
-- 为视频生成AI提供足够的画面构建信息
-- 避免抽象词汇，使用具象的视觉化描述`, systemPrompt, scriptLabel, scriptContent, taskLabel, taskInstruction, charListLabel, characterList, charConstraint, sceneListLabel, sceneList, sceneConstraint)
+**Description Principles**:
+- All descriptive fields should be as detailed as if describing a scene to a blind person
+- Include sensory details: visual, auditory, tactile, olfactory
+- Describe lighting, color, texture, and movement
+- Provide sufficient visual information for the video generation AI to construct the scene
+- Avoid abstract words, use concrete visual descriptions`, systemPrompt, scriptLabel, scriptContent, taskLabel, taskInstruction, charListLabel, characterList, charConstraint, sceneListLabel, sceneList, sceneConstraint)
 
-	// 创建异步任务
+	// Create async task
 	task, err := s.taskService.CreateTask("storyboard_generation", episodeID)
 	if err != nil {
 		s.log.Errorw("Failed to create task", "error", err)
@@ -337,16 +337,16 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string) (
 		"scene_count", len(scenes),
 		"scenes", sceneList)
 
-	// 启动后台goroutine处理AI调用和后续逻辑
+	// Start background goroutine for AI call and subsequent logic
 	go s.processStoryboardGeneration(task.ID, episodeID, model, prompt)
 
-	// 立即返回任务ID
+	// Return task ID immediately
 	return task.ID, nil
 }
 
-// processStoryboardGeneration 后台处理故事板生成
+// processStoryboardGeneration processes storyboard generation in background
 func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model, prompt string) {
-	// 更新任务状态为处理中
+	// Update task status to processing
 	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 10, "Generating storyboard..."); err != nil {
 		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
 		return
@@ -354,8 +354,8 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 
 	s.log.Infow("Processing storyboard generation", "task_id", taskID, "episode_id", episodeID)
 
-	// 调用AI服务生成（如果指定了模型则使用指定的模型）
-	// 设置较大的max_tokens以确保完整返回所有分镜的JSON
+	// Call AI service to generate (use specified model if provided)
+	// Set large max_tokens to ensure complete JSON return of all storyboard shots
 	var text string
 	var err error
 	if model != "" {
@@ -379,27 +379,27 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 		return
 	}
 
-	// 更新任务进度
+	// Update task progress
 	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 50, "Storyboard generated, parsing result..."); err != nil {
 		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
 		return
 	}
 
-	// 解析JSON结果
-	// AI可能返回两种格式：
-	// 1. 数组格式: [{...}, {...}]
-	// 2. 对象格式: {"storyboards": [{...}, {...}]}
+	// Parse JSON result
+	// AI may return two formats:
+	// 1. Array format: [{...}, {...}]
+	// 2. Object format: {"storyboards": [{...}, {...}]}
 	var result GenerateStoryboardResult
 
-	// 先尝试解析为数组格式
+	// Try parsing as array format first
 	var storyboards []Storyboard
 	if err := utils.SafeParseAIJSON(text, &storyboards); err == nil {
-		// 成功解析为数组，包装为对象
+		// Successfully parsed as array, wrap as object
 		result.Storyboards = storyboards
 		result.Total = len(storyboards)
 		s.log.Infow("Parsed storyboard as array format", "count", len(storyboards), "task_id", taskID)
 	} else {
-		// 尝试解析为对象格式
+		// Try parsing as object format
 		if err := utils.SafeParseAIJSON(text, &result); err != nil {
 			s.log.Errorw("Failed to parse storyboard JSON in both formats", "error", err, "response", text[:min(500, len(text))], "task_id", taskID)
 			if updateErr := s.taskService.UpdateTaskError(taskID, fmt.Errorf("failed to parse storyboard result: %w", err)); updateErr != nil {
@@ -411,7 +411,7 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 		s.log.Infow("Parsed storyboard as object format", "count", len(result.Storyboards), "task_id", taskID)
 	}
 
-	// 计算总时长（所有分镜时长之和）
+	// Calculate total duration (sum of all storyboard durations)
 	totalDuration := 0
 	for _, sb := range result.Storyboards {
 		totalDuration += sb.Duration
@@ -423,13 +423,13 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 		"count", result.Total,
 		"total_duration_seconds", totalDuration)
 
-	// 更新任务进度
+	// Update task progress
 	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 70, "Saving storyboards..."); err != nil {
 		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
 		return
 	}
 
-	// 保存分镜头到数据库
+	// Save storyboard shots to database
 	if err := s.saveStoryboards(episodeID, result.Storyboards); err != nil {
 		s.log.Errorw("Failed to save storyboards", "error", err, "task_id", taskID)
 		if updateErr := s.taskService.UpdateTaskError(taskID, fmt.Errorf("failed to save storyboards: %w", err)); updateErr != nil {
@@ -438,17 +438,17 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 		return
 	}
 
-	// 更新任务进度
+	// Update task progress
 	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 90, "Updating episode duration..."); err != nil {
 		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
 		return
 	}
 
-	// 更新剧集时长（秒转分钟，向上取整）
+	// Update episode duration (seconds to minutes, round up)
 	durationMinutes := (totalDuration + 59) / 60
 	if err := s.db.Model(&models.Episode{}).Where("id = ?", episodeID).Update("duration", durationMinutes).Error; err != nil {
 		s.log.Errorw("Failed to update episode duration", "error", err, "task_id", taskID)
-		// 不中断流程，只记录错误
+		// Don't interrupt the flow, just log the error
 	} else {
 		s.log.Infow("Episode duration updated",
 			"task_id", taskID,
@@ -457,7 +457,7 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 			"duration_minutes", durationMinutes)
 	}
 
-	// 更新任务结果
+	// Update task result
 	resultData := gin.H{
 		"storyboards":      result.Storyboards,
 		"total":            result.Total,
@@ -473,11 +473,11 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 	s.log.Infow("Storyboard generation completed", "task_id", taskID, "episode_id", episodeID)
 }
 
-// generateImagePrompt 生成专门用于图片生成的提示词（首帧静态画面）
+// generateImagePrompt generates a prompt specifically for image generation (first frame static image)
 func (s *StoryboardService) generateImagePrompt(sb Storyboard) string {
 	var parts []string
 
-	// 1. 完整的场景背景描述
+	// 1. Complete scene background description
 	if sb.Location != "" {
 		locationDesc := sb.Location
 		if sb.Time != "" {
@@ -486,7 +486,7 @@ func (s *StoryboardService) generateImagePrompt(sb Storyboard) string {
 		parts = append(parts, locationDesc)
 	}
 
-	// 2. 角色初始静态姿态（去除动作过程，只保留起始状态）
+	// 2. Character initial static pose (remove action process, keep starting state only)
 	if sb.Action != "" {
 		initialPose := extractInitialPose(sb.Action)
 		if initialPose != "" {
@@ -494,12 +494,12 @@ func (s *StoryboardService) generateImagePrompt(sb Storyboard) string {
 		}
 	}
 
-	// 3. 情绪氛围
+	// 3. Emotional atmosphere
 	if sb.Emotion != "" {
 		parts = append(parts, sb.Emotion)
 	}
 
-	// 4. 动漫风格
+	// 4. Anime style
 	parts = append(parts, "anime style, first frame")
 
 	if len(parts) > 0 {
@@ -508,37 +508,36 @@ func (s *StoryboardService) generateImagePrompt(sb Storyboard) string {
 	return "anime scene"
 }
 
-// extractInitialPose 提取初始静态姿态（去除动作过程）
+// extractInitialPose extracts the initial static pose (removes action process)
 func extractInitialPose(action string) string {
-	// 去除动作过程关键词，保留初始状态描述
+	// Remove action process keywords, keep initial state description
 	processWords := []string{
-		"然后", "接着", "接下来", "随后", "紧接着",
-		"向下", "向上", "向前", "向后", "向左", "向右",
-		"开始", "继续", "逐渐", "慢慢", "快速", "突然", "猛然",
+		"then", "next", "afterwards", "subsequently", "immediately after",
+		"downward", "upward", "forward", "backward", "leftward", "rightward",
+		"begin", "continue", "gradually", "slowly", "quickly", "suddenly", "abruptly",
 	}
 
 	result := action
 	for _, word := range processWords {
 		if idx := strings.Index(result, word); idx > 0 {
-			// 在动作过程词之前截断
+			// Truncate before the action process word
 			result = result[:idx]
 			break
 		}
 	}
 
-	// 清理末尾标点
-	result = strings.TrimRight(result, "，。,. ")
+	// Clean trailing punctuation
 	return strings.TrimSpace(result)
 }
 
-// extractSimpleLocation 提取简化的场景地点（去除详细描述）
+// extractSimpleLocation extracts simplified scene location (removes detailed description)
 func extractSimpleLocation(location string) string {
-	// 在"·"符号处截断，只保留主场景名称
+	// Truncate at "·" symbol, keep only the main scene name
 	if idx := strings.Index(location, "·"); idx > 0 {
 		return strings.TrimSpace(location[:idx])
 	}
 
-	// 如果有逗号，只保留第一部分
+	// If there's a comma, keep only the first part
 	if idx := strings.Index(location, "，"); idx > 0 {
 		return strings.TrimSpace(location[:idx])
 	}
@@ -546,7 +545,7 @@ func extractSimpleLocation(location string) string {
 		return strings.TrimSpace(location[:idx])
 	}
 
-	// 限制长度不超过15个字符
+	// Limit length to no more than 15 characters
 	maxLen := 15
 	if len(location) > maxLen {
 		return strings.TrimSpace(location[:maxLen])
@@ -555,13 +554,13 @@ func extractSimpleLocation(location string) string {
 	return strings.TrimSpace(location)
 }
 
-// extractSimplePose 提取简单的核心姿态关键词（不超过10个字）
+// extractSimplePose extracts simple core pose keywords (no more than 10 characters)
 func extractSimplePose(action string) string {
-	// 只提取前面最多10个字符作为核心姿态
+	// Extract only the first 10 characters as core pose
 	runes := []rune(action)
 	maxLen := 10
 	if len(runes) > maxLen {
-		// 在标点符号处截断
+		// Truncate at punctuation
 		truncated := runes[:maxLen]
 		for i := maxLen - 1; i >= 0; i-- {
 			if truncated[i] == '，' || truncated[i] == '。' || truncated[i] == ',' || truncated[i] == '.' {
@@ -574,34 +573,33 @@ func extractSimplePose(action string) string {
 	return strings.TrimSpace(action)
 }
 
-// extractFirstFramePose 从动作描述中提取首帧静态姿态
+// extractFirstFramePose extracts the first frame static pose from action description
 func extractFirstFramePose(action string) string {
-	// 去除表示动作过程的关键词，保留初始状态
+	// Remove action process keywords, keep initial state
 	processWords := []string{
-		"然后", "接着", "向下", "向前", "走向", "冲向", "转身",
-		"开始", "继续", "逐渐", "慢慢", "快速", "突然",
+		"then", "next", "downward", "forward", "walk toward", "rush toward", "turn around",
+		"begin", "continue", "gradually", "slowly", "quickly", "suddenly",
 	}
 
 	pose := action
 	for _, word := range processWords {
-		// 简单处理：在这些词之前截断
+		// Simple handling: truncate before these words
 		if idx := strings.Index(pose, word); idx > 0 {
 			pose = pose[:idx]
 			break
 		}
 	}
 
-	// 清理末尾标点
-	pose = strings.TrimRight(pose, "，。,.")
+	// Clean trailing punctuation
 	return strings.TrimSpace(pose)
 }
 
-// extractCompositionType 从镜头类型中提取构图类型（去除运镜）
+// extractCompositionType extracts composition type from shot type (removes camera movement)
 func extractCompositionType(shotType string) string {
-	// 去除运镜相关描述
+	// Remove camera movement related descriptions
 	cameraMovements := []string{
-		"晃动", "摇晃", "推进", "拉远", "跟随", "环绕",
-		"运镜", "摄影", "移动", "旋转",
+		"shake", "sway", "push in", "pull out", "follow", "orbit",
+		"camera movement", "cinematography", "move", "rotate",
 	}
 
 	comp := shotType
@@ -609,7 +607,7 @@ func extractCompositionType(shotType string) string {
 		comp = strings.ReplaceAll(comp, movement, "")
 	}
 
-	// 清理多余的标点和空格
+	// Clean extra punctuation and spaces
 	comp = strings.ReplaceAll(comp, "··", "·")
 	comp = strings.ReplaceAll(comp, "·", " ")
 	comp = strings.TrimSpace(comp)
@@ -617,26 +615,26 @@ func extractCompositionType(shotType string) string {
 	return comp
 }
 
-// generateVideoPrompt 生成专门用于视频生成的提示词（包含运镜和动态元素）
+// generateVideoPrompt generates a prompt specifically for video generation (includes camera movement and dynamic elements)
 func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 	var parts []string
 	videoRatio := "16:9"
-	// 1. 人物动作
+	// 1. Character action
 	if sb.Action != "" {
 		parts = append(parts, fmt.Sprintf("Action: %s", sb.Action))
 	}
 
-	// 2. 对话
+	// 2. Dialogue
 	if sb.Dialogue != "" {
 		parts = append(parts, fmt.Sprintf("Dialogue: %s", sb.Dialogue))
 	}
 
-	// 3. 镜头运动（视频特有）
+	// 3. Camera movement (video-specific)
 	if sb.Movement != "" {
 		parts = append(parts, fmt.Sprintf("Camera movement: %s", sb.Movement))
 	}
 
-	// 4. 镜头类型和角度
+	// 4. Shot type and angle
 	if sb.ShotType != "" {
 		parts = append(parts, fmt.Sprintf("Shot type: %s", sb.ShotType))
 	}
@@ -644,7 +642,7 @@ func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 		parts = append(parts, fmt.Sprintf("Camera angle: %s", sb.Angle))
 	}
 
-	// 5. 场景环境
+	// 5. Scene environment
 	if sb.Location != "" {
 		locationDesc := sb.Location
 		if sb.Time != "" {
@@ -653,12 +651,12 @@ func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 		parts = append(parts, fmt.Sprintf("Scene: %s", locationDesc))
 	}
 
-	// 6. 环境氛围
+	// 6. Environmental atmosphere
 	if sb.Atmosphere != "" {
 		parts = append(parts, fmt.Sprintf("Atmosphere: %s", sb.Atmosphere))
 	}
 
-	// 7. 情绪和结果
+	// 7. Emotion and result
 	if sb.Emotion != "" {
 		parts = append(parts, fmt.Sprintf("Mood: %s", sb.Emotion))
 	}
@@ -666,7 +664,7 @@ func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 		parts = append(parts, fmt.Sprintf("Result: %s", sb.Result))
 	}
 
-	// 8. 音频元素
+	// 8. Audio elements
 	if sb.BgmPrompt != "" {
 		parts = append(parts, fmt.Sprintf("BGM: %s", sb.BgmPrompt))
 	}
@@ -674,7 +672,7 @@ func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 		parts = append(parts, fmt.Sprintf("Sound effects: %s", sb.SoundEffect))
 	}
 
-	// 9. 视频比例
+	// 9. Video ratio
 	parts = append(parts, fmt.Sprintf("=VideoRatio: %s", videoRatio))
 	if len(parts) > 0 {
 		return strings.Join(parts, ". ")
@@ -683,40 +681,40 @@ func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 }
 
 func (s *StoryboardService) saveStoryboards(episodeID string, storyboards []Storyboard) error {
-	// 验证 episodeID
+	// Validate episodeID
 	epID, err := strconv.ParseUint(episodeID, 10, 32)
 	if err != nil {
 		s.log.Errorw("Invalid episode ID", "episode_id", episodeID, "error", err)
-		return fmt.Errorf("无效的章节ID: %s", episodeID)
+		return fmt.Errorf("invalid episode ID: %s", episodeID)
 	}
 
-	// 防御性检查：如果AI返回的分镜数量为0，不应该删除旧分镜
+	// Defensive check: if AI returned 0 storyboard shots, don't delete old ones
 	if len(storyboards) == 0 {
-		s.log.Errorw("AI返回的分镜数量为0，拒绝保存以避免删除现有分镜", "episode_id", episodeID)
-		return fmt.Errorf("AI生成分镜失败：返回的分镜数量为0")
+		s.log.Errorw("AI returned 0 storyboard shots, refusing to save to avoid deleting existing storyboards", "episode_id", episodeID)
+		return fmt.Errorf("AI storyboard generation failed: returned 0 storyboard shots")
 	}
 
-	s.log.Infow("开始保存分镜头",
+	s.log.Infow("Starting to save storyboard shots",
 		"episode_id", episodeID,
 		"episode_id_uint", uint(epID),
 		"storyboard_count", len(storyboards))
 
-	// 开启事务
+	// Begin transaction
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		// 验证该章节是否存在
+		// Validate that the episode exists
 		var episode models.Episode
 		if err := tx.First(&episode, epID).Error; err != nil {
 			s.log.Errorw("Episode not found", "episode_id", episodeID, "error", err)
-			return fmt.Errorf("章节不存在: %s", episodeID)
+			return fmt.Errorf("episode not found: %s", episodeID)
 		}
 
-		s.log.Infow("找到章节信息",
+		s.log.Infow("Found episode information",
 			"episode_id", episode.ID,
 			"episode_number", episode.EpisodeNum,
 			"drama_id", episode.DramaID,
 			"title", episode.Title)
 
-		// 获取该剧集所有的分镜ID（使用 uint 类型）
+		// Get all storyboard IDs for this episode (using uint type)
 		var storyboardIDs []uint
 		if err := tx.Model(&models.Storyboard{}).
 			Where("episode_id = ?", uint(epID)).
@@ -724,24 +722,24 @@ func (s *StoryboardService) saveStoryboards(episodeID string, storyboards []Stor
 			return err
 		}
 
-		s.log.Infow("查询到现有分镜",
+		s.log.Infow("Found existing storyboards",
 			"episode_id_string", episodeID,
 			"episode_id_uint", uint(epID),
 			"existing_storyboard_count", len(storyboardIDs),
 			"storyboard_ids", storyboardIDs)
 
-		// 如果有分镜，先清理关联的image_generations的storyboard_id
+		// If there are storyboards, first clear the storyboard_id in associated image_generations
 		if len(storyboardIDs) > 0 {
 			if err := tx.Model(&models.ImageGeneration{}).
 				Where("storyboard_id IN ?", storyboardIDs).
 				Update("storyboard_id", nil).Error; err != nil {
 				return err
 			}
-			s.log.Infow("已清理关联的图片生成记录", "count", len(storyboardIDs))
+			s.log.Infow("Cleared associated image generation records", "count", len(storyboardIDs))
 		}
 
-		// 删除该剧集已有的分镜头（使用 uint 类型确保类型匹配）
-		s.log.Warnw("准备删除分镜数据",
+		// Delete existing storyboard shots for this episode (using uint type to ensure type match)
+		s.log.Warnw("Preparing to delete storyboard data",
 			"episode_id_string", episodeID,
 			"episode_id_uint", uint(epID),
 			"episode_id_from_db", episode.ID,
@@ -749,47 +747,47 @@ func (s *StoryboardService) saveStoryboards(episodeID string, storyboards []Stor
 
 		result := tx.Where("episode_id = ?", uint(epID)).Delete(&models.Storyboard{})
 		if result.Error != nil {
-			s.log.Errorw("删除旧分镜失败", "episode_id", uint(epID), "error", result.Error)
+			s.log.Errorw("Failed to delete old storyboards", "episode_id", uint(epID), "error", result.Error)
 			return result.Error
 		}
 
-		s.log.Infow("已删除旧分镜头",
+		s.log.Infow("Deleted old storyboard shots",
 			"episode_id", uint(epID),
 			"deleted_count", result.RowsAffected)
 
-		// 注意：不删除背景，因为背景是在分镜拆解前就提取好的
-		// AI会直接返回scene_id，不需要在这里做字符串匹配
+		// Note: Do not delete scenes, as they are extracted before storyboard breakdown
+		// AI returns scene_id directly, no string matching needed here
 
-		// 保存新的分镜头
+		// Save new storyboard shots
 		for _, sb := range storyboards {
-			// 构建描述信息，包含对话
-			description := fmt.Sprintf("【镜头类型】%s\n【运镜】%s\n【动作】%s\n【对话】%s\n【结果】%s\n【情绪】%s",
+			// Build description info, including dialogue
+			description := fmt.Sprintf("【Shot Type】%s\n【Movement】%s\n【Action】%s\n【Dialogue】%s\n【Result】%s\n【Emotion】%s",
 				sb.ShotType, sb.Movement, sb.Action, sb.Dialogue, sb.Result, sb.Emotion)
 
-			// 生成两种专用提示词
-			imagePrompt := s.generateImagePrompt(sb) // 专用于图片生成
-			videoPrompt := s.generateVideoPrompt(sb) // 专用于视频生成
+			// Generate two specialized prompts
+			imagePrompt := s.generateImagePrompt(sb) // For image generation
+			videoPrompt := s.generateVideoPrompt(sb) // For video generation
 
-			// 处理 dialogue 字段
+			// Handle dialogue field
 			var dialoguePtr *string
 			if sb.Dialogue != "" {
 				dialoguePtr = &sb.Dialogue
 			}
 
-			// 使用AI直接返回的SceneID
+			// Use SceneID returned directly by AI
 			if sb.SceneID != nil {
 				s.log.Infow("Background ID from AI",
 					"shot_number", sb.ShotNumber,
 					"scene_id", *sb.SceneID)
 			}
 
-			// 处理 title 字段
+			// Handle title field
 			var titlePtr *string
 			if sb.Title != "" {
 				titlePtr = &sb.Title
 			}
 
-			// 处理shot_type、angle、movement字段
+			// Handle shot_type, angle, movement fields
 			var shotTypePtr, anglePtr, movementPtr *string
 			if sb.ShotType != "" {
 				shotTypePtr = &sb.ShotType
@@ -801,7 +799,7 @@ func (s *StoryboardService) saveStoryboards(episodeID string, storyboards []Stor
 				movementPtr = &sb.Movement
 			}
 
-			// 处理bgm_prompt、sound_effect字段
+			// Handle bgm_prompt, sound_effect fields
 			var bgmPromptPtr, soundEffectPtr *string
 			if sb.BgmPrompt != "" {
 				bgmPromptPtr = &sb.BgmPrompt
@@ -810,7 +808,7 @@ func (s *StoryboardService) saveStoryboards(episodeID string, storyboards []Stor
 				soundEffectPtr = &sb.SoundEffect
 			}
 
-			// 处理result、atmosphere字段
+			// Handle result, atmosphere fields
 			var resultPtr, atmospherePtr *string
 			if sb.Result != "" {
 				resultPtr = &sb.Result
@@ -846,7 +844,7 @@ func (s *StoryboardService) saveStoryboards(episodeID string, storyboards []Stor
 				return err
 			}
 
-			// 关联角色
+			// Associate characters
 			if len(sb.Characters) > 0 {
 				var characters []models.Character
 				if err := tx.Where("id IN ?", sb.Characters).Find(&characters).Error; err != nil {
@@ -869,7 +867,7 @@ func (s *StoryboardService) saveStoryboards(episodeID string, storyboards []Stor
 	})
 }
 
-// CreateStoryboardRequest 创建分镜请求
+// CreateStoryboardRequest represents a request to create a storyboard
 type CreateStoryboardRequest struct {
 	EpisodeID        uint    `json:"episode_id"`
 	SceneID          *uint   `json:"scene_id"`
@@ -891,9 +889,9 @@ type CreateStoryboardRequest struct {
 	Characters       []uint  `json:"characters"`
 }
 
-// CreateStoryboard 创建单个分镜
+// CreateStoryboard creates a single storyboard shot
 func (s *StoryboardService) CreateStoryboard(req *CreateStoryboardRequest) (*models.Storyboard, error) {
-	// 构建Storyboard对象
+	// Build Storyboard object
 	sb := Storyboard{
 		ShotNumber:  req.StoryboardNumber,
 		ShotType:    getString(req.ShotType),
@@ -906,7 +904,7 @@ func (s *StoryboardService) CreateStoryboard(req *CreateStoryboardRequest) (*mod
 		Dialogue:    getString(req.Dialogue),
 		Result:      getString(req.Result),
 		Atmosphere:  getString(req.Atmosphere),
-		Emotion:     "", // 可以后续添加
+		Emotion:     "", // Can be added later
 		Duration:    req.Duration,
 		BgmPrompt:   getString(req.BgmPrompt),
 		SoundEffect: getString(req.SoundEffect),
@@ -916,11 +914,11 @@ func (s *StoryboardService) CreateStoryboard(req *CreateStoryboardRequest) (*mod
 		sb.Title = *req.Title
 	}
 
-	// 生成提示词
+	// Generate prompts
 	imagePrompt := s.generateImagePrompt(sb)
 	videoPrompt := s.generateVideoPrompt(sb)
 
-	// 构建 description
+	// Build description
 	desc := ""
 	if req.Description != nil {
 		desc = *req.Description
@@ -952,7 +950,7 @@ func (s *StoryboardService) CreateStoryboard(req *CreateStoryboardRequest) (*mod
 		return nil, fmt.Errorf("failed to create storyboard: %w", err)
 	}
 
-	// 关联角色
+	// Associate characters
 	if len(req.Characters) > 0 {
 		var characters []models.Character
 		if err := s.db.Where("id IN ?", req.Characters).Find(&characters).Error; err != nil {
@@ -966,7 +964,7 @@ func (s *StoryboardService) CreateStoryboard(req *CreateStoryboardRequest) (*mod
 	return modelSB, nil
 }
 
-// DeleteStoryboard 删除分镜
+// DeleteStoryboard deletes a storyboard shot
 func (s *StoryboardService) DeleteStoryboard(storyboardID uint) error {
 	result := s.db.Where("id = ? ", storyboardID).Delete(&models.Storyboard{})
 	if result.Error != nil {
