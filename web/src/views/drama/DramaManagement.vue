@@ -170,7 +170,7 @@
               </el-table-column>
               <el-table-column label="Shots" width="100">
                 <template #default="{ row }">
-                  {{ row.shots?.length || 0 }}
+                  {{ row.storyboards?.length || 0 }}
                 </template>
               </el-table-column>
               <el-table-column :label="$t('common.createdAt')" width="180">
@@ -913,13 +913,13 @@ const getStatusText = (status?: string) => {
 };
 
 const getEpisodeStatusType = (episode: any) => {
-  if (episode.shots && episode.shots.length > 0) return "success";
+  if (episode.storyboards && episode.storyboards.length > 0) return "success";
   if (episode.script_content) return "warning";
   return "info";
 };
 
 const getEpisodeStatusText = (episode: any) => {
-  if (episode.shots && episode.shots.length > 0) return "Split";
+  if (episode.storyboards && episode.storyboards.length > 0) return "Split";
   if (episode.script_content) return "Created";
   return "Draft";
 };

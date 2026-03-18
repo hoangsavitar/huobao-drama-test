@@ -1,3 +1,4 @@
+<template>
   <div class="professional-editor">
     <!-- 顶部工具栏 -->
     <AppHeader
@@ -259,15 +260,15 @@
                       :placeholder="$t('editor.shotTypePlaceholder')"
                       @change="saveStoryboardField('shot_type')"
                     >
-                      <el-option label="大远景" value="大远景" />
-                      <el-option label="远景" value="远景" />
-                      <el-option label="全景" value="全景" />
-                      <el-option label="中全景" value="中全景" />
-                      <el-option label="中景" value="中景" />
-                      <el-option label="中近景" value="中近景" />
-                      <el-option label="近景" value="近景" />
-                      <el-option label="特写" value="特写" />
-                      <el-option label="大特写" value="大特写" />
+                      <el-option label="Extreme long shot" value="Extreme long shot" />
+                      <el-option label="Long shot" value="Long shot" />
+                      <el-option label="Full shot" value="Full shot" />
+                      <el-option label="Medium full shot" value="Medium full shot" />
+                      <el-option label="Medium shot" value="Medium shot" />
+                      <el-option label="Medium close-up" value="Medium close-up" />
+                      <el-option label="Close-up" value="Close-up" />
+                      <el-option label="Big close-up" value="Big close-up" />
+                      <el-option label="Extreme close-up" value="Extreme close-up" />
                     </el-select>
                   </div>
 
@@ -279,20 +280,20 @@
                       :placeholder="$t('editor.movementPlaceholder')"
                       @change="saveStoryboardField('movement')"
                     >
-                      <el-option label="固定镜头" value="固定镜头" />
-                      <el-option label="推镜" value="推镜" />
-                      <el-option label="拉镜" value="拉镜" />
-                      <el-option label="摇镜" value="摇镜" />
-                      <el-option label="移镜" value="移镜" />
-                      <el-option label="跟镜" value="跟镜" />
-                      <el-option label="升降镜头" value="升降镜头" />
-                      <el-option label="环绕" value="环绕" />
-                      <el-option label="甩镜" value="甩镜" />
-                      <el-option label="变焦" value="变焦" />
-                      <el-option label="手持晃动" value="手持晃动" />
-                      <el-option label="稳定器运动" value="稳定器运动" />
-                      <el-option label="轨道推拉" value="轨道推拉" />
-                      <el-option label="航拍" value="航拍" />
+                      <el-option label="Static shot" value="Static shot" />
+                      <el-option label="Push in" value="Push in" />
+                      <el-option label="Pull out" value="Pull out" />
+                      <el-option label="Pan" value="Pan" />
+                      <el-option label="Tracking" value="Tracking" />
+                      <el-option label="Follow" value="Follow" />
+                      <el-option label="Crane" value="Crane" />
+                      <el-option label="Orbit" value="Orbit" />
+                      <el-option label="Whip pan" value="Whip pan" />
+                      <el-option label="Zoom" value="Zoom" />
+                      <el-option label="Handheld" value="Handheld" />
+                      <el-option label="Steadicam" value="Steadicam" />
+                      <el-option label="Dolly" value="Dolly" />
+                      <el-option label="Drone" value="Drone" />
                     </el-select>
                   </div>
 
@@ -304,23 +305,17 @@
                       :placeholder="$t('editor.anglePlaceholder')"
                       @change="saveStoryboardField('angle')"
                     >
-                      <el-option label="平视" value="平视" />
-                      <el-option label="俯视" value="俯视" />
-                      <el-option label="仰视" value="仰视" />
-                      <el-option
-                        label="大俯视（鸟瞰）"
-                        value="大俯视（鸟瞰）"
-                      />
-                      <el-option label="大仰视" value="大仰视" />
-                      <el-option label="正侧面" value="正侧面" />
-                      <el-option label="斜侧面" value="斜侧面" />
-                      <el-option label="背面" value="背面" />
-                      <el-option
-                        label="倾斜（荷兰角）"
-                        value="倾斜（荷兰角）"
-                      />
-                      <el-option label="主观视角" value="主观视角" />
-                      <el-option label="过肩" value="过肩" />
+                      <el-option label="Eye level" value="Eye level" />
+                      <el-option label="High angle" value="High angle" />
+                      <el-option label="Low angle" value="Low angle" />
+                      <el-option label="Bird's-eye view" value="Bird's-eye view" />
+                      <el-option label="Worm's-eye view" value="Worm's-eye view" />
+                      <el-option label="Profile" value="Profile" />
+                      <el-option label="Three-quarter" value="Three-quarter" />
+                      <el-option label="Back view" value="Back view" />
+                      <el-option label="Dutch angle" value="Dutch angle" />
+                      <el-option label="POV" value="POV" />
+                      <el-option label="Over-the-shoulder" value="Over-the-shoulder" />
                     </el-select>
                   </div>
                 </div>
@@ -1770,7 +1765,7 @@
     >
       <div class="character-image-preview" v-if="previewCharacter">
         <img
-          v-if="previewCharacter.local_path"
+          v-if="hasImage(previewCharacter)"
           :src="getImageUrl(previewCharacter)"
           :alt="previewCharacter.name"
         />
@@ -1813,7 +1808,7 @@
         >
           <div class="character-avatar-large">
             <img
-              v-if="char.local_path"
+              v-if="hasImage(char)"
               :src="getImageUrl(char)"
               :alt="char.name"
             />
@@ -1854,7 +1849,7 @@
         >
           <div class="character-avatar-large">
             <img
-              v-if="prop.local_path"
+              v-if="hasImage(prop)"
               :src="getImageUrl(prop)"
               :alt="prop.name"
             />
@@ -2994,20 +2989,24 @@ const generateFrameImage = async () => {
 
   generatingImage.value = true;
   try {
-    // 收集参考图片的 local_path
+    // 收集参考图片的 local_path / image_url
     const referenceImages: string[] = [];
 
-    // 1. 添加场景图片（从background字段获取 local_path）
+    // 1. 添加场景图片（从background字段获取 url）
     if (currentStoryboard.value.background?.local_path) {
       referenceImages.push(currentStoryboard.value.background.local_path);
+    } else if (currentStoryboard.value.background?.image_url) {
+      referenceImages.push(currentStoryboard.value.background.image_url);
     }
 
-    // 2. 添加当前镜头登场的角色图片（使用 local_path）
+    // 2. 添加当前镜头登场的角色图片（使用 url）
     const storyboardCharacters = currentStoryboardCharacters.value;
     if (storyboardCharacters && storyboardCharacters.length > 0) {
       storyboardCharacters.forEach((char: any) => {
         if (char.local_path) {
           referenceImages.push(char.local_path);
+        } else if (char.image_url) {
+          referenceImages.push(char.image_url);
         }
       });
     }

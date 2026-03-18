@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -340,24 +341,56 @@ func (s *ImageGenerationService) completeImageGeneration(imageGenID uint, result
 
 	// Download image to local storage and save the relative path to the database
 	var localPath *string
-	if s.localStorage != nil && result.ImageURL != "" &&
-		(strings.HasPrefix(result.ImageURL, "http://") || strings.HasPrefix(result.ImageURL, "https://")) {
-		downloadResult, err := s.localStorage.DownloadFromURLWithPath(result.ImageURL, "images")
-		if err != nil {
-			errStr := err.Error()
-			if len(errStr) > 200 {
-				errStr = errStr[:200] + "..."
+	if s.localStorage != nil && result.ImageURL != "" {
+		if strings.HasPrefix(result.ImageURL, "http://") || strings.HasPrefix(result.ImageURL, "https://") {
+			downloadResult, err := s.localStorage.DownloadFromURLWithPath(result.ImageURL, "images")
+			if err != nil {
+				errStr := err.Error()
+				if len(errStr) > 200 {
+					errStr = errStr[:200] + "..."
+				}
+				s.log.Warnw("Failed to download image to local storage",
+					"error", errStr,
+					"id", imageGenID,
+					"original_url", truncateImageURL(result.ImageURL))
+			} else {
+				localPath = &downloadResult.RelativePath
+				s.log.Infow("Image downloaded to local storage",
+					"id", imageGenID,
+					"original_url", truncateImageURL(result.ImageURL),
+					"local_path", downloadResult.RelativePath)
 			}
-			s.log.Warnw("Failed to download image to local storage",
-				"error", errStr,
-				"id", imageGenID,
-				"original_url", truncateImageURL(result.ImageURL))
-		} else {
-			localPath = &downloadResult.RelativePath
-			s.log.Infow("Image downloaded to local storage",
-				"id", imageGenID,
-				"original_url", truncateImageURL(result.ImageURL),
-				"local_path", downloadResult.RelativePath)
+		} else if strings.HasPrefix(result.ImageURL, "data:image/") {
+			parts := strings.SplitN(result.ImageURL, ",", 2)
+			if len(parts) == 2 {
+				decodedData, err := base64.StdEncoding.DecodeString(parts[1])
+				if err != nil {
+					s.log.Errorw("Failed to decode base64 image", "error", err, "id", imageGenID)
+				} else {
+					ext := ".jpg"
+					if strings.Contains(parts[0], "image/png") {
+						ext = ".png"
+					} else if strings.Contains(parts[0], "image/webp") {
+						ext = ".webp"
+					}
+					
+					filename := fmt.Sprintf("gen_%d%s", imageGenID, ext)
+					url, err := s.localStorage.Upload(bytes.NewReader(decodedData), filename, "images")
+					if err != nil {
+						s.log.Errorw("Failed to save base64 image to local storage", "error", err, "id", imageGenID)
+					} else {
+						partsUrl := strings.Split(url, "/")
+						newFilename := partsUrl[len(partsUrl)-1]
+						relPath := fmt.Sprintf("images/%s", newFilename)
+						localPath = &relPath
+						result.ImageURL = url // Overwrite the huge base64 payload
+						
+						s.log.Infow("Base64 Image decoded and saved to local storage",
+							"id", imageGenID,
+							"local_path", *localPath)
+					}
+				}
+			}
 		}
 	}
 

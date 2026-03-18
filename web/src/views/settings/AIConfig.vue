@@ -1,3 +1,4 @@
+<template>
   <div class="page-container">
     <div class="content-wrapper animate-fade-in">
       <!-- Page Header / 页面头部 -->

@@ -349,7 +349,7 @@ export default {
     nextStepCharacterImages: '下一步：角色图片',
     nextStep: '下一步',
     reGenerateShots: '重新拆分',
-    reGenerateShotsConfirm: '重新拂分将覆盖现有镜头，确定继续吗？',
+    reGenerateShotsConfirm: '重新拆分将覆盖现有镜头，确定继续吗？',
     pleaseWriteScript: '请先创作剧本内容',
     splitStoryboardFirst: '请先对剧本进行分镜拆解',
     aiSplitting: 'AI拆分中...',

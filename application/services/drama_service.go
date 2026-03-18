@@ -592,27 +592,69 @@ func (s *DramaService) SaveEpisodes(dramaID string, req *SaveEpisodesRequest) er
 		return err
 	}
 
-	// Delete old episodes
-	if err := s.db.Where("drama_id = ?", dramaIDUint).Delete(&models.Episode{}).Error; err != nil {
-		s.log.Errorw("Failed to delete old episodes", "error", err)
+	// Get existing episodes for mapping
+	var existingEpisodes []models.Episode
+	if err := s.db.Where("drama_id = ?", dramaIDUint).Find(&existingEpisodes).Error; err != nil {
+		s.log.Errorw("Failed to fetch existing episodes", "error", err)
 		return err
 	}
 
-	// Create new episodes (excluding scenes, which are generated in subsequent steps)
-	for _, ep := range req.Episodes {
-		episode := models.Episode{
-			DramaID:       dramaIDUint,
-			EpisodeNum:    ep.EpisodeNum,
-			Title:         ep.Title,
-			Description:   ep.Description,
-			ScriptContent: ep.ScriptContent,
-			Duration:      ep.Duration,
-			Status:        "draft",
-		}
+	existingMap := make(map[int]models.Episode)
+	for _, ep := range existingEpisodes {
+		existingMap[ep.EpisodeNum] = ep
+	}
 
-		if err := s.db.Create(&episode).Error; err != nil {
-			s.log.Errorw("Failed to create episode", "error", err, "episode", ep.EpisodeNum)
-			continue
+	incomingMap := make(map[int]bool)
+
+	// Create or update episodes
+	for _, ep := range req.Episodes {
+		incomingMap[ep.EpisodeNum] = true
+
+		if existing, exists := existingMap[ep.EpisodeNum]; exists {
+			// Update existing episode
+			updates := map[string]interface{}{
+				"title":          ep.Title,
+				"description":    ep.Description,
+				"script_content": ep.ScriptContent,
+				"duration":       ep.Duration,
+			}
+			if ep.Status != "" {
+				updates["status"] = ep.Status
+			}
+			
+			if err := s.db.Model(&existing).Updates(updates).Error; err != nil {
+				s.log.Errorw("Failed to update episode", "error", err, "episode", ep.EpisodeNum)
+			}
+		} else {
+			// Create new episode
+			status := ep.Status
+			if status == "" {
+				status = "draft"
+			}
+			
+			episode := models.Episode{
+				DramaID:       dramaIDUint,
+				EpisodeNum:    ep.EpisodeNum,
+				Title:         ep.Title,
+				Description:   ep.Description,
+				ScriptContent: ep.ScriptContent,
+				Duration:      ep.Duration,
+				Status:        status,
+			}
+
+			if err := s.db.Create(&episode).Error; err != nil {
+				s.log.Errorw("Failed to create episode", "error", err, "episode", ep.EpisodeNum)
+				continue
+			}
+		}
+	}
+
+	// Delete episodes that are no longer in the request
+	for epNum, existing := range existingMap {
+		if !incomingMap[epNum] {
+			if err := s.db.Delete(&existing).Error; err != nil {
+				s.log.Errorw("Failed to delete episode", "error", err, "episode", epNum)
+			}
 		}
 	}
 
