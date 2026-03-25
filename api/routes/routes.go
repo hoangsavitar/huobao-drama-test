@@ -137,8 +137,6 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 		episodes.POST("/:episode_id/characters/extract", characterLibraryHandler.ExtractCharacters)
 		episodes.GET("/:episode_id/storyboards", sceneHandler.GetStoryboardsForEpisode)
 		episodes.GET("/:episode_id/frame-prompts", handlers2.GetEpisodeFramePrompts(db, log))
-		episodes.POST("/:episode_id/batch-first-frames", framePromptHandler.BatchGenerateFirstFramePrompts)
-		episodes.POST("/:episode_id/batch-ltx-prompts", framePromptHandler.BatchGenerateLtxPrompts)
 		episodes.POST("/:episode_id/finalize", dramaHandler.FinalizeEpisode)
 		episodes.GET("/:episode_id/download", dramaHandler.DownloadEpisodeVideo)
 		}
