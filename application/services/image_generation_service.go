@@ -92,12 +92,27 @@ type GenerateImageRequest struct {
 	ReferenceImages []string `json:"reference_images"` // List of reference image URLs
 }
 
+// aspectRatioToSize returns the recommended pixel dimensions for a given aspect ratio.
+func aspectRatioToSize(ratio string) string {
+	switch ratio {
+	case "9:16":
+		return "1440x2560"
+	default:
+		return "2560x1440"
+	}
+}
+
 func (s *ImageGenerationService) GenerateImage(request *GenerateImageRequest) (*models.ImageGeneration, error) {
 	var drama models.Drama
 	if err := s.db.Where("id = ? ", request.DramaID).First(&drama).Error; err != nil {
 		return nil, fmt.Errorf("drama not found")
 	}
 	// Note: SceneID may refer to the Scene or Storyboard table; the caller has already performed permission verification, so we skip it here
+
+	// Default size from drama's aspect ratio when not explicitly set
+	if request.Size == "" {
+		request.Size = aspectRatioToSize(drama.AspectRatio)
+	}
 
 	provider := request.Provider
 	if provider == "" {
@@ -158,16 +173,19 @@ func (s *ImageGenerationService) GenerateImage(request *GenerateImageRequest) (*
 
 func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 	var imageGen models.ImageGeneration
-	imageRatio := "16:9"
 	if err := s.db.First(&imageGen, imageGenID).Error; err != nil {
 		s.log.Errorw("Failed to load image generation", "error", err, "id", imageGenID)
 		return
 	}
 
-	// Get the drama's style information
+	// Get the drama's style and aspect ratio
 	var drama models.Drama
 	if err := s.db.First(&drama, imageGen.DramaID).Error; err != nil {
 		s.log.Warnw("Failed to load drama for style", "error", err, "drama_id", imageGen.DramaID)
+	}
+	imageRatio := drama.AspectRatio
+	if imageRatio == "" {
+		imageRatio = "16:9"
 	}
 
 	s.db.Model(&imageGen).Update("status", models.ImageStatusProcessing)
@@ -889,11 +907,20 @@ func (s *ImageGenerationService) processBackgroundExtraction(taskID string, epis
 		return
 	}
 
+	var drama models.Drama
+	if err := s.db.First(&drama, episode.DramaID).Error; err != nil {
+		s.log.Warnw("Failed to load drama for aspect ratio", "drama_id", episode.DramaID, "error", err)
+	}
+	aspectRatio := drama.AspectRatio
+	if aspectRatio == "" {
+		aspectRatio = "16:9"
+	}
+
 	s.log.Infow("Extracting backgrounds from script", "episode_id", episodeID, "model", model, "task_id", taskID)
 	dramaID := episode.DramaID
 
 	// Use AI to extract scenes from the script content
-	backgroundsInfo, err := s.extractBackgroundsFromScript(*episode.ScriptContent, dramaID, model, style)
+	backgroundsInfo, err := s.extractBackgroundsFromScript(*episode.ScriptContent, dramaID, model, style, aspectRatio)
 	if err != nil {
 		s.log.Errorw("Failed to extract backgrounds from script", "error", err, "task_id", taskID)
 		s.taskService.UpdateTaskStatus(taskID, "failed", 0, "AI scene extraction failed: "+err.Error())
@@ -961,7 +988,7 @@ func (s *ImageGenerationService) processBackgroundExtraction(taskID string, epis
 }
 
 // extractBackgroundsFromScript uses AI to extract scene information from script content
-func (s *ImageGenerationService) extractBackgroundsFromScript(scriptContent string, dramaID uint, model string, style string) ([]BackgroundInfo, error) {
+func (s *ImageGenerationService) extractBackgroundsFromScript(scriptContent string, dramaID uint, model, style, aspectRatio string) ([]BackgroundInfo, error) {
 	if scriptContent == "" {
 		return []BackgroundInfo{}, nil
 	}
@@ -984,7 +1011,7 @@ func (s *ImageGenerationService) extractBackgroundsFromScript(scriptContent stri
 	}
 
 	// Use internationalized prompts
-	systemPrompt := s.promptI18n.GetSceneExtractionPrompt(style)
+	systemPrompt := s.promptI18n.GetSceneExtractionPrompt(style, aspectRatio)
 	contentLabel := s.promptI18n.FormatUserPrompt("script_content_label")
 
 	// Build different format instructions based on language
@@ -1118,7 +1145,7 @@ Please strictly follow the JSON format and ensure all fields use English.`
 }
 
 // extractBackgroundsWithAI uses AI to intelligently analyze scenes and extract unique backgrounds
-func (s *ImageGenerationService) extractBackgroundsWithAI(storyboards []models.Storyboard, style string) ([]BackgroundInfo, error) {
+func (s *ImageGenerationService) extractBackgroundsWithAI(storyboards []models.Storyboard, style, aspectRatio string) ([]BackgroundInfo, error) {
 	if len(storyboards) == 0 {
 		return []BackgroundInfo{}, nil
 	}
@@ -1148,7 +1175,7 @@ func (s *ImageGenerationService) extractBackgroundsWithAI(storyboards []models.S
 	}
 
 	// Use internationalized prompts
-	systemPrompt := s.promptI18n.GetSceneExtractionPrompt(style)
+	systemPrompt := s.promptI18n.GetSceneExtractionPrompt(style, aspectRatio)
 	storyboardLabel := s.promptI18n.FormatUserPrompt("storyboard_list_label")
 
 	// Build different prompts based on language

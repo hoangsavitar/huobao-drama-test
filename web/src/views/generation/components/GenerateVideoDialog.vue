@@ -200,17 +200,21 @@ const motionMarks = {
   100: 'Dynamic'
 }
 
-watch(() => props.modelValue, (val) => {
+watch(() => props.modelValue, async (val) => {
   if (val) {
-    loadDramas()
+    await loadDramas()
     if (props.dramaId) {
       form.drama_id = props.dramaId
       loadImages(props.dramaId)
+      const drama = dramas.value.find(d => d.id === props.dramaId)
+      if (drama?.aspect_ratio) {
+        form.aspect_ratio = drama.aspect_ratio
+      }
     }
   }
 })
 
-const loadDramas = async () => {
+const loadDramas = async (): Promise<void> => {
   try {
     const result = await dramaAPI.list({ page: 1, page_size: 100 })
     dramas.value = result.items
@@ -239,6 +243,10 @@ const onDramaChange = (dramaId: string) => {
   images.value = []
   if (dramaId) {
     loadImages(dramaId)
+    const drama = dramas.value.find(d => d.id === dramaId)
+    if (drama?.aspect_ratio) {
+      form.aspect_ratio = drama.aspect_ratio
+    }
   }
 }
 

@@ -90,7 +90,7 @@ if err := s.db.First(&drama, episode.DramaID).Error; err != nil {
 s.log.Warnw("Failed to load drama", "error", err, "drama_id", episode.DramaID)
 }
 
-promptTemplate := s.promptI18n.GetPropExtractionPrompt(drama.Style)
+promptTemplate := s.promptI18n.GetPropExtractionPrompt(drama.Style, drama.AspectRatio)
 prompt := fmt.Sprintf(promptTemplate, script)
 
 response, err := s.aiService.GenerateText(prompt, "", ai.WithMaxTokens(2000))

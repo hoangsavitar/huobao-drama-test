@@ -527,14 +527,60 @@
             >
               <div class="shots-header">
                 <h3>{{ $t("workflow.shotList") }}</h3>
+                <div class="shots-batch-actions">
+                  <el-checkbox
+                    v-model="selectAllStoryboards"
+                    @change="toggleSelectAllStoryboards"
+                  >
+                    {{ $t("workflow.selectAll") }}
+                  </el-checkbox>
+                  <el-button
+                    type="primary"
+                    :loading="batchGeneratingFramePrompts"
+                    :disabled="selectedStoryboardIds.length === 0"
+                    @click="batchGenerateFirstFramePrompts"
+                  >
+                    {{ $t("workflow.batchGenerateFirstFrame") }}
+                    <span v-if="selectedStoryboardIds.length > 0">
+                      ({{ selectedStoryboardIds.length }})
+                    </span>
+                  </el-button>
+                  <el-button
+                    type="success"
+                    :loading="batchGeneratingStoryboardImages"
+                    :disabled="selectedStoryboardIds.length === 0"
+                    @click="batchGenerateStoryboardImages"
+                  >
+                    {{ $t("workflow.batchGenerateShotImage") }}
+                    <span v-if="selectedStoryboardIds.length > 0">
+                      ({{ selectedStoryboardIds.length }})
+                    </span>
+                  </el-button>
+                  <el-button
+                    :icon="Document"
+                    @click="exportVideoPrompts"
+                  >
+                    {{ $t("workflow.exportVideoPrompts") }}
+                  </el-button>
+                  <el-button
+                    :icon="Picture"
+                    :loading="exportingShotImages"
+                    @click="exportShotImagesZip"
+                  >
+                    {{ $t("workflow.exportShotImages") }}
+                  </el-button>
+                </div>
               </div>
 
               <el-table
+                ref="storyboardTableRef"
                 :data="currentEpisode.storyboards"
                 border
                 stripe
                 style="margin-top: 16px"
+                @selection-change="handleStoryboardSelectionChange"
               >
+                <el-table-column type="selection" width="50" />
                 <el-table-column
                   type="index"
                   :label="$t('storyboard.table.number')"
@@ -619,6 +665,57 @@
                 >
                   <template #default="{ row }">
                     {{ row.duration || "-" }}s
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  :label="$t('workflow.firstFrameStatus')"
+                  width="100"
+                >
+                  <template #default="{ row }">
+                    <el-tag
+                      v-if="hasFirstFramePrompt(row.id)"
+                      type="success"
+                      size="small"
+                    >
+                      {{ $t("workflow.firstFramePrompted") }}
+                    </el-tag>
+                    <el-tag v-else type="info" size="small" effect="plain">
+                      -
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  :label="$t('workflow.shotImageStatus')"
+                  width="110"
+                >
+                  <template #default="{ row }">
+                    <el-tag
+                      v-if="row.composed_image"
+                      type="success"
+                      size="small"
+                    >
+                      {{ $t("workflow.shotImageReady") }}
+                    </el-tag>
+                    <el-tag
+                      v-else-if="
+                        row.image_generation_status === 'pending' ||
+                        row.image_generation_status === 'processing'
+                      "
+                      type="warning"
+                      size="small"
+                    >
+                      {{ $t("workflow.shotImageGenerating") }}
+                    </el-tag>
+                    <el-tag
+                      v-else-if="row.image_generation_status === 'failed'"
+                      type="danger"
+                      size="small"
+                    >
+                      {{ $t("workflow.shotImageFailed") }}
+                    </el-tag>
+                    <el-tag v-else type="info" size="small" effect="plain">
+                      {{ $t("workflow.shotImageNone") }}
+                    </el-tag>
                   </template>
                 </el-table-column>
                 <el-table-column
@@ -1229,9 +1326,18 @@ import { characterLibraryAPI } from "@/api/character-library";
 import { aiAPI } from "@/api/ai";
 import type { AIServiceConfig } from "@/types/ai";
 import { imageAPI } from "@/api/image";
+import type { ImageGeneration } from "@/types/image";
 import type { Drama } from "@/types/drama";
+import { buildShotImagesZip } from "@/utils/exportShotImagesZip";
 import { AppHeader } from "@/components/common";
 import { getImageUrl, hasImage } from "@/utils/image";
+import {
+  generateFirstFrame,
+  getEpisodeFramePrompts,
+  getStoryboardFramePrompts,
+} from "@/api/frame";
+import type { FramePromptRecord } from "@/api/frame";
+import { taskAPI } from "@/api/task";
 
 const route = useRoute();
 const router = useRouter();
@@ -1262,6 +1368,14 @@ const selectedCharacterIds = ref<number[]>([]);
 const selectedSceneIds = ref<number[]>([]);
 const selectAllCharacters = ref(false);
 const selectAllScenes = ref(false);
+
+// Storyboard batch first-frame prompt state
+const selectedStoryboardIds = ref<number[]>([]);
+const selectAllStoryboards = ref(false);
+const batchGeneratingFramePrompts = ref(false);
+const batchGeneratingStoryboardImages = ref(false);
+const exportingShotImages = ref(false);
+const episodeFramePrompts = ref<Record<string, FramePromptRecord[]>>({});
 
 // 对话框状态
 const promptDialogVisible = ref(false);
@@ -1539,10 +1653,50 @@ const loadDramaData = async () => {
       currentStep.value = 0;
     }
 
+    // Enrich storyboard characters via the dedicated storyboards endpoint,
+    // which reliably returns characters (GET /dramas/:id nested preload is unreliable for many2many)
+    await enrichStoryboardCharacters();
+
     // 检查是否有生成中的角色或场景，自动启动轮询
     await checkAndStartPolling();
+
+    // Load frame prompts now that episode data is available
+    await loadEpisodeFramePrompts();
   } catch (error: any) {
     ElMessage.error(error.message || "Failed to load project data");
+  }
+};
+
+const enrichStoryboardCharacters = async () => {
+  const ep = currentEpisode.value;
+  if (!ep?.id || !ep.storyboards?.length) return;
+  try {
+    const sbData: any = await dramaAPI.getStoryboards(String(ep.id));
+    const enrichedMap = new Map<number, any>(
+      (sbData.storyboards || []).map((sb: any) => [sb.id, sb]),
+    );
+    const epIdx = drama.value?.episodes?.findIndex(
+      (e: any) => e.episode_number === episodeNumber,
+    );
+    if (epIdx !== undefined && epIdx >= 0 && drama.value?.episodes) {
+      drama.value.episodes[epIdx].storyboards = drama.value.episodes[
+        epIdx
+      ].storyboards!.map((sb: any) => {
+        const en =
+          enrichedMap.get(sb.id) ?? enrichedMap.get(Number(sb.id));
+        return {
+          ...sb,
+          characters: en?.characters ?? sb.characters ?? [],
+          background: en?.background ?? sb.background,
+          composed_image: en?.composed_image ?? sb.composed_image,
+          image_generation_id: en?.image_generation_id ?? sb.image_generation_id,
+          image_generation_status:
+            en?.image_generation_status ?? sb.image_generation_status,
+        };
+      });
+    }
+  } catch (e) {
+    console.warn("Failed to enrich storyboard characters:", e);
   }
 };
 
@@ -2438,6 +2592,270 @@ const handleExtractScenes = async () => {
   }
 };
 
+// ── Storyboard batch first-frame prompt ──────────────────────────────────────
+
+const loadEpisodeFramePrompts = async () => {
+  const ep = currentEpisode.value;
+  if (!ep?.id) return;
+  try {
+    const data = await getEpisodeFramePrompts(ep.id);
+    episodeFramePrompts.value = data.frame_prompts_by_storyboard || {};
+  } catch (error: any) {
+    console.error("Failed to load episode frame prompts:", error);
+  }
+};
+
+const hasFirstFramePrompt = (storyboardId: number | string): boolean => {
+  const prompts = episodeFramePrompts.value[String(storyboardId)] || [];
+  return prompts.some((p) => p.frame_type === "first");
+};
+
+const handleStoryboardSelectionChange = (rows: any[]) => {
+  selectedStoryboardIds.value = rows.map((r) => r.id);
+  const total = currentEpisode.value?.storyboards?.length || 0;
+  selectAllStoryboards.value =
+    total > 0 && selectedStoryboardIds.value.length === total;
+};
+
+const storyboardTableRef = ref<any>(null);
+
+const toggleSelectAllStoryboards = (checked: boolean) => {
+  const table = storyboardTableRef.value;
+  if (!table) return;
+  if (checked) {
+    table.toggleAllSelection();
+  } else {
+    table.clearSelection();
+  }
+};
+
+const pollTaskUntilDone = async (taskId: string): Promise<void> => {
+  const maxAttempts = 60;
+  const interval = 3000;
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise((r) => setTimeout(r, interval));
+    try {
+      const task = await taskAPI.getStatus(taskId);
+      if (task.status === "completed" || task.status === "failed") return;
+    } catch {
+      // continue polling on transient errors
+    }
+  }
+};
+
+const toNumericStoryboardId = (id: number | string): number =>
+  typeof id === "string" ? parseInt(id, 10) : id;
+
+const batchGenerateStoryboardImages = async () => {
+  if (selectedStoryboardIds.value.length === 0) return;
+  batchGeneratingStoryboardImages.value = true;
+  let done = 0;
+  let failed = 0;
+  const ids = [...selectedStoryboardIds.value];
+  try {
+    for (const rawId of ids) {
+      const storyboardId = toNumericStoryboardId(rawId);
+      const sb = currentEpisode.value?.storyboards?.find(
+        (s: any) => Number(s.id) === storyboardId,
+      );
+      if (!sb) {
+        failed++;
+        continue;
+      }
+      try {
+        const fpData = await getStoryboardFramePrompts(storyboardId);
+        const fp = fpData.frame_prompts?.find((p) => p.frame_type === "first");
+        if (!fp?.prompt) {
+          failed++;
+          continue;
+        }
+        const referenceImages: string[] = [];
+        if (sb.background?.local_path)
+          referenceImages.push(sb.background.local_path);
+        else if (sb.background?.image_url)
+          referenceImages.push(sb.background.image_url);
+        if (Array.isArray(sb.characters)) {
+          sb.characters.forEach((char: any) => {
+            if (char.local_path) referenceImages.push(char.local_path);
+            else if (char.image_url) referenceImages.push(char.image_url);
+          });
+        }
+        await imageAPI.generateImage({
+          drama_id: dramaId,
+          prompt: fp.prompt,
+          storyboard_id: storyboardId,
+          image_type: "storyboard",
+          frame_type: "first",
+          reference_images:
+            referenceImages.length > 0 ? referenceImages : undefined,
+          model: selectedImageModel.value || undefined,
+        });
+        done++;
+      } catch {
+        failed++;
+      }
+    }
+    ElMessage.success(
+      $t("workflow.batchShotImageSubmitted", { done, failed }),
+    );
+    await loadDramaData();
+    let checkCount = 0;
+    const maxChecks = 25;
+    const iv = setInterval(async () => {
+      checkCount++;
+      await loadDramaData();
+      if (checkCount >= maxChecks) clearInterval(iv);
+    }, 3000);
+  } catch (error: any) {
+    ElMessage.error(
+      error.message || $t("workflow.batchShotImageFailed"),
+    );
+  } finally {
+    batchGeneratingStoryboardImages.value = false;
+  }
+};
+
+const batchGenerateFirstFramePrompts = async () => {
+  if (selectedStoryboardIds.value.length === 0) return;
+  batchGeneratingFramePrompts.value = true;
+  try {
+    const results = await Promise.allSettled(
+      selectedStoryboardIds.value.map((id) => generateFirstFrame(id)),
+    );
+
+    const taskIds: string[] = [];
+    results.forEach((result, idx) => {
+      if (result.status === "fulfilled") {
+        taskIds.push(result.value.task_id);
+      } else {
+        console.error(
+          `Failed to submit frame prompt for storyboard ${selectedStoryboardIds.value[idx]}:`,
+          result.reason,
+        );
+      }
+    });
+
+    ElMessage.success($t("workflow.batchFramePromptSubmitted"));
+
+    // Wait for all tasks to complete
+    await Promise.allSettled(taskIds.map((id) => pollTaskUntilDone(id)));
+
+    await loadEpisodeFramePrompts();
+    ElMessage.success($t("workflow.batchFramePromptDone"));
+  } catch (error: any) {
+    ElMessage.error(error.message || "Batch frame prompt generation failed");
+  } finally {
+    batchGeneratingFramePrompts.value = false;
+  }
+};
+
+// ── Export shot images (zip: Ep…/drama/shot_…/) ───────────────────────────────
+
+const sanitizeZipBaseName = (s: string) =>
+  s.replace(/[/\\:*?"<>|]/g, "_").trim().slice(0, 100) || "export";
+
+const exportShotImagesZip = async () => {
+  const ep = currentEpisode.value;
+  const d = drama.value;
+  if (!ep?.storyboards?.length) {
+    ElMessage.warning($t("workflow.exportShotImagesNoStoryboards"));
+    return;
+  }
+  const shots = ep.storyboards as any[];
+  const shotIds = new Set(shots.map((s) => Number(s.id)));
+
+  exportingShotImages.value = true;
+  try {
+    const all: ImageGeneration[] = [];
+    let page = 1;
+    let totalPages = 1;
+    const maxPages = 80;
+    do {
+      const res = await imageAPI.listImages({
+        drama_id: dramaId,
+        status: "completed",
+        page,
+        page_size: 100,
+      });
+      all.push(...res.items);
+      totalPages = Math.max(1, res.pagination?.total_pages ?? 1);
+      page++;
+    } while (page <= totalPages && page <= maxPages);
+
+    const relevant = all.filter(
+      (g) =>
+        g.storyboard_id != null &&
+        shotIds.has(Number(g.storyboard_id)) &&
+        (!g.image_type || g.image_type === "storyboard"),
+    );
+    const hasComposed = shots.some((s) => s.composed_image);
+    if (relevant.length === 0 && !hasComposed) {
+      ElMessage.warning($t("workflow.exportShotImagesEmpty"));
+      return;
+    }
+
+    ElMessage.info($t("workflow.exportShotImagesBuilding"));
+    const blob = await buildShotImagesZip({
+      dramaTitle: d?.title || "drama",
+      episodeNumber,
+      episodeTitle: ep.title || `Episode_${episodeNumber}`,
+      shots: shots.map((s) => ({
+        id: s.id,
+        storyboard_number: s.storyboard_number,
+        title: s.title,
+        composed_image: s.composed_image,
+      })),
+      imageGens: all,
+    });
+
+    const nameBase = sanitizeZipBaseName(
+      `Ep${episodeNumber}_${d?.title || "drama"}_shot_images`,
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${nameBase}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    ElMessage.success($t("workflow.exportShotImagesDone"));
+  } catch (e: any) {
+    ElMessage.error(e?.message || $t("workflow.exportShotImagesFailed"));
+  } finally {
+    exportingShotImages.value = false;
+  }
+};
+
+// ── Export video prompts ──────────────────────────────────────────────────────
+
+const exportVideoPrompts = () => {
+  const storyboards = currentEpisode.value?.storyboards || [];
+  if (storyboards.length === 0) {
+    ElMessage.warning("No storyboards to export");
+    return;
+  }
+
+  const lines = storyboards.map((sb: any, i: number) => {
+    const shotNum = sb.storyboard_number || i + 1;
+    const title = sb.title ? ` - ${sb.title}` : "";
+    const prompt = sb.video_prompt || $t("workflow.noVideoPrompt");
+    return `Shot ${shotNum}${title}\n${prompt}`;
+  });
+
+  const content = lines.join("\n\n---\n\n");
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `episode_${episodeNumber}_video_prompts.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  ElMessage.success($t("workflow.exportSuccess"));
+};
+
 // 监听步骤变化，保存到 localStorage
 watch(currentStep, (newStep) => {
   localStorage.setItem(getStepStorageKey(), newStep.toString());
@@ -2675,6 +3093,25 @@ onMounted(() => {
 
 .stage-body {
   background: var(--bg-card);
+}
+
+.shots-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  h3 {
+    margin: 0;
+  }
+}
+
+.shots-batch-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .action-buttons {

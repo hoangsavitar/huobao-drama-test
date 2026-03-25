@@ -623,8 +623,10 @@ func (s *VideoGenerationService) getVideoClient(provider string, modelName strin
 		return video.NewPikaClient(baseURL, apiKey, model), nil
 	case "minimax":
 		return video.NewMinimaxClient(baseURL, apiKey, model), nil
+	case "ltx_proxy", "proxy":
+		return video.NewProxyClient(baseURL, apiKey), nil
 	default:
-		return nil, fmt.Errorf("unsupported video provider: %s", provider)
+		return nil, fmt.Errorf("unsupported video provider: %s", config.Provider)
 	}
 }
 

@@ -334,10 +334,16 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 		prompt = character.Name
 	}
 
-	// Use the already loaded drama's style information
+	// Append style and aspect ratio so the image API uses the correct framing
 	if drama.Style != "" && drama.Style != "realistic" {
 		prompt += ", " + drama.Style
 	}
+	aspectRatio := drama.AspectRatio
+	if aspectRatio == "" {
+		aspectRatio = "16:9"
+	}
+	prompt += ", " + aspectRatio + " aspect ratio"
+
 	// Call image generation service
 	dramaIDStr := fmt.Sprintf("%d", character.DramaID)
 	imageType := "character"
@@ -346,9 +352,8 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 		CharacterID: &character.ID,
 		ImageType:   imageType,
 		Prompt:      prompt,
-		Provider:    "openai",    // or read from config
-		Model:       modelName,   // use user-specified model
-		Size:        "2560x1440", // 3,686,400 pixels, meets API minimum requirements (16:9 ratio)
+		Provider:    "openai",
+		Model:       modelName,
 		Quality:     "standard",
 	}
 
@@ -534,7 +539,7 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 		s.log.Warnw("Failed to load drama", "error", err, "drama_id", episode.DramaID)
 	}
 
-	prompt := s.promptI18n.GetCharacterExtractionPrompt(drama.Style)
+	prompt := s.promptI18n.GetCharacterExtractionPrompt(drama.Style, drama.AspectRatio)
 	userPrompt := fmt.Sprintf("Script Content:\n%s", script)
 
 	response, err := s.aiService.GenerateText(userPrompt, prompt, ai.WithMaxTokens(3000))

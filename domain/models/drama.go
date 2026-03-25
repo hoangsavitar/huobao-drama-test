@@ -13,6 +13,7 @@ type Drama struct {
 	Description   *string        `gorm:"type:text" json:"description"`
 	Genre         *string        `gorm:"type:varchar(50)" json:"genre"`
 	Style         string         `gorm:"type:varchar(50);default:'realistic'" json:"style"`
+	AspectRatio   string         `gorm:"type:varchar(10);default:'16:9'" json:"aspect_ratio"`
 	TotalEpisodes int            `gorm:"default:1" json:"total_episodes"`
 	TotalDuration int            `gorm:"default:0" json:"total_duration"`
 	Status        string         `gorm:"type:varchar(20);default:'draft';not null" json:"status"`
@@ -105,6 +106,8 @@ type Storyboard struct {
 	Atmosphere       *string        `gorm:"type:text" json:"atmosphere"`
 	ImagePrompt      *string        `gorm:"type:text" json:"image_prompt"`
 	VideoPrompt      *string        `gorm:"type:text" json:"video_prompt"`
+	LtxPrompt        *string        `gorm:"type:text" json:"ltx_prompt"`
+	VideoPrompts     datatypes.JSON `gorm:"type:json" json:"video_prompts"`
 	BgmPrompt        *string        `gorm:"type:text" json:"bgm_prompt"`
 	SoundEffect      *string        `gorm:"size:255" json:"sound_effect"`
 	Dialogue         *string        `gorm:"type:text" json:"dialogue"`

@@ -131,13 +131,16 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 		// Storyboard routes
 		episodes := api.Group("/episodes")
 		{
-			// Storyboards
-			episodes.POST("/:episode_id/storyboards", storyboardHandler.GenerateStoryboard)
-			episodes.POST("/:episode_id/props/extract", propHandler.ExtractProps)
-			episodes.POST("/:episode_id/characters/extract", characterLibraryHandler.ExtractCharacters)
-			episodes.GET("/:episode_id/storyboards", sceneHandler.GetStoryboardsForEpisode)
-			episodes.POST("/:episode_id/finalize", dramaHandler.FinalizeEpisode)
-			episodes.GET("/:episode_id/download", dramaHandler.DownloadEpisodeVideo)
+		// Storyboards
+		episodes.POST("/:episode_id/storyboards", storyboardHandler.GenerateStoryboard)
+		episodes.POST("/:episode_id/props/extract", propHandler.ExtractProps)
+		episodes.POST("/:episode_id/characters/extract", characterLibraryHandler.ExtractCharacters)
+		episodes.GET("/:episode_id/storyboards", sceneHandler.GetStoryboardsForEpisode)
+		episodes.GET("/:episode_id/frame-prompts", handlers2.GetEpisodeFramePrompts(db, log))
+		episodes.POST("/:episode_id/batch-first-frames", framePromptHandler.BatchGenerateFirstFramePrompts)
+		episodes.POST("/:episode_id/batch-ltx-prompts", framePromptHandler.BatchGenerateLtxPrompts)
+		episodes.POST("/:episode_id/finalize", dramaHandler.FinalizeEpisode)
+		episodes.GET("/:episode_id/download", dramaHandler.DownloadEpisodeVideo)
 		}
 
 		// Task routes
@@ -208,6 +211,7 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 			storyboards.DELETE("/:id", storyboardHandler.DeleteStoryboard)
 			storyboards.POST("/:id/props", propHandler.AssociateProps)
 			storyboards.POST("/:id/frame-prompt", framePromptHandler.GenerateFramePrompt)
+			storyboards.PUT("/:id/frame-prompt", handlers2.UpdateFramePrompt(db, log))
 			storyboards.GET("/:id/frame-prompts", handlers2.GetStoryboardFramePrompts(db, log))
 		}
 

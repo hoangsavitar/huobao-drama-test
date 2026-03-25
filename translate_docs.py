@@ -1,4 +1,4 @@
-# Data Migration Service Documentation
+content = """# Data Migration Service Documentation
 
 ## Overview
 
@@ -126,3 +126,7 @@ if err := migrationService.MigrateLocalPaths(); err != nil {
 - **Service Implementation**: `application/services/data_migration_service.go`
 - **Integration Setup**: `main.go` (Around lines 45-55)
 - **Documentation File**: `docs/DATA_MIGRATION.md`
+"""
+
+with open("docs/DATA_MIGRATION.md", "w", encoding="utf-8") as f:
+    f.write(content)

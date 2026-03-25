@@ -133,7 +133,18 @@
                 value="guoman3d"
               />
               <el-option :label="$t('drama.styles.chibi3d')" value="chibi3d" />
+              <el-option :label="$t('drama.styles.kdrama')" value="kdrama" />
             </el-select>
+          </el-form-item>
+          <el-form-item :label="$t('drama.aspectRatio')" required>
+            <el-radio-group v-model="editForm.aspect_ratio" size="large">
+              <el-radio-button value="16:9">
+                16:9 &nbsp;{{ $t('drama.aspectRatioLandscape') }}
+              </el-radio-button>
+              <el-radio-button value="9:16">
+                9:16 &nbsp;{{ $t('drama.aspectRatioPortrait') }}
+              </el-radio-button>
+            </el-radio-group>
           </el-form-item>
         </el-form>
         <template #footer>
@@ -258,6 +269,7 @@ const editForm = ref({
   title: "",
   description: "",
   style: "ghibli",
+  aspect_ratio: "16:9",
 });
 
 // Open edit dialog / 打开编辑对话框
@@ -271,6 +283,7 @@ const editDrama = async (id: string) => {
       title: drama.title,
       description: drama.description || "",
       style: drama.style || "ghibli",
+      aspect_ratio: drama.aspect_ratio || "16:9",
     };
   } catch (error: any) {
     ElMessage.error(error.message || "加载失败");
@@ -293,6 +306,7 @@ const saveEdit = async () => {
       title: editForm.value.title,
       description: editForm.value.description,
       style: editForm.value.style,
+      aspect_ratio: editForm.value.aspect_ratio,
     });
     ElMessage.success("保存成功");
     editDialogVisible.value = false;

@@ -6,7 +6,6 @@ export type FrameType = 'first' | 'key' | 'last' | 'panel' | 'action'
 // 单帧提示词
 export interface SingleFramePrompt {
   prompt: string
-  description: string
 }
 
 // 多帧提示词
@@ -85,7 +84,6 @@ export interface FramePromptRecord {
   storyboard_id: number
   frame_type: FrameType
   prompt: string
-  description?: string
   layout?: string
   created_at: string
   updated_at: string
@@ -96,4 +94,29 @@ export interface FramePromptRecord {
  */
 export function getStoryboardFramePrompts(storyboardId: number): Promise<{ frame_prompts: FramePromptRecord[] }> {
   return request.get<{ frame_prompts: FramePromptRecord[] }>(`/storyboards/${storyboardId}/frame-prompts`)
+}
+
+/**
+ * 保存/覆盖帧提示词（用户手动编辑后保存）
+ */
+export function updateFramePrompt(
+  storyboardId: number | string,
+  frameType: FrameType,
+  prompt: string
+): Promise<{ frame_prompt: FramePromptRecord | null }> {
+  return request.put<{ frame_prompt: FramePromptRecord | null }>(
+    `/storyboards/${storyboardId}/frame-prompt`,
+    { frame_type: frameType, prompt }
+  )
+}
+
+/**
+ * 查询整个章节所有镜头的帧提示词（按 storyboard_id 分组）
+ */
+export function getEpisodeFramePrompts(
+  episodeId: string | number
+): Promise<{ frame_prompts_by_storyboard: Record<string, FramePromptRecord[]> }> {
+  return request.get<{ frame_prompts_by_storyboard: Record<string, FramePromptRecord[]> }>(
+    `/episodes/${episodeId}/frame-prompts`
+  )
 }

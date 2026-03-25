@@ -168,6 +168,11 @@ export default {
       view: 'View',
       delete: 'Delete'
     },
+    style: 'Art Style',
+    stylePlaceholder: 'Select art style',
+    aspectRatio: 'Aspect Ratio',
+    aspectRatioLandscape: '(Landscape)',
+    aspectRatioPortrait: '(Portrait)',
     styles: {
       ghibli: 'Ghibli',
       guoman: 'Guoman',
@@ -177,7 +182,8 @@ export default {
       voxel: 'Voxel',
       urban: 'Urban',
       guoman3d: 'Guoman 3D',
-      chibi3d: 'Chibi 3D'
+      chibi3d: 'Chibi 3D',
+      kdrama: 'Photorealistic Korean Drama'
     },
     management: {
       overview: 'Project Overview',
@@ -528,7 +534,31 @@ export default {
     deleteAsset: 'Delete Asset',
     confirmDelete: 'Confirm Delete',
     tip: 'Tip',
-    edit: 'Edit'
+    edit: 'Edit',
+    batchGenerateFirstFrame: 'Batch Generate First Frame Prompt',
+    batchGenerateShotImage: 'Batch Generate Shot Image',
+    exportVideoPrompts: 'Export Video Prompts',
+    firstFramePrompted: 'Prompted',
+    firstFrameStatus: 'First Frame',
+    shotImageStatus: 'Shot Image',
+    shotImageReady: 'Ready',
+    shotImageNone: 'None',
+    shotImageGenerating: 'Generating',
+    shotImageFailed: 'Failed',
+    batchShotImageSubmitted:
+      'Submitted {done} image job(s), {failed} skipped (no first-frame prompt or error)',
+    batchShotImageFailed: 'Batch shot image failed',
+    exportShotImages: 'Export Shot Images',
+    exportShotImagesNoStoryboards: 'No storyboards to export',
+    exportShotImagesEmpty:
+      'No completed shot images or composed shots in this episode',
+    exportShotImagesBuilding: 'Building zip (downloading images)…',
+    exportShotImagesDone: 'Shot images zip downloaded',
+    exportShotImagesFailed: 'Export shot images failed',
+    noVideoPrompt: '(no prompt)',
+    exportSuccess: 'Exported successfully',
+    batchFramePromptSubmitted: 'Batch frame prompt tasks submitted',
+    batchFramePromptDone: 'All frame prompts generated'
   },
   tooltip: {
     editPrompt: 'Edit Prompt',

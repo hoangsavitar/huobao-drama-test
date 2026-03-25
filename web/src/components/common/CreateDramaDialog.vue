@@ -56,7 +56,19 @@
           <el-option :label="$t('drama.styles.urban')" value="urban" />
           <el-option :label="$t('drama.styles.guoman3d')" value="guoman3d" />
           <el-option :label="$t('drama.styles.chibi3d')" value="chibi3d" />
+          <el-option :label="$t('drama.styles.kdrama')" value="kdrama" />
         </el-select>
+      </el-form-item>
+
+      <el-form-item :label="$t('drama.aspectRatio')" prop="aspect_ratio" required>
+        <el-radio-group v-model="form.aspect_ratio" size="large">
+          <el-radio-button value="16:9">
+            16:9 &nbsp;{{ $t('drama.aspectRatioLandscape') }}
+          </el-radio-button>
+          <el-radio-button value="9:16">
+            9:16 &nbsp;{{ $t('drama.aspectRatioPortrait') }}
+          </el-radio-button>
+        </el-radio-group>
       </el-form-item>
     </el-form>
 
@@ -121,6 +133,7 @@ const form = reactive<CreateDramaRequest>({
   title: "",
   description: "",
   style: "ghibli",
+  aspect_ratio: "16:9",
 });
 
 // Validation rules / 验证规则
@@ -135,6 +148,7 @@ const rules: FormRules = {
     },
   ],
   style: [{ required: true, message: "Please select style", trigger: "change" }],
+  aspect_ratio: [{ required: true, message: "Please select aspect ratio", trigger: "change" }],
 };
 
 // Reset form when dialog closes / 关闭时重置表单

@@ -32,6 +32,7 @@ type CreateDramaRequest struct {
 	Description string `json:"description"`
 	Genre       string `json:"genre"`
 	Style       string `json:"style"`
+	AspectRatio string `json:"aspect_ratio"`
 	Tags        string `json:"tags"`
 }
 
@@ -40,6 +41,7 @@ type UpdateDramaRequest struct {
 	Description string `json:"description"`
 	Genre       string `json:"genre"`
 	Style       string `json:"style"`
+	AspectRatio string `json:"aspect_ratio"`
 	Tags        string `json:"tags"`
 	Status      string `json:"status" binding:"omitempty,oneof=draft planning production completed archived"`
 }
@@ -54,9 +56,10 @@ type DramaListQuery struct {
 
 func (s *DramaService) CreateDrama(req *CreateDramaRequest) (*models.Drama, error) {
 	drama := &models.Drama{
-		Title:  req.Title,
-		Status: "draft",
-		Style:  "ghibli", // default style
+		Title:       req.Title,
+		Status:      "draft",
+		Style:       "ghibli",
+		AspectRatio: "16:9",
 	}
 
 	if req.Description != "" {
@@ -67,6 +70,9 @@ func (s *DramaService) CreateDrama(req *CreateDramaRequest) (*models.Drama, erro
 	}
 	if req.Style != "" {
 		drama.Style = req.Style
+	}
+	if req.AspectRatio != "" {
+		drama.AspectRatio = req.AspectRatio
 	}
 
 	if err := s.db.Create(drama).Error; err != nil {
@@ -89,7 +95,8 @@ func (s *DramaService) GetDrama(dramaID string) (*models.Drama, error) {
 		Preload("Episodes.Storyboards", func(db *gorm.DB) *gorm.DB {
 			return db.Order("storyboards.storyboard_number ASC")
 		}).
-		Preload("Episodes.Storyboards.Props"). // Load props associated with storyboards
+		Preload("Episodes.Storyboards.Props").       // Load props associated with storyboards
+		Preload("Episodes.Storyboards.Characters"). // Load characters associated with storyboards
 		First(&drama).Error
 
 	if err != nil {
@@ -278,6 +285,9 @@ func (s *DramaService) UpdateDrama(dramaID string, req *UpdateDramaRequest) (*mo
 	}
 	if req.Style != "" {
 		updates["style"] = req.Style
+	}
+	if req.AspectRatio != "" {
+		updates["aspect_ratio"] = req.AspectRatio
 	}
 	if req.Tags != "" {
 		updates["tags"] = req.Tags
@@ -652,6 +662,15 @@ func (s *DramaService) SaveEpisodes(dramaID string, req *SaveEpisodesRequest) er
 	// Delete episodes that are no longer in the request
 	for epNum, existing := range existingMap {
 		if !incomingMap[epNum] {
+			// Soft delete related scenes, storyboards, and other entities
+			if err := s.db.Where("episode_id = ?", existing.ID).Delete(&models.Scene{}).Error; err != nil {
+				s.log.Errorw("Failed to cascade delete scenes", "error", err, "episode", epNum)
+			}
+			if err := s.db.Where("episode_id = ?", existing.ID).Delete(&models.Storyboard{}).Error; err != nil {
+				s.log.Errorw("Failed to cascade delete storyboards", "error", err, "episode", epNum)
+			}
+			// (Note: StoryboardCharacters and Props might not have soft deletes or episode bindings depending on schema, so we stick to scenes and storyboards which are episode-bound and soft-deleted)
+			
 			if err := s.db.Delete(&existing).Error; err != nil {
 				s.log.Errorw("Failed to delete episode", "error", err, "episode", epNum)
 			}

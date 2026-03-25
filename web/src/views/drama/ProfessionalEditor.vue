@@ -1,5 +1,8 @@
 <template>
-  <div class="professional-editor">
+  <div
+    class="professional-editor"
+    :style="{ '--image-ratio': imageAspectRatioCss }"
+  >
     <!-- 顶部工具栏 -->
     <AppHeader
       :fixed="false"
@@ -495,6 +498,10 @@
                     :rows="8"
                     :placeholder="$t('editor.promptPlaceholder')"
                   />
+                  <div v-if="promptSaveStatus" class="prompt-save-status">
+                    <span v-if="promptSaveStatus === 'saving'" style="color: var(--text-secondary); font-size:12px;">saving...</span>
+                    <span v-else-if="promptSaveStatus === 'saved'" style="color: #67c23a; font-size:12px;">✓ saved</span>
+                  </div>
                 </div>
 
                 <!-- 生成控制 -->
@@ -2043,7 +2050,7 @@ import {
 } from "@element-plus/icons-vue";
 import { dramaAPI } from "@/api/drama";
 import { propAPI } from "@/api/prop";
-import { generateFramePrompt, type FrameType } from "@/api/frame";
+import { generateFramePrompt, getStoryboardFramePrompts, updateFramePrompt, type FrameType } from "@/api/frame";
 import { imageAPI } from "@/api/image";
 import { videoAPI } from "@/api/video";
 import { aiAPI } from "@/api/ai";
@@ -2071,6 +2078,13 @@ const episodeId = ref<number>(0);
 
 const drama = ref<Drama | null>(null);
 const episode = ref<Episode | null>(null);
+
+// Returns CSS aspect-ratio value string: "16 / 9" or "9 / 16"
+const imageAspectRatioCss = computed(() => {
+  const r = drama.value?.aspect_ratio
+  if (r === '9:16') return '9 / 16'
+  return '16 / 9'
+})
 const storyboards = ref<Storyboard[]>([]);
 const characters = ref<any[]>([]);
 const availableScenes = ref<any[]>([]);
@@ -2078,6 +2092,8 @@ const props = ref<any[]>([]);
 const showPropSelector = ref(false);
 
 const currentStoryboardId = ref<string | null>(null);
+const promptSaveStatus = ref<"" | "saving" | "saved">(""); // auto-save indicator
+let promptSaveTimer: ReturnType<typeof setTimeout> | null = null;
 const activeTab = ref("shot");
 const showSceneSelector = ref(false);
 const showCharacterSelector = ref(false);
@@ -2558,6 +2574,10 @@ watch(currentStoryboard, async (newStoryboard) => {
     return;
   }
 
+  // Cancel any pending auto-save for previous storyboard
+  if (promptSaveTimer) { clearTimeout(promptSaveTimer); promptSaveTimer = null; }
+  promptSaveStatus.value = "";
+
   // 设置切换标志
   isSwitchingFrameType.value = true;
 
@@ -2568,6 +2588,9 @@ watch(currentStoryboard, async (newStoryboard) => {
     last: "",
     panel: "",
   };
+
+  // Always reload from DB so batch/external generations are picked up fresh
+  await loadFramePromptsFromDB(newStoryboard.id);
 
   // 加载当前帧类型的提示词
   const storageKey = getPromptStorageKey(
@@ -2606,16 +2629,16 @@ watch(currentStoryboard, async (newStoryboard) => {
   await loadPreviousStoryboardLastFrame();
 });
 
-// 监听提示词变化，自动保存到sessionStorage
+// 监听提示词变化：保存到sessionStorage + 防抖自动保存到DB
 watch(currentFramePrompt, (newPrompt) => {
-  // 如果正在切换帧类型或分镜，不要保存（避免错误保存到新帧类型）
   if (isSwitchingFrameType.value) return;
   if (!currentStoryboard.value) return;
 
-  const storageKey = getPromptStorageKey(
-    currentStoryboard.value.id,
-    selectedFrameType.value,
-  );
+  const storyboardId = currentStoryboard.value.id;
+  const frameType = selectedFrameType.value;
+  const storageKey = getPromptStorageKey(storyboardId, frameType);
+
+  // 1. Immediately sync to sessionStorage
   if (storageKey) {
     if (newPrompt) {
       sessionStorage.setItem(storageKey, newPrompt);
@@ -2623,6 +2646,19 @@ watch(currentFramePrompt, (newPrompt) => {
       sessionStorage.removeItem(storageKey);
     }
   }
+
+  // 2. Debounced save to DB (1.5s after last keystroke)
+  if (promptSaveTimer) clearTimeout(promptSaveTimer);
+  promptSaveStatus.value = "saving";
+  promptSaveTimer = setTimeout(async () => {
+    try {
+      await updateFramePrompt(storyboardId, frameType, newPrompt);
+      promptSaveStatus.value = "saved";
+      setTimeout(() => { promptSaveStatus.value = ""; }, 2000);
+    } catch {
+      promptSaveStatus.value = "";
+    }
+  }, 1500);
 });
 
 // 监听视频模型切换，清空已选图片和参考图模式
@@ -2775,6 +2811,39 @@ const saveStoryboardField = async (fieldName: string) => {
 
 // 提取帧提示词
 // 提取帧提示词
+// Load all frame prompts for a storyboard from the DB into sessionStorage.
+// sessionStorage acts as a write-through cache — existing session edits are kept.
+const loadFramePromptsFromDB = async (storyboardId: number | string) => {
+  try {
+    const data = await getStoryboardFramePrompts(Number(storyboardId));
+    const prompts = data.frame_prompts || [];
+    // Always overwrite sessionStorage from DB so we always see the latest saved value
+    // (handles: regeneration from another page, batch generation from EpisodeWorkflow, etc.)
+    const seen = new Set<string>();
+    prompts.forEach((fp: any) => {
+      const key = `frame_prompt_${storyboardId}_${fp.frame_type}`;
+      if (!seen.has(fp.frame_type)) {
+        // First (most recent) record per frame_type wins (query ordered by created_at DESC)
+        seen.add(fp.frame_type);
+        if (fp.prompt) {
+          sessionStorage.setItem(key, fp.prompt);
+        } else {
+          sessionStorage.removeItem(key);
+        }
+      }
+    });
+    // Clear keys that no longer exist in DB
+    const existingTypes = new Set(prompts.map((fp: any) => fp.frame_type));
+    (["first", "key", "last", "panel", "action"] as FrameType[]).forEach((ft) => {
+      if (!existingTypes.has(ft)) {
+        sessionStorage.removeItem(`frame_prompt_${storyboardId}_${ft}`);
+      }
+    });
+  } catch (error) {
+    console.error("Failed to load frame prompts from DB:", error);
+  }
+};
+
 const extractFramePrompt = async () => {
   if (!currentStoryboard.value) return;
 
@@ -3366,6 +3435,7 @@ const generateVideo = async () => {
       provider: provider,
       model: selectedVideoModel.value,
       reference_mode: selectedReferenceMode.value,
+      aspect_ratio: drama.value?.aspect_ratio || '16:9',
     };
 
     // 根据参考图模式设置参数
@@ -4995,7 +5065,7 @@ onBeforeUnmount(() => {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 16px;
+        padding: 12px 16px;
         border-bottom: 1px solid var(--border-primary);
 
         h3 {
@@ -5003,6 +5073,7 @@ onBeforeUnmount(() => {
           font-size: 16px;
           font-weight: 500;
         }
+
       }
 
       .storyboard-list {
@@ -5012,7 +5083,8 @@ onBeforeUnmount(() => {
 
         .storyboard-item {
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
+          align-items: flex-start;
           padding: 12px;
           margin-bottom: 8px;
           background: var(--bg-secondary);
@@ -5022,6 +5094,11 @@ onBeforeUnmount(() => {
 
           &:hover {
             background: var(--bg-card-hover);
+          }
+
+          .shot-content {
+            flex: 1;
+            min-width: 0;
           }
 
           &.active {
@@ -5281,7 +5358,7 @@ onBeforeUnmount(() => {
 
         :deep(.el-image) {
           width: 100%;
-          aspect-ratio: 16 / 9;
+          aspect-ratio: var(--image-ratio, 16 / 9);
           background: var(--bg-secondary);
           display: block;
           height: 100%;
@@ -5289,7 +5366,7 @@ onBeforeUnmount(() => {
 
         .image-placeholder {
           width: 100%;
-          aspect-ratio: 16 / 9;
+          aspect-ratio: var(--image-ratio, 16 / 9);
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -5471,7 +5548,7 @@ onBeforeUnmount(() => {
 
         .image-placeholder {
           width: 100%;
-          aspect-ratio: 16 / 9;
+          aspect-ratio: var(--image-ratio, 16 / 9);
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -5860,7 +5937,7 @@ onBeforeUnmount(() => {
         img {
           width: 100%;
           max-width: 180px;
-          aspect-ratio: 16 / 9;
+          aspect-ratio: var(--image-ratio, 16 / 9);
           object-fit: cover;
           display: block;
           transition: transform 0.3s;

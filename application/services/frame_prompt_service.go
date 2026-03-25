@@ -60,8 +60,7 @@ MultiFrame  *MultiFramePrompt  `json:"multi_frame,omitempty"`  // Multi frame pr
 
 // SingleFramePrompt represents a single frame prompt
 type SingleFramePrompt struct {
-Prompt      string `json:"prompt"`
-Description string `json:"description"`
+Prompt string `json:"prompt"`
 }
 
 // MultiFramePrompt represents a multi-frame prompt
@@ -115,12 +114,16 @@ scene = nil
 }
 }
 
-// Get drama style information
+// Get drama style and aspect ratio
 var episode models.Episode
 if err := s.db.Preload("Drama").First(&episode, storyboard.EpisodeID).Error; err != nil {
 s.log.Warnw("Failed to load episode and drama", "error", err, "episode_id", storyboard.EpisodeID)
 }
 dramaStyle := episode.Drama.Style
+aspectRatio := episode.Drama.AspectRatio
+if aspectRatio == "" {
+aspectRatio = "16:9"
+}
 
 response := &FramePromptResponse{
 FrameType: req.FrameType,
@@ -129,36 +132,34 @@ FrameType: req.FrameType,
 // Generate prompts
 switch req.FrameType {
 case FrameTypeFirst:
-response.SingleFrame = s.generateFirstFrame(storyboard, scene, dramaStyle, model)
-// Save single frame prompt
-s.saveFramePrompt(req.StoryboardID, string(req.FrameType), response.SingleFrame.Prompt, response.SingleFrame.Description, "")
+response.SingleFrame = s.generateFirstFrame(storyboard, scene, dramaStyle, aspectRatio, model)
+s.saveFramePrompt(req.StoryboardID, string(req.FrameType), response.SingleFrame.Prompt, "")
 case FrameTypeKey:
-response.SingleFrame = s.generateKeyFrame(storyboard, scene, dramaStyle, model)
-s.saveFramePrompt(req.StoryboardID, string(req.FrameType), response.SingleFrame.Prompt, response.SingleFrame.Description, "")
+response.SingleFrame = s.generateKeyFrame(storyboard, scene, dramaStyle, aspectRatio, model)
+s.saveFramePrompt(req.StoryboardID, string(req.FrameType), response.SingleFrame.Prompt, "")
 case FrameTypeLast:
-response.SingleFrame = s.generateLastFrame(storyboard, scene, dramaStyle, model)
-s.saveFramePrompt(req.StoryboardID, string(req.FrameType), response.SingleFrame.Prompt, response.SingleFrame.Description, "")
+response.SingleFrame = s.generateLastFrame(storyboard, scene, dramaStyle, aspectRatio, model)
+s.saveFramePrompt(req.StoryboardID, string(req.FrameType), response.SingleFrame.Prompt, "")
 case FrameTypePanel:
 count := req.PanelCount
 if count == 0 {
 count = 3
 }
-response.MultiFrame = s.generatePanelFrames(storyboard, scene, count, dramaStyle, model)
-// Save multi-frame prompts (merged into one record)
+response.MultiFrame = s.generatePanelFrames(storyboard, scene, count, dramaStyle, aspectRatio, model)
 var prompts []string
 for _, frame := range response.MultiFrame.Frames {
 prompts = append(prompts, frame.Prompt)
 }
 combinedPrompt := strings.Join(prompts, "\n---\n")
-s.saveFramePrompt(req.StoryboardID, string(req.FrameType), combinedPrompt, "Panel board combined prompt", response.MultiFrame.Layout)
+s.saveFramePrompt(req.StoryboardID, string(req.FrameType), combinedPrompt, response.MultiFrame.Layout)
 case FrameTypeAction:
-response.MultiFrame = s.generateActionSequence(storyboard, scene, dramaStyle, model)
+response.MultiFrame = s.generateActionSequence(storyboard, scene, dramaStyle, aspectRatio, model)
 var prompts []string
 for _, frame := range response.MultiFrame.Frames {
 prompts = append(prompts, frame.Prompt)
 }
 combinedPrompt := strings.Join(prompts, "\n---\n")
-s.saveFramePrompt(req.StoryboardID, string(req.FrameType), combinedPrompt, "Action sequence combined prompt", response.MultiFrame.Layout)
+s.saveFramePrompt(req.StoryboardID, string(req.FrameType), combinedPrompt, response.MultiFrame.Layout)
 default:
 s.log.Errorw("Unsupported frame type during frame prompt generation", "frame_type", req.FrameType, "task_id", taskID)
 s.taskService.UpdateTaskStatus(taskID, "failed", 0, "Unsupported frame type")
@@ -176,16 +177,13 @@ s.log.Infow("Frame prompt generation completed", "task_id", taskID, "storyboard_
 }
 
 // saveFramePrompt saves a frame prompt to the database
-func (s *FramePromptService) saveFramePrompt(storyboardID, frameType, prompt, description, layout string) {
+func (s *FramePromptService) saveFramePrompt(storyboardID, frameType, prompt, layout string) {
 framePrompt := models.FramePrompt{
 StoryboardID: uint(mustParseUint(storyboardID)),
 FrameType:    frameType,
 Prompt:       prompt,
 }
 
-if description != "" {
-framePrompt.Description = &description
-}
 if layout != "" {
 framePrompt.Layout = &layout
 }
@@ -207,12 +205,12 @@ return result
 }
 
 // generateFirstFrame generates first frame prompt
-func (s *FramePromptService) generateFirstFrame(sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) *SingleFramePrompt {
+func (s *FramePromptService) generateFirstFrame(sb models.Storyboard, scene *models.Scene, dramaStyle, aspectRatio, model string) *SingleFramePrompt {
 // Build context information
 contextInfo := s.buildStoryboardContext(sb, scene)
 
 // Use i18n prompts
-systemPrompt := s.promptI18n.GetFirstFramePrompt(dramaStyle)
+systemPrompt := s.promptI18n.GetFirstFramePrompt(dramaStyle, aspectRatio)
 userPrompt := s.promptI18n.FormatUserPrompt("frame_info", contextInfo)
 
 // Call AI generation (use specified model if provided)
@@ -233,10 +231,7 @@ if err != nil {
 s.log.Warnw("AI generation failed, using fallback", "error", err)
 // Fallback: use simple concatenation
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "first frame, static shot")
-return &SingleFramePrompt{
-Prompt:      fallbackPrompt,
-Description: "Static image at shot start, showing initial state",
-}
+return &SingleFramePrompt{Prompt: fallbackPrompt}
 }
 
 // Parse AI-returned JSON
@@ -245,22 +240,19 @@ if result == nil {
 // JSON parsing failed, use fallback
 s.log.Warnw("Failed to parse AI JSON response, using fallback", "storyboard_id", sb.ID, "response", aiResponse)
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "first frame, static shot")
-return &SingleFramePrompt{
-Prompt:      fallbackPrompt,
-Description: "Static image at shot start, showing initial state",
-}
+return &SingleFramePrompt{Prompt: fallbackPrompt}
 }
 
 return result
 }
 
 // generateKeyFrame generates key frame prompt
-func (s *FramePromptService) generateKeyFrame(sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) *SingleFramePrompt {
+func (s *FramePromptService) generateKeyFrame(sb models.Storyboard, scene *models.Scene, dramaStyle, aspectRatio, model string) *SingleFramePrompt {
 // Build context information
 contextInfo := s.buildStoryboardContext(sb, scene)
 
 // Use i18n prompts
-systemPrompt := s.promptI18n.GetKeyFramePrompt(dramaStyle)
+systemPrompt := s.promptI18n.GetKeyFramePrompt(dramaStyle, aspectRatio)
 userPrompt := s.promptI18n.FormatUserPrompt("key_frame_info", contextInfo)
 
 // Call AI generation (use specified model if provided)
@@ -280,10 +272,7 @@ aiResponse, err = s.aiService.GenerateText(userPrompt, systemPrompt)
 if err != nil {
 s.log.Warnw("AI generation failed, using fallback", "error", err)
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "key frame, dynamic action")
-return &SingleFramePrompt{
-Prompt:      fallbackPrompt,
-Description: "Action climax moment, showing key action",
-}
+return &SingleFramePrompt{Prompt: fallbackPrompt}
 }
 
 // Parse AI-returned JSON
@@ -292,22 +281,19 @@ if result == nil {
 // JSON parsing failed, use fallback
 s.log.Warnw("Failed to parse AI JSON response, using fallback", "storyboard_id", sb.ID, "response", aiResponse)
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "key frame, dynamic action")
-return &SingleFramePrompt{
-Prompt:      fallbackPrompt,
-Description: "Action climax moment, showing key action",
-}
+return &SingleFramePrompt{Prompt: fallbackPrompt}
 }
 
 return result
 }
 
 // generateLastFrame generates last frame prompt
-func (s *FramePromptService) generateLastFrame(sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) *SingleFramePrompt {
+func (s *FramePromptService) generateLastFrame(sb models.Storyboard, scene *models.Scene, dramaStyle, aspectRatio, model string) *SingleFramePrompt {
 // Build context information
 contextInfo := s.buildStoryboardContext(sb, scene)
 
 // Use i18n prompts
-systemPrompt := s.promptI18n.GetLastFramePrompt(dramaStyle)
+systemPrompt := s.promptI18n.GetLastFramePrompt(dramaStyle, aspectRatio)
 userPrompt := s.promptI18n.FormatUserPrompt("last_frame_info", contextInfo)
 
 // Call AI generation (use specified model if provided)
@@ -327,10 +313,7 @@ aiResponse, err = s.aiService.GenerateText(userPrompt, systemPrompt)
 if err != nil {
 s.log.Warnw("AI generation failed, using fallback", "error", err)
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "last frame, final state")
-return &SingleFramePrompt{
-Prompt:      fallbackPrompt,
-Description: "End of shot image, showing final state and result",
-}
+return &SingleFramePrompt{Prompt: fallbackPrompt}
 }
 
 // Parse AI-returned JSON
@@ -339,37 +322,29 @@ if result == nil {
 // JSON parsing failed, use fallback
 s.log.Warnw("Failed to parse AI JSON response, using fallback", "storyboard_id", sb.ID, "response", aiResponse)
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "last frame, final state")
-return &SingleFramePrompt{
-Prompt:      fallbackPrompt,
-Description: "End of shot image, showing final state and result",
-}
+return &SingleFramePrompt{Prompt: fallbackPrompt}
 }
 
 return result
 }
 
 // generatePanelFrames generates panel board prompts (multi-grid combo)
-func (s *FramePromptService) generatePanelFrames(sb models.Storyboard, scene *models.Scene, count int, dramaStyle string, model string) *MultiFramePrompt {
+func (s *FramePromptService) generatePanelFrames(sb models.Storyboard, scene *models.Scene, count int, dramaStyle, aspectRatio, model string) *MultiFramePrompt {
 layout := fmt.Sprintf("horizontal_%d", count)
 
 frames := make([]SingleFramePrompt, count)
 
 // Fixed generation: first frame -> key frame -> last frame
 if count == 3 {
-frames[0] = *s.generateFirstFrame(sb, scene, dramaStyle, model)
-frames[0].Description = "Grid 1: Initial state"
-
-frames[1] = *s.generateKeyFrame(sb, scene, dramaStyle, model)
-frames[1].Description = "Grid 2: Action climax"
-
-frames[2] = *s.generateLastFrame(sb, scene, dramaStyle, model)
-frames[2].Description = "Grid 3: Final state"
+frames[0] = *s.generateFirstFrame(sb, scene, dramaStyle, aspectRatio, model)
+frames[1] = *s.generateKeyFrame(sb, scene, dramaStyle, aspectRatio, model)
+frames[2] = *s.generateLastFrame(sb, scene, dramaStyle, aspectRatio, model)
 } else if count == 4 {
 // 4 grids: first frame -> middle frame 1 -> middle frame 2 -> last frame
-frames[0] = *s.generateFirstFrame(sb, scene, dramaStyle, model)
-frames[1] = *s.generateKeyFrame(sb, scene, dramaStyle, model)
-frames[2] = *s.generateKeyFrame(sb, scene, dramaStyle, model)
-frames[3] = *s.generateLastFrame(sb, scene, dramaStyle, model)
+frames[0] = *s.generateFirstFrame(sb, scene, dramaStyle, aspectRatio, model)
+frames[1] = *s.generateKeyFrame(sb, scene, dramaStyle, aspectRatio, model)
+frames[2] = *s.generateKeyFrame(sb, scene, dramaStyle, aspectRatio, model)
+frames[3] = *s.generateLastFrame(sb, scene, dramaStyle, aspectRatio, model)
 }
 
 return &MultiFramePrompt{
@@ -379,12 +354,12 @@ Frames: frames,
 }
 
 // generateActionSequence generates action sequence prompts (3x3 grid)
-func (s *FramePromptService) generateActionSequence(sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) *MultiFramePrompt {
+func (s *FramePromptService) generateActionSequence(sb models.Storyboard, scene *models.Scene, dramaStyle, aspectRatio, model string) *MultiFramePrompt {
 // Build context information
 contextInfo := s.buildStoryboardContext(sb, scene)
 
 // Use i18n prompts - specifically designed for action sequences
-systemPrompt := s.promptI18n.GetActionSequenceFramePrompt(dramaStyle)
+systemPrompt := s.promptI18n.GetActionSequenceFramePrompt(dramaStyle, aspectRatio)
 userPrompt := s.promptI18n.FormatUserPrompt("frame_info", contextInfo)
 
 // Call AI generation (use specified model if provided)
@@ -408,12 +383,7 @@ s.log.Warnw("AI generation failed for action sequence, using fallback", "error",
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "3x3 storyboard grid action sequence, character consistency, continuous movement progression")
 return &MultiFramePrompt{
 Layout: "grid_3x3",
-Frames: []SingleFramePrompt{
-{
-Prompt:      fallbackPrompt,
-Description: "3x3 grid action sequence, showing continuous movement progression",
-},
-},
+Frames: []SingleFramePrompt{{Prompt: fallbackPrompt}},
 }
 }
 
@@ -425,12 +395,7 @@ s.log.Warnw("Failed to parse AI JSON response for action sequence, using fallbac
 fallbackPrompt := s.buildFallbackPrompt(sb, scene, "3x3 storyboard grid action sequence, character consistency, continuous movement progression")
 return &MultiFramePrompt{
 Layout: "grid_3x3",
-Frames: []SingleFramePrompt{
-{
-Prompt:      fallbackPrompt,
-Description: "3x3 grid action sequence, showing continuous movement progression",
-},
-},
+Frames: []SingleFramePrompt{{Prompt: fallbackPrompt}},
 }
 }
 

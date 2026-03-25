@@ -144,9 +144,9 @@ func (p *PromptI18n) GetStoryboardSystemPrompt() string {
 }
 
 // GetSceneExtractionPrompt gets the scene extraction prompt
-func (p *PromptI18n) GetSceneExtractionPrompt(style string) string {
+func (p *PromptI18n) GetSceneExtractionPrompt(style, aspectRatio string) string {
 	// default image ratio
-	imageRatio := "16:9"
+	if aspectRatio == "" { aspectRatio = "16:9" }; imageRatio := aspectRatio
 
 	if p.IsEnglish() {
 		return fmt.Sprintf(`[Task] Extract all unique scene backgrounds from the script
@@ -170,7 +170,7 @@ func (p *PromptI18n) GetSceneExtractionPrompt(style string) string {
 Each element containing:
 - location: Location (e.g., "luxurious office")
 - time: Time period (e.g., "afternoon")
-- prompt: Complete English image generation prompt (pure background, explicitly stating no people)`, style, imageRatio)
+- prompt: Complete English image generation prompt (pure background, explicitly stating no people)`, p.styleLabel(style), imageRatio)
 	}
 
 	return fmt.Sprintf(`【任务】从剧本中提取所有唯一的场景背景
@@ -193,12 +193,12 @@ Each element containing:
 每个元素包含：
 - location：地点（如"豪华办公室"）
 - time：时间（如"下午"）
-- prompt：完整的中文图片生成提示词（纯背景，明确说明无人物）`, style, imageRatio)
+- prompt：完整的中文图片生成提示词（纯背景，明确说明无人物）`, p.styleLabel(style), imageRatio)
 }
 
 // GetFirstFramePrompt gets the first frame prompt
-func (p *PromptI18n) GetFirstFramePrompt(style string) string {
-	imageRatio := "16:9"
+func (p *PromptI18n) GetFirstFramePrompt(style, aspectRatio string) string {
+	if aspectRatio == "" { aspectRatio = "16:9" }; imageRatio := aspectRatio
 	if p.IsEnglish() {
 		return fmt.Sprintf(`You are a professional image generation prompt expert. Please generate prompts suitable for AI image generation based on the provided shot information.
 
@@ -213,9 +213,8 @@ Key Points:
 - **Style Requirement**: %s
 - **Image Ratio**: %s
 Output Format:
-Return a JSON object containing:
-- prompt: Complete English image generation prompt (detailed description, suitable for AI image generation)
-- description: Simplified Chinese description (for reference)`, style, imageRatio)
+Return a JSON object containing only:
+- prompt: Complete English image generation prompt (detailed description, suitable for AI image generation)`, p.styleLabel(style), imageRatio)
 	}
 
 	return fmt.Sprintf(`你是一个专业的图像生成提示词专家。请根据提供的镜头信息，生成适合用于AI图像生成的提示词。
@@ -231,14 +230,13 @@ Return a JSON object containing:
 - **风格要求**：%s
 - **图片比例**：%s
 输出格式：
-返回一个JSON对象，包含：
-- prompt：完整的中文图片生成提示词（详细描述，适合AI图像生成）
-- description：简化的中文描述（供参考）`, style, imageRatio)
+仅返回一个JSON对象，包含：
+- prompt：完整的英文图片生成提示词（详细描述，适合AI图像生成）`, p.styleLabel(style), imageRatio)
 }
 
 // GetKeyFramePrompt gets the key frame prompt
-func (p *PromptI18n) GetKeyFramePrompt(style string) string {
-	imageRatio := "16:9"
+func (p *PromptI18n) GetKeyFramePrompt(style, aspectRatio string) string {
+	if aspectRatio == "" { aspectRatio = "16:9" }; imageRatio := aspectRatio
 	if p.IsEnglish() {
 		return fmt.Sprintf(`You are a professional image generation prompt expert. Please generate prompts suitable for AI image generation based on the provided shot information.
 
@@ -253,9 +251,8 @@ Key Points:
 - **Style Requirement**: %s
 - **Image Ratio**: %s
 Output Format:
-Return a JSON object containing:
-- prompt: Complete English image generation prompt (detailed description, suitable for AI image generation)
-- description: Simplified Chinese description (for reference)`, style, imageRatio)
+Return a JSON object containing only:
+- prompt: Complete English image generation prompt (detailed description, suitable for AI image generation)`, p.styleLabel(style), imageRatio)
 	}
 
 	return fmt.Sprintf(`你是一个专业的图像生成提示词专家。请根据提供的镜头信息，生成适合用于AI图像生成的提示词。
@@ -271,14 +268,13 @@ Return a JSON object containing:
 - **风格要求**：%s
 - **图片比例**：%s
 输出格式：
-返回一个JSON对象，包含：
-- prompt：完整的中文图片生成提示词（详细描述，适合AI图像生成）
-- description：简化的中文描述（供参考）`, style, imageRatio)
+仅返回一个JSON对象，包含：
+- prompt：完整的英文图片生成提示词（详细描述，适合AI图像生成）`, p.styleLabel(style), imageRatio)
 }
 
 // GetActionSequenceFramePrompt gets the action sequence frame prompt
-func (p *PromptI18n) GetActionSequenceFramePrompt(style string) string {
-	imageRatio := "16:9"
+func (p *PromptI18n) GetActionSequenceFramePrompt(style, aspectRatio string) string {
+	if aspectRatio == "" { aspectRatio = "16:9" }; imageRatio := aspectRatio
 	if p.IsEnglish() {
 		return fmt.Sprintf(`**Role:** You are an expert in visual storytelling and image generation prompting. You need to generate a single prompt that describes a 3x3 grid action sequence.
 
@@ -309,19 +305,17 @@ Each frame **must** follow these specific rules:
 
 **Output Specification:**
 
-You must return a **JSON object** with the following structure:
+You must return a **JSON object** with only:
 
 - **prompt**: A **complete English image generation prompt** (describing the 3x3 grid layout, subject features, the evolution of the 9 actions, environment, and lighting details to ensure the AI generates one single image containing 9 frames).
-- **description**: A **simplified English description** (summarizing the core content of the action sequence).
 
 **Example Format:**
 
 {
-  "prompt": "Action sequence layout, 3x3 grid composition\n [Frame 1]: [Subject] standing naturally in [Setting], feet shoulder-width apart...\n---\n [Frame 2]: [Subject] locking eyes forward, leaning body slightly...\n---\n [Frame 3]: [Subject's legs] bending slightly, center of gravity lowering...\n---\n [Frame 4]: [Subject] pushing off with back leg, body moving forward, dust rising from [Setting's ground]...\n---\n [Frame 5]: [Subject's clothing] fluttering, body leaning deep, fist charging power...\n---\n [Frame 6]: [Subject] sprinting at full speed, fist striking out...\n---\n [Frame 7]: [Subject] impact moment, body lunging forward...\n---\n [Frame 8]: [Subject] slowing down, pulling back the fist...\n---\n [Frame 9]: [Subject's full appearance] standing firm in [Setting], recovering original stance.",
-  "description": "Complete action sequence of a swordsman in black from drawing a blade to striking."
+  "prompt": "Action sequence layout, 3x3 grid composition\n [Frame 1]: [Subject] standing naturally in [Setting], feet shoulder-width apart...\n---\n [Frame 2]: [Subject] locking eyes forward, leaning body slightly...\n---\n [Frame 3]: [Subject's legs] bending slightly, center of gravity lowering...\n---\n [Frame 4]: [Subject] pushing off with back leg, body moving forward, dust rising from [Setting's ground]...\n---\n [Frame 5]: [Subject's clothing] fluttering, body leaning deep, fist charging power...\n---\n [Frame 6]: [Subject] sprinting at full speed, fist striking out...\n---\n [Frame 7]: [Subject] impact moment, body lunging forward...\n---\n [Frame 8]: [Subject] slowing down, pulling back the fist...\n---\n [Frame 9]: [Subject's full appearance] standing firm in [Setting], recovering original stance."
 }
 
-`, style, imageRatio)
+`, p.styleLabel(style), imageRatio)
 	}
 
 	return fmt.Sprintf(`**Role:** 你是一位精通视觉叙事与图像生成提示词的专家。你需要生成一个描述 3x3 九宫格动作序列的提示词。
@@ -350,20 +344,18 @@ You must return a **JSON object** with the following structure:
 * %s
 
 **Output Specification:**
-必须返回一个 **JSON 对象**,其结构如下:
-* prompt: **完整的中文图片生成提示词**(描述整个 3x3 九宫格的布局、主体特征、9 个动作的演进过程、环境、光影细节,确保 AI 能直接生成一张包含 9 个格子的完整图像)。
-* description: **简化的中文描述**(概括这个动作序列的核心内容)。
+必须返回一个 **JSON 对象**,仅包含:
+* prompt: **完整的英文图片生成提示词**(描述整个 3x3 九宫格的布局、主体特征、9 个动作的演进过程、环境、光影细节,确保 AI 能直接生成一张包含 9 个格子的完整图像)。
 
 **示例格式:**
 {
-  "prompt": "动作序列布局，3x3方格布局\n [第1格]: [角色参考图2] 在 [场景参考图1] 中自然站立，双脚分开...\n---\n [第2格]: [角色参考图2] 眼神锁定，身体前倾...\n---\n [第3格]: [角色参考图2的腿部] 双腿微屈，重心下沉...\n---\n [第4格]: [角色参考图2] 后腿蹬地，身体前移，[场景参考图1的地面] 扬起尘土...\n---\n [第5格]: [角色参考图2的服装] 身体前倾，拳头蓄力...\n---\n [第6格]: [角色参考图2] 全速冲刺，拳头击出...\n---\n [第7格]: [角色参考图2] 拳头击中，身体前冲...\n---\n [第8格]: [角色参考图2] 减速收拳...\n---\n [第9格]: [角色参考图2的完整外观] 在 [场景参考图1] 中站稳，恢复姿态。\n",
-  "description": "黑衣剑客从拔剑到攻击的完整动作序列"
+  "prompt": "动作序列布局，3x3方格布局\n [第1格]: [角色参考图2] 在 [场景参考图1] 中自然站立，双脚分开...\n---\n [第2格]: [角色参考图2] 眼神锁定，身体前倾...\n---\n [第3格]: [角色参考图2的腿部] 双腿微屈，重心下沉...\n---\n [第4格]: [角色参考图2] 后腿蹬地，身体前移，[场景参考图1的地面] 扬起尘土...\n---\n [第5格]: [角色参考图2的服装] 身体前倾，拳头蓄力...\n---\n [第6格]: [角色参考图2] 全速冲刺，拳头击出...\n---\n [第7格]: [角色参考图2] 拳头击中，身体前冲...\n---\n [第8格]: [角色参考图2] 减速收拳...\n---\n [第9格]: [角色参考图2的完整外观] 在 [场景参考图1] 中站稳，恢复姿态。\n"
 }`, imageRatio)
 }
 
 // GetLastFramePrompt gets the last frame prompt
-func (p *PromptI18n) GetLastFramePrompt(style string) string {
-	imageRatio := "16:9"
+func (p *PromptI18n) GetLastFramePrompt(style, aspectRatio string) string {
+	if aspectRatio == "" { aspectRatio = "16:9" }; imageRatio := aspectRatio
 	if p.IsEnglish() {
 		return fmt.Sprintf(`You are a professional image generation prompt expert. Please generate prompts suitable for AI image generation based on the provided shot information.
 
@@ -378,9 +370,8 @@ Key Points:
 - **Style Requirement**: %s
 - **Image Ratio**: %s
 Output Format:
-Return a JSON object containing:
-- prompt: Complete English image generation prompt (detailed description, suitable for AI image generation)
-- description: Simplified Chinese description (for reference)`, style, imageRatio)
+Return a JSON object containing only:
+- prompt: Complete English image generation prompt (detailed description, suitable for AI image generation)`, p.styleLabel(style), imageRatio)
 	}
 
 	return fmt.Sprintf(`你是一个专业的图像生成提示词专家。请根据提供的镜头信息，生成适合用于AI图像生成的提示词。
@@ -396,9 +387,8 @@ Return a JSON object containing:
 - **风格要求**：%s
 - **图片比例**：%s
 输出格式：
-返回一个JSON对象，包含：
-- prompt：完整的中文图片生成提示词（详细描述，适合AI图像生成）
-- description：简化的中文描述（供参考）`, style, imageRatio)
+仅返回一个JSON对象，包含：
+- prompt：完整的英文图片生成提示词（详细描述，适合AI图像生成）`, p.styleLabel(style), imageRatio)
 }
 
 // GetOutlineGenerationPrompt gets the outline generation prompt
@@ -445,8 +435,8 @@ Return a JSON object containing:
 }
 
 // GetCharacterExtractionPrompt gets the character extraction prompt
-func (p *PromptI18n) GetCharacterExtractionPrompt(style string) string {
-	imageRatio := "16:9"
+func (p *PromptI18n) GetCharacterExtractionPrompt(style, aspectRatio string) string {
+	if aspectRatio == "" { aspectRatio = "16:9" }; imageRatio := aspectRatio
 	if p.IsEnglish() {
 		return fmt.Sprintf(`You are a professional character analyst, skilled at extracting and analyzing character information from scripts.
 
@@ -466,7 +456,7 @@ Requirements:
 - **Image Ratio**: %s
 Output Format:
 **CRITICAL: Return ONLY a valid JSON array. Do NOT include any markdown code blocks, explanations, or other text. Start directly with [ and end with ].**
-Each element is a character object containing the above fields.`, style, imageRatio)
+Each element is a character object containing the above fields.`, p.styleLabel(style), imageRatio)
 	}
 
 	return fmt.Sprintf(`你是一个专业的角色分析师，擅长从剧本中提取和分析角色信息。
@@ -487,11 +477,11 @@ Each element is a character object containing the above fields.`, style, imageRa
 - **图片比例**：%s
 输出格式：
 **重要：必须只返回纯JSON数组，不要包含任何markdown代码块、说明文字或其他内容。直接以 [ 开头，以 ] 结尾。**
-每个元素是一个角色对象，包含上述字段。`, style, imageRatio)
+每个元素是一个角色对象，包含上述字段。`, p.styleLabel(style), imageRatio)
 }
 
 // GetPropExtractionPrompt gets the prop extraction prompt
-func (p *PromptI18n) GetPropExtractionPrompt(style string) string {
+func (p *PromptI18n) GetPropExtractionPrompt(style, aspectRatio string) string {
 	imageRatio := "1:1"
 
 	if p.IsEnglish() {
@@ -515,7 +505,7 @@ JSON array, each object containing:
 - description: Role in the drama and visual description
 - image_prompt: English image generation prompt (Focus on the object, isolated, detailed, cinematic lighting, high quality)
 
-Please return JSON array directly.`, style, imageRatio)
+Please return JSON array directly.`, p.styleLabel(style), imageRatio)
 	}
 
 	return fmt.Sprintf(`请从以下剧本中提取关键道具。
@@ -538,7 +528,7 @@ JSON数组，每个对象包含：
 - description: 在剧中的作用和中文外观描述
 - image_prompt: 英文图片生成提示词 (Focus on the object, isolated, detailed, cinematic lighting, high quality)
 
-请直接返回JSON数组。`, style, imageRatio)
+请直接返回JSON数组。`, p.styleLabel(style), imageRatio)
 }
 
 // GetEpisodeScriptPrompt gets the episode script generation prompt
@@ -672,6 +662,27 @@ func (p *PromptI18n) FormatUserPrompt(key string, args ...interface{}) string {
 	return template
 }
 
+// styleLabel returns a human-readable description of the style for use in AI frame-prompt instructions.
+// This ensures Gemini writes prompts with the correct visual vocabulary even for complex style keys.
+func (p *PromptI18n) styleLabel(style string) string {
+	labels := map[string]string{
+		"ghibli":    "Ghibli anime style (Studio Ghibli watercolor cel-shading aesthetic)",
+		"guoman":    "Guoman fantasy illustration style (Chinese ink-painting meets epic fantasy VFX)",
+		"wasteland": "Post-apocalyptic wasteland style (hard line-art, limited retro palette, Moebius influence)",
+		"nostalgia": "90s retro anime style (nostalgic cel-shading, film grain, muted pastel tones)",
+		"pixel":     "Pixel art style (8-bit/16-bit limited palette, aliased blocky aesthetics)",
+		"voxel":     "3D voxel art style (cube-unit modular world, global illumination rendering)",
+		"urban":     "Modern webtoon urban style (crisp vector line-art, neon-accented cool tones)",
+		"guoman3d":  "High-fidelity 3D Xianxia style (Unreal Engine 5 PBR, Eastern cinematic lighting)",
+		"chibi3d":   "3D chibi toy art style (blind-box proportions, plastic/resin PBR texture)",
+		"kdrama":    "Photorealistic Korean drama style (cinematic live-action, glass-skin beauty, shallow DOF, K-drama color grading — NO animation, NO illustration)",
+	}
+	if label, ok := labels[style]; ok {
+		return label
+	}
+	return style
+}
+
 // GetStylePrompt gets the style prompt
 func (p *PromptI18n) GetStylePrompt(style string) string {
 	if style == "" {
@@ -751,6 +762,15 @@ func (p *PromptI18n) GetStylePrompt(style string) string {
 - **视觉流派与画面质感**：采用 **3D 盲盒艺术风格 (Blind Box / Toy Art Style)**。画面具有极强的 **类塑料与树脂质感 (Plastic and Resin texture)**，表面圆润、平滑，边缘带有微妙的倒角。主体呈现出明显的 **Q 版比例**（大头小身），增强了亲和力。
 - **色彩美学逻辑**：使用 **"温和的高饱和调色盘 (Muted Vibrant Palette)"**。色彩鲜艳但并不刺眼。色彩分布遵循"主次分明"原则，利用大面积的自然底色（如森林绿、泥土褐）衬托主体鲜明的服饰色彩。
 - **光影表现手法**：光源通常柔和且均匀。**顶光/面光**：均匀照亮主体正面，突出五官和服饰细节。**环境遮蔽 (Ambient Occlusion)**：在缝隙和接触面产生细腻的阴影，增强物体的重量感和真实感。`,
+
+			"kdrama": `**[专家角色定位]**
+你是一位专注于**韩剧超写实摄影美学**的电影级视觉总监，深谙 Netflix/tvN 高端韩剧（如《爱的迫降》《文森佐》《我的野蛮女友2022》）的摄影风格。你的核心使命是生成**真实演员感**的超写实场景，而非任何动画或插画风格。
+
+**[风格核心逻辑]**
+- **视觉流派与画面质感**：采用**电影级超写实摄影（Cinematic Photorealism）**风格。画面必须表现出真实的人物皮肤纹理、服饰面料质感和真实场景深度。完全拒绝动漫化、插画化或卡通感，追求"可以假扮真实剧照"的视觉质量。
+- **人物美学逻辑**：韩剧美学核心在于**"精致而自然的妆感"**。皮肤质感白皙通透，带有微微发光的玻璃肌质感（Glass skin）。眉眼精致，但避免过度滤镜感。人物比例修长，服饰搭配精准体现角色身份（豪门精英 vs 普通人 vs 职场精英）。
+- **色彩美学逻辑**：使用**"韩剧专属色彩分级（K-Drama Color Grading）"**。整体色调微微降低饱和度，偏向清冷或暖橙的电影调色。阴影区域带有微蓝或微青色偏向，高光区域偏暖白。这种调色使画面同时具有**"真实感"**和**"梦幻感"**的双重气质。
+- **光影表现手法**：强调**"柔光电影布光（Soft Cinematic Lighting）"**。主光源通常来自侧前方，使用柔和的散射光（Diffused key light），在人物脸上营造均匀而立体的光影。眼睛必须有明显的**眼神光（Catchlight）**。常用**浅景深（Shallow DOF）**配合85mm-135mm人像焦段感，使背景虚化，主体突出。`,
 		},
 		"en": {
 			"ghibli": `**[Expert Role]**
@@ -824,6 +844,15 @@ You are a top-tier **3D Toy Designer and Rendering Artist**, specializing in hig
 - **Visual Genre & Frame Texture**: Adopts a **3D Blind Box / Toy Art Style**. The image features strong **plastic and resin textures**; surfaces are rounded and smooth with subtle beveled edges. The subject uses **Chibi proportions** (large head, small body) to enhance appeal.
 - **Color Aesthetic Logic**: Uses a **"Muted Vibrant Palette."** Colors are vivid but not piercing. Color distribution follows a "primary-secondary" principle, using large areas of natural base colors (forest green, earth brown) to set off the bright colors of the character's outfit.
 - **Lighting Technique**: Light sources are typically soft and even: **Top/Key Light**: Evenly illuminates the subject's front, highlighting facial features and clothing details. **Ambient Occlusion (AO)**: Produces delicate shadows in crevices and contact points, enhancing the object's sense of weight and realism.`,
+
+			"kdrama": `**[Expert Role]**
+You are a cinematic Visual Director specializing in **photorealistic Korean Drama aesthetics**, with deep expertise in the photography style of premium Netflix/tvN productions (Crash Landing on You, Vincenzo, Business Proposal). Your core mission is to generate **hyperrealistic live-action scenes** — absolutely no animation, illustration, or cartoon aesthetics.
+
+**[Core Style Logic]**
+- **Visual Genre & Texture**: Adopts **Cinematic Photorealism**. Every image must convey real human skin texture, authentic fabric detail, and true scene depth. The result should be indistinguishable from a real K-drama still frame. Reject all anime, painterly, or stylized looks entirely.
+- **Character Aesthetics**: The K-drama aesthetic centers on **"refined yet natural beauty."** Skin appears fair and luminous with a subtle **glass skin** glow. Features are delicate but not over-filtered. Body proportions are elegant; clothing precisely reflects the character's social status (chaebol elite, everyday person, career professional).
+- **Color Aesthetic Logic**: Uses **"K-Drama Color Grading."** The overall tone is subtly desaturated, leaning toward cool-clean or warm-orange cinematic grades. Shadow regions carry a slight blue-teal bias; highlights shift warm-white. This grading achieves the dual quality of **realism** and **dreamlike elegance** simultaneously.
+- **Lighting Technique**: Emphasizes **"Soft Cinematic Lighting."** The key light source comes from front-side, using diffused scatter (softbox quality) to create even yet sculptural facial lighting. Eyes must have a distinct **catchlight**. Apply **shallow depth of field** with an 85mm–135mm portrait lens feel, keeping backgrounds smoothly bokeh'd and the subject razor-sharp.`,
 		},
 	}
 
@@ -934,4 +963,70 @@ You are a top-tier video dynamics analyst and synthesis expert. You can accurate
 	}
 
 	return ""
+}
+
+// GetLtxVideoSystemPrompt returns the system prompt for LTX 2.3 Video generation
+func (p *PromptI18n) GetLtxVideoSystemPrompt() string {
+	return `You are an elite LTX 2.3 Prompt Engineer specializing in Image-to-Video (I2V) and Native Audio Generation inside ComfyUI. Your goal is to transform the user's raw video idea into a SINGLE, dense, and cinematic paragraph (150-300 words) that perfectly exploits the LTX 2.3 architecture without jump cuts, identity loss, or audio artifacts.
+
+CRITICAL I2V RULES FOR CONSISTENCY:
+
+1. SUBJECT ANCHORING (Identity Fix):
+   - DO NOT use names or specific descriptive nouns for things already in the reference image. Just use "The subject," "The primary character," or "The central object." Re-describing the subject's appearance forces the model to re-generate them, causing severe "Identity Drift."
+   - Focus your tokens entirely on ACTION, not visual descriptions.
+   - Describe UNSEEN details: Only if the camera moves/pans, describe parts of the subject or scene NOT visible in the initial reference image (e.g., hidden objects coming into frame).
+
+2. MOTION CONTINUITY (Jump Cut Fix):
+   - Start motion correctly: DO NOT use "Immediately breaking the stillness". Instead, use "Smoothly initiating a continuous [Movement]..." to prevent abrupt latent spikes at second 1, which causes the model to "run out of breath" and slow down later.
+   - For Camera movement, always specify a "continuous, single-axis linear path" (e.g., "smooth single-axis dolly backward").
+   - Describe new elements as "gradually entering the periphery" only as a result of that camera motion.
+
+3. TOKEN DENSITY & PROGRESSION (Background Scroll Fix):
+   - Devote 70% of tokens to the MOVEABLE subject and 30% to the camera path. Over-describing the background causes "Background Scrolling" where the environment moves instead of the subject.
+   - Motion Progression: Use temporal connectors like "as," "simultaneously," "while," and "then" to chain actions chronologically.
+
+4. AUDIO CLARITY DECOUPLING (Noise & Reverb Fix):
+   - DO NOT use time-peaking constraints (e.g., "peaking at 2.5-second mark") or separate "Finale" sections. Forcing audio into narrow timestamps causes the VAE to compress and distort sound.
+   - BGM Suppression: Forcefully include the phrases "WITHOUT ANY BACKGROUND MUSIC" and "ZERO MUSICAL ELEMENTS" at the end of audio descriptions to eliminate muddy, reverberating latent music tracks.
+   - Soundstage Purity: ALWAYS include "clean, distortion-free, studio-quality, centered, close-mic clarity" right before dialogue or primary Foley.
+   - Narrator Integration (Phrase-Acting-Phrase): "The subject speaks in a [voice tone/quality: resonant, calm gravitas, etc.], '[Line]'. They [Physical action], then continue, '[Line]'."
+
+5. CINEMATIC STACK:
+   - Start your paragraph with Lens (e.g., "24mm wide angle" or "85mm portrait") and technical modifiers ("180 degree shutter equivalent," "natural motion blur").
+
+OUTPUT RULE: You are outputting for a BATCH of files. You must ONLY output a valid JSON object matching the following structure:
+{
+  "results": [
+    {
+      "original_filename": "shot_01.txt",
+      "optimized_prompt": "YOUR DIRECT SINGLE CINEMATIC PARAGRAPH GOES HERE"
+    }
+  ]
+}
+No conversational text, no extra markdown formatting around the JSON. Just raw structural JSON.`
+}
+
+// FormatBatchPromptShots formats a list of storyboards into a text structure expected by the batching LLM
+func (p *PromptI18n) FormatBatchPromptShots(shots []models.Storyboard) string {
+	importStr := ""
+	for _, shot := range shots {
+		importStr += fmt.Sprintf("shot_%d.txt:\n", shot.ID)
+		if shot.Action != nil && *shot.Action != "" {
+			importStr += fmt.Sprintf("- Action: %s\n", *shot.Action)
+		}
+		if shot.Atmosphere != nil && *shot.Atmosphere != "" {
+			importStr += fmt.Sprintf("- Atmosphere: %s\n", *shot.Atmosphere)
+		}
+		if shot.ShotType != nil && *shot.ShotType != "" {
+			importStr += fmt.Sprintf("- Shot Type: %s\n", *shot.ShotType)
+		}
+		if shot.Movement != nil && *shot.Movement != "" {
+			importStr += fmt.Sprintf("- Camera Movement: %s\n", *shot.Movement)
+		}
+		if shot.ImagePrompt != nil && *shot.ImagePrompt != "" {
+			importStr += fmt.Sprintf("- Base Image Visuals: %s\n", *shot.ImagePrompt)
+		}
+		importStr += "\n"
+	}
+	return importStr
 }

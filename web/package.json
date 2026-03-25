@@ -19,6 +19,7 @@
     "cropperjs": "^2.1.0",
     "dayjs": "^1.11.10",
     "element-plus": "^2.5.0",
+    "jszip": "^3.10.1",
     "lodash-es": "^4.17.22",
     "pinia": "^2.1.0",
     "vue": "^3.4.0",

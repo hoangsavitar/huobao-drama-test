@@ -370,13 +370,18 @@ func (s *StoryboardCompositionService) GenerateSceneImage(req *GenerateSceneImag
 	// Build scene image generation prompt
 	prompt := req.Prompt
 	if prompt == "" {
-		// Use the scene Prompt field
 		prompt = scene.Prompt
 		if prompt == "" {
 			prompt = fmt.Sprintf("%s scene, %s", scene.Location, scene.Time)
 		}
 		s.log.Infow("Using scene prompt", "scene_id", req.SceneID, "prompt", prompt)
 	}
+	// Append aspect ratio so the image API frames the scene correctly
+	sceneAspectRatio := drama.AspectRatio
+	if sceneAspectRatio == "" {
+		sceneAspectRatio = "16:9"
+	}
+	prompt += ", " + sceneAspectRatio + " aspect ratio"
 
 	// Generate directly using imageGen service
 	if s.imageGen != nil {
@@ -385,8 +390,8 @@ func (s *StoryboardCompositionService) GenerateSceneImage(req *GenerateSceneImag
 			DramaID:   fmt.Sprintf("%d", scene.DramaID),
 			ImageType: string(models.ImageTypeScene),
 			Prompt:    prompt,
-			Model:     req.Model,   // Use user-specified model
-			Size:      "2560x1440", // 3,686,400 pixels, meets doubao model minimum requirement (16:9 ratio)
+			Model:     req.Model,
+			Size:      aspectRatioToSize(drama.AspectRatio),
 			Quality:   "standard",
 		}
 		imageGen, err := s.imageGen.GenerateImage(genReq)

@@ -79,7 +79,7 @@ s.taskService.UpdateTaskStatus(taskID, "failed", 0, "drama information not found
 return
 }
 
-systemPrompt := s.promptI18n.GetCharacterExtractionPrompt(drama.Style)
+systemPrompt := s.promptI18n.GetCharacterExtractionPrompt(drama.Style, drama.AspectRatio)
 
 outlineText := req.Outline
 if outlineText == "" {
