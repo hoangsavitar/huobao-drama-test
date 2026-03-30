@@ -126,6 +126,7 @@ CREATE TABLE IF NOT EXISTS storyboards (
     atmosphere TEXT,
     image_prompt TEXT,
     video_prompt TEXT,
+    ltx_video_prompt TEXT,
     characters TEXT, -- JSON存储
     composed_image TEXT,
     video_url TEXT,

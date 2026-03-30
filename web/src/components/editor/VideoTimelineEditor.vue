@@ -266,37 +266,41 @@
       </div>
     </div>
 
-    <!-- 转场设置对话框 -->
-    <el-dialog v-model="transitionDialogVisible" title="设置转场效果" width="500px">
+    <!-- Transition settings dialog -->
+    <el-dialog
+      v-model="transitionDialogVisible"
+      title="Set Transition Effects"
+      width="500px"
+    >
       <el-form label-width="100px">
         <el-form-item :label="$t('video.transitionType')">
           <el-select v-model="editingTransition.type" :placeholder="$t('video.selectTransition')">
-            <el-option label="无转场" value="none" />
-            <!-- 淡入淡出类 -->
-            <el-option label="淡入淡出" value="fade" />
-            <el-option label="黑场过渡" value="fadeblack" />
-            <el-option label="白场过渡" value="fadewhite" />
-            <el-option label="灰场过渡" value="fadegrays" />
-            <!-- 滑动类 -->
-            <el-option label="左滑" value="slideleft" />
-            <el-option label="右滑" value="slideright" />
-            <el-option label="上滑" value="slideup" />
-            <el-option label="下滑" value="slidedown" />
-            <!-- 擦除类 -->
-            <el-option label="左擦除" value="wipeleft" />
-            <el-option label="右擦除" value="wiperight" />
-            <el-option label="上擦除" value="wipeup" />
-            <el-option label="下擦除" value="wipedown" />
-            <!-- 圆形类 -->
-            <el-option label="圆形展开" value="circleopen" />
-            <el-option label="圆形收缩" value="circleclose" />
-            <!-- 其他特效 -->
-            <el-option label="溶解" value="dissolve" />
-            <el-option label="距离" value="distance" />
-            <el-option label="水平打开" value="horzopen" />
-            <el-option label="水平关闭" value="horzclose" />
-            <el-option label="垂直打开" value="vertopen" />
-            <el-option label="垂直关闭" value="vertclose" />
+            <el-option label="None" value="none" />
+            <!-- Fade transitions -->
+            <el-option label="Fade" value="fade" />
+            <el-option label="Fade to Black" value="fadeblack" />
+            <el-option label="Fade to White" value="fadewhite" />
+            <el-option label="Fade to Gray" value="fadegrays" />
+            <!-- Slide transitions -->
+            <el-option label="Slide Left" value="slideleft" />
+            <el-option label="Slide Right" value="slideright" />
+            <el-option label="Slide Up" value="slideup" />
+            <el-option label="Slide Down" value="slidedown" />
+            <!-- Wipe transitions -->
+            <el-option label="Wipe Left" value="wipeleft" />
+            <el-option label="Wipe Right" value="wiperight" />
+            <el-option label="Wipe Up" value="wipeup" />
+            <el-option label="Wipe Down" value="wipedown" />
+            <!-- Circular transitions -->
+            <el-option label="Circle Open" value="circleopen" />
+            <el-option label="Circle Close" value="circleclose" />
+            <!-- Other effects -->
+            <el-option label="Dissolve" value="dissolve" />
+            <el-option label="Distance" value="distance" />
+            <el-option label="Horizontal Open" value="horzopen" />
+            <el-option label="Horizontal Close" value="horzclose" />
+            <el-option label="Vertical Open" value="vertopen" />
+            <el-option label="Vertical Close" value="vertclose" />
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('video.transitionDuration')" v-if="editingTransition.type !== 'none'">
@@ -311,15 +315,19 @@
         </el-form-item>
         <el-alert
           v-if="editingTransition.type !== 'none'"
-          title="注意：添加转场效果需要重新编码视频，处理时间会更长"
+          title="Note: Adding transition effects requires re-encoding the video, so processing will take longer."
           type="warning"
           :closable="false"
           show-icon
         />
       </el-form>
       <template #footer>
-        <el-button @click="transitionDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="applyTransition">确定</el-button>
+        <el-button @click="transitionDialogVisible = false">{{
+          $t("common.cancel")
+        }}</el-button>
+        <el-button type="primary" @click="applyTransition">{{
+          $t("common.confirm")
+        }}</el-button>
       </template>
     </el-dialog>
 
@@ -1619,7 +1627,7 @@ const seekToTime = (time: number) => {
 // 播放控制
 const playTimeline = () => {
   if (timelineClips.value.length === 0) {
-    ElMessage.warning('时间线中没有视频片段')
+    ElMessage.warning($t('video.noTimelineClips'))
     return
   }
 

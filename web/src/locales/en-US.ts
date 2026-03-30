@@ -221,6 +221,7 @@ export default {
       propsCreated: 'Props Created'
     }
   },
+  // NOTE: professionalEditor i18n keys are defined later in this file.
   character: {
     title: 'Character Management',
     create: 'Create Character',
@@ -537,14 +538,33 @@ export default {
     edit: 'Edit',
     batchGenerateFirstFrame: 'Batch Generate First Frame Prompt',
     batchGenerateShotImage: 'Batch Generate Shot Image',
-    exportVideoPrompts: 'Export Video Prompts',
+    batchGenerateLtxVideoPrompt: 'Batch Generate LTX Video Prompt',
+    batchGenerateVideo: 'Batch Generate Video',
+    exportFullVideo: 'Export Full Video',
     firstFramePrompted: 'Prompted',
     firstFrameStatus: 'First Frame',
+    ltxVideoPromptStatus: 'LTX Video Prompt',
+    ltxVideoPromptReady: 'Ready',
     shotImageStatus: 'Shot Image',
     shotImageReady: 'Ready',
     shotImageNone: 'None',
     shotImageGenerating: 'Generating',
     shotImageFailed: 'Failed',
+    ltxVideoPromptGenerating: 'Generating',
+    videoGenStatus: 'Video',
+    videoGenSubmitting: 'Submitting…',
+    videoGenReady: 'Ready',
+    videoGenProcessing: 'Processing',
+    videoGenFailed: 'Failed',
+    videoGenModel: 'Video Generation Model',
+    selectVideoModel: 'Select video generation model',
+    videoModelTip:
+      'Used for batch video on this page (same defaults as Professional Editor: first-frame reference + LTX/video prompt)',
+    pleaseSelectVideoModel: 'Please select a video model in AI Config first',
+    batchVideoSubmitted:
+      'Submitted {done} video job(s), {failed} skipped (no prompt ≥5 chars or no first-frame image)',
+    batchVideoFailed: 'Batch video generation failed',
+    batchVideoNoEpisode: 'No storyboards in this episode',
     batchShotImageSubmitted:
       'Submitted {done} image job(s), {failed} skipped (no first-frame prompt or error)',
     batchShotImageFailed: 'Batch shot image failed',
@@ -555,10 +575,18 @@ export default {
     exportShotImagesBuilding: 'Building zip (downloading images)…',
     exportShotImagesDone: 'Shot images zip downloaded',
     exportShotImagesFailed: 'Export shot images failed',
-    noVideoPrompt: '(no prompt)',
-    exportSuccess: 'Exported successfully',
+    exportFullVideoNoStoryboards: 'No storyboards in this episode',
+    exportFullVideoNoVideos: 'No completed videos found to merge',
+    exportFullVideoSubmitted: 'Full video merge submitted, waiting for completion...',
+    exportFullVideoDone: 'Full video exported successfully',
+    exportFullVideoStillProcessing:
+      'Merge is still processing. Please check Video Merge list in Professional Editor shortly.',
+    exportFullVideoFailed: 'Export full video failed',
     batchFramePromptSubmitted: 'Batch frame prompt tasks submitted',
-    batchFramePromptDone: 'All frame prompts generated'
+    batchFramePromptDone: 'All frame prompts generated',
+    batchLtxVideoPromptSubmitted: 'Submitted LTX video prompt task',
+    batchLtxVideoPromptDone: 'All LTX video prompts generated',
+    batchLtxVideoPromptFailed: 'Batch LTX video prompt failed'
   },
   tooltip: {
     editPrompt: 'Edit Prompt',
@@ -656,7 +684,130 @@ export default {
     duration: 'Duration',
     seconds: 's',
     videoDuration: 'Video Duration',
-    downloadVideo: 'Download Video'
+    downloadVideo: 'Download Video',
+
+    referenceMode: 'Reference Mode',
+    selectReferenceMode: 'Select reference mode',
+    referenceModes: {
+      none: 'Text-only',
+      single: 'Single image',
+      firstLast: 'First & last frames',
+      multiple: 'Multiple images'
+    },
+    referenceModeDescriptions: {
+      none: 'No reference images',
+      single: 'Use a single reference image',
+      firstLast: 'Use first and last frames',
+      multiple: 'Up to {max} images'
+    },
+    referenceModeTitles: {
+      single: 'Single reference',
+      firstLast: 'First & last frames',
+      multiple: 'Multiple references'
+    },
+    referenceFrameLabels: {
+      first: 'First frame',
+      last: 'Last frame'
+    },
+    referenceSlotHints: {
+      clickToPick: 'Click an image above to select',
+      pickFirst: 'Pick first frame',
+      pickLast: 'Pick last frame'
+    },
+    pleaseSelectReferenceMode: 'Please select a reference mode first',
+    unknownReferenceMode: 'Unknown reference mode',
+    pleaseSelectReferenceImages: 'Please select reference image(s)',
+    pleaseSelectValidReferenceImage: 'Please select a valid reference image',
+    firstLastSelectFrameTypeWarning:
+      'In first/last mode, please choose images with First frame or Last frame type',
+    noActionSequenceImages: 'No action-sequence images yet',
+    noFirstFrameImages: 'No first-frame images yet',
+    noLastFrameImages: 'No last-frame images yet',
+    noKeyFrameImages: 'No key-frame images yet',
+    noPanelImages: 'No storyboard-panel images yet',
+    noImagesYet: 'No images yet',
+    noPromptYet: 'No prompt yet',
+    previousShot: 'Previous shot',
+    clickToUseAsFirstFrame: 'Click to use as first-frame reference',
+    addedAsFirstFrameReference: 'Added as first-frame reference',
+    removedFirstFrameReference: 'Removed first-frame reference',
+    pleaseSelectVideoModel: 'Please select a video model first',
+    pleaseSelectStoryboard: 'Please select a storyboard first',
+    pleaseSelectShot: 'Please select a shot first',
+    loadPreviousLastFramesFailed: 'Failed to load previous shot last frames',
+    loadVideoModelConfigFailed: 'Failed to load video model configuration',
+    loadVideoModelsFailed: 'Failed to load video models',
+    loadVideoAssetsFailed: 'Failed to load video assets',
+    loadVideoMergesFailed: 'Failed to load video merge list',
+    loadDataFailed: 'Failed to load data',
+    episodeNotFound: 'Episode not found',
+
+    generateFailed: 'Generation failed',
+    extractFailed: 'Extraction failed',
+    saveFailed: 'Save failed',
+    deleteFailed: 'Delete failed',
+    addFailed: 'Add failed',
+    unknownError: 'Unknown error',
+    parseTaskResultFailed: 'Failed to parse task result',
+
+    promptExtractedSuccess: '{frameType} prompt extracted',
+    imageTaskSubmitted:
+      'Image generation task submitted{refCount, plural, =0 {} other { (added {refCount} reference images)}}',
+    videoTaskSubmitted: 'Video generation task submitted',
+
+    maxSelectImages: 'You can select at most {max} images',
+
+    confirmDeleteTitle: 'Confirm deletion',
+    confirmDeleteVideoBody:
+      'Are you sure you want to delete this video? This action cannot be undone.',
+    confirmDeleteImageBody: 'Are you sure you want to delete this image?',
+    confirmDeleteMergeBody:
+      'Are you sure you want to delete this merge record? This action cannot be undone.',
+    confirmDeleteShotBody:
+      'Are you sure you want to delete shot {shotNumber}? This action cannot be undone.',
+
+    deleteSuccess: 'Deleted successfully',
+    deleteVideoFailed: 'Failed to delete video',
+    deleteImageFailed: 'Failed to delete image',
+
+    addedToAssets: 'Added to assets',
+    onlyCompletedVideoCanBeAdded: 'Only completed videos can be added to assets',
+
+    saveCroppedImageSuccess: 'Cropped image saved',
+    saveCroppedImageFailed: 'Failed to save cropped image',
+
+    addStoryboardSuccess: 'Storyboard added',
+    addStoryboardFailed: 'Failed to add storyboard',
+    deleteStoryboardSuccess: 'Storyboard deleted',
+    deleteStoryboardFailed: 'Failed to delete storyboard',
+    shotTitle: 'Shot {shotNumber}',
+    newShotDescription: 'New shot description',
+    newShotAction: 'New shot action',
+
+    sceneLinkedSuccess: 'Scene linked',
+    sceneLinkFailed: 'Failed to link scene',
+
+    videoDownloadStarted: 'Video download started',
+    downloadVideoFailed: 'Failed to download video',
+    videoDownloadFailedTryLater: 'Video download failed, please try again later',
+
+    timelineZoomInDevelopment: 'Timeline zoom is under development',
+    imageGenerationInDevelopment: 'Image generation is under development',
+
+    uploadFailed: 'Upload failed',
+    uploadSuccess: 'Image uploaded',
+    uploadImageFailed: 'Failed to upload image',
+    imageTooLarge10MB: 'Image size must be ≤ 10MB',
+    userUploadedImage: 'User uploaded image',
+
+    addCharacterToShotTitle: 'Add characters to shot',
+    selectSceneBackgroundTitle: 'Select scene background',
+    videoPreviewTitle: 'Video preview',
+    characterFallback: 'Character',
+    sceneAlt: 'Scene',
+    removePropTitle: 'Remove prop',
+    removedCharacter: 'Removed character: {name}',
+    addedCharacter: 'Added character: {name}'
   },
   storyboard: {
     title: 'Storyboard',
@@ -769,6 +920,7 @@ export default {
     dragToTimeline: 'Drag scenes to timeline to start editing',
     videoTrack: 'Video Track',
     audioTrack: 'Audio Track',
+    noTimelineClips: 'No video clips in the timeline',
     clearTrack: 'Clear Track',
     soundAndMusic: 'Sound & Music',
     soundMusicInDev: 'Sound & Music feature in development',

@@ -55,6 +55,8 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 	audioExtractionHandler := handlers2.NewAudioExtractionHandler(log, cfg.Storage.LocalPath)
 	settingsHandler := handlers2.NewSettingsHandler(cfg, log)
 	propHandler := handlers2.NewPropHandler(db, cfg, log, aiService, imageGenService)
+	ltxVideoPromptService := services2.NewLtxVideoPromptBatchService(db, log, aiService)
+	ltxVideoPromptHandler := handlers2.NewLtxVideoPromptHandler(ltxVideoPromptService, log)
 
 	api := r.Group("/api/v1")
 	{
@@ -137,6 +139,7 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 		episodes.POST("/:episode_id/characters/extract", characterLibraryHandler.ExtractCharacters)
 		episodes.GET("/:episode_id/storyboards", sceneHandler.GetStoryboardsForEpisode)
 		episodes.GET("/:episode_id/frame-prompts", handlers2.GetEpisodeFramePrompts(db, log))
+		episodes.POST("/:episode_id/ltx-video-prompts/batch", ltxVideoPromptHandler.BatchGenerateLtxVideoPrompts)
 		episodes.POST("/:episode_id/finalize", dramaHandler.FinalizeEpisode)
 		episodes.GET("/:episode_id/download", dramaHandler.DownloadEpisodeVideo)
 		}

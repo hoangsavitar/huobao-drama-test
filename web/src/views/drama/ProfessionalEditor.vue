@@ -121,7 +121,7 @@
                 >
                   <img
                     :src="getImageUrl(currentStoryboard.background)"
-                    alt="场景"
+                    :alt="$t('professionalEditor.sceneAlt')"
                     style="cursor: pointer"
                   />
                   <div class="scene-info">
@@ -230,7 +230,7 @@
                     <div
                       class="cast-remove"
                       @click.stop="togglePropInShot(prop.id)"
-                      title="移除道具"
+                      :title="$t('professionalEditor.removePropTitle')"
                     >
                       <el-icon :size="14">
                         <Close />
@@ -621,7 +621,7 @@
                 </div>
               </div>
             </div>
-            <el-empty v-else description="未选择镜头" />
+            <el-empty v-else :description="$t('editor.noShotSelected')" />
           </el-tab-pane>
 
           <!-- 视频生成标签 -->
@@ -630,7 +630,11 @@
               <div class="video-generation-section">
                 <!-- 生成提示词展示 -->
                 <div class="video-prompt-box">
-                  {{ currentStoryboard.video_prompt || "暂无提示词" }}
+                  {{
+                    currentStoryboard.ltx_video_prompt ||
+                    currentStoryboard.video_prompt ||
+                    $t("professionalEditor.noPromptYet")
+                  }}
                 </div>
 
                 <!-- 视频参数设置 -->
@@ -663,20 +667,29 @@
                               size="small"
                               type="success"
                               style="margin-left: 4px"
-                              >多图</el-tag
+                              >{{
+                                $t("professionalEditor.referenceModes.multiple")
+                              }}</el-tag
                             >
                             <el-tag
                               v-if="model.supportFirstLastFrame"
                               size="small"
                               type="primary"
                               style="margin-left: 4px"
-                              >首尾帧</el-tag
+                              >{{
+                                $t("professionalEditor.referenceModes.firstLast")
+                              }}</el-tag
                             >
                             <el-tag
                               size="small"
                               type="info"
                               style="margin-left: 4px"
-                              >最多{{ model.maxImages }}张</el-tag
+                              >{{
+                                $t(
+                                  "professionalEditor.referenceModeDescriptions.multiple",
+                                  { max: model.maxImages },
+                                )
+                              }}</el-tag
                             >
                           </div>
                         </div>
@@ -691,10 +704,12 @@
                     "
                     class="param-row"
                   >
-                    <span class="param-label">参考图</span>
+                    <span class="param-label">{{
+                      $t("professionalEditor.referenceMode")
+                    }}</span>
                     <el-select
                       v-model="selectedReferenceMode"
-                      placeholder="请选择参考图模式"
+                      :placeholder="$t('professionalEditor.selectReferenceMode')"
                       size="default"
                       style="flex: 1"
                     >
@@ -759,11 +774,19 @@
                       v-model="selectedVideoFrameType"
                       size="default"
                     >
-                      <el-radio-button label="first">首帧</el-radio-button>
-                      <el-radio-button label="last">尾帧</el-radio-button>
+                      <el-radio-button label="first">{{
+                        $t("editor.firstFrame")
+                      }}</el-radio-button>
+                      <el-radio-button label="last">{{
+                        $t("editor.lastFrame")
+                      }}</el-radio-button>
                       <!-- <el-radio-button label="panel">分镜板</el-radio-button> -->
-                      <el-radio-button label="action">动作序列</el-radio-button>
-                      <el-radio-button label="key">关键帧</el-radio-button>
+                      <el-radio-button label="action">{{
+                        $t("editor.actionSequence")
+                      }}</el-radio-button>
+                      <el-radio-button label="key">{{
+                        $t("editor.keyFrame")
+                      }}</el-radio-button>
                     </el-radio-group>
                   </div>
 
@@ -792,12 +815,14 @@
                           "
                         >
                           <el-tag size="small" type="primary">
-                            上一镜头 #{{
+                            {{ $t("professionalEditor.previousShot") }} #{{
                               previousStoryboard?.storyboard_number
                             }}
-                            尾帧
+                            {{ $t("editor.lastFrame") }}
                           </el-tag>
-                          <span class="hint-text">点击添加为首帧参考</span>
+                          <span class="hint-text">{{
+                            $t("professionalEditor.clickToUseAsFirstFrame")
+                          }}</span>
                         </div>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap">
                           <div
@@ -912,7 +937,7 @@
                               i.frame_type === 'first',
                           ) && previousStoryboardLastFrames.length === 0
                         "
-                        description="暂无首帧图片"
+                        :description="$t('professionalEditor.noFirstFrameImages')"
                         size="small"
                       />
                     </div>
@@ -994,7 +1019,7 @@
                               i.frame_type === 'key',
                           )
                         "
-                        description="暂无关键帧图片"
+                        :description="$t('professionalEditor.noKeyFrameImages')"
                         size="small"
                       />
                     </div>
@@ -1076,7 +1101,7 @@
                               i.frame_type === 'last',
                           )
                         "
-                        description="暂无尾帧图片"
+                        :description="$t('professionalEditor.noLastFrameImages')"
                         size="small"
                       />
                     </div>
@@ -1158,7 +1183,7 @@
                               i.frame_type === 'panel',
                           )
                         "
-                        description="暂无分镜板图片"
+                        :description="$t('professionalEditor.noPanelImages')"
                         size="small"
                       />
                     </div>
@@ -1240,7 +1265,9 @@
                               i.frame_type === 'action',
                           )
                         "
-                        description="暂无动作序列图片"
+                        :description="
+                          $t('professionalEditor.noActionSequenceImages')
+                        "
                         size="small"
                       />
                     </div>
@@ -1265,7 +1292,9 @@
                       v-if="selectedReferenceMode === 'single'"
                       style="text-align: center"
                     >
-                      <div class="reference-mode-title">单图参考</div>
+                      <div class="reference-mode-title">
+                        {{ $t("professionalEditor.referenceModeTitles.single") }}
+                      </div>
                       <div style="display: inline-block">
                         <div
                           class="image-slot"
@@ -1284,7 +1313,9 @@
                             <el-icon :size="32" color="#c0c4cc">
                               <Plus />
                             </el-icon>
-                            <div class="slot-hint">点击上方选择图片</div>
+                            <div class="slot-hint">
+                              {{ $t("professionalEditor.referenceSlotHints.clickToPick") }}
+                            </div>
                           </div>
                           <div
                             v-if="selectedImageObjects[0]"
@@ -1303,7 +1334,9 @@
                       v-else-if="selectedReferenceMode === 'first_last'"
                       style="text-align: center"
                     >
-                      <div class="reference-mode-title">首尾帧</div>
+                      <div class="reference-mode-title">
+                        {{ $t("professionalEditor.referenceModeTitles.firstLast") }}
+                      </div>
                       <div
                         style="
                           display: flex;
@@ -1313,7 +1346,9 @@
                         "
                       >
                         <div>
-                          <div class="frame-label">首帧</div>
+                          <div class="frame-label">
+                            {{ $t("professionalEditor.referenceFrameLabels.first") }}
+                          </div>
                           <div
                             class="image-slot"
                             @click="
@@ -1335,7 +1370,9 @@
                               <el-icon :size="32" color="#c0c4cc">
                                 <Plus />
                               </el-icon>
-                              <div class="slot-hint">选择首帧</div>
+                              <div class="slot-hint">
+                                {{ $t("professionalEditor.referenceSlotHints.pickFirst") }}
+                              </div>
                             </div>
                             <div
                               v-if="firstFrameSlotImage"
@@ -1351,7 +1388,9 @@
                           <Right />
                         </el-icon>
                         <div>
-                          <div class="frame-label">尾帧</div>
+                          <div class="frame-label">
+                            {{ $t("professionalEditor.referenceFrameLabels.last") }}
+                          </div>
                           <div
                             class="image-slot"
                             @click="
@@ -1373,7 +1412,9 @@
                               <el-icon :size="32" color="#c0c4cc">
                                 <Plus />
                               </el-icon>
-                              <div class="slot-hint">选择尾帧</div>
+                              <div class="slot-hint">
+                                {{ $t("professionalEditor.referenceSlotHints.pickLast") }}
+                              </div>
                             </div>
                             <div
                               v-if="lastFrameSlotImage"
@@ -1401,7 +1442,8 @@
                           font-weight: 500;
                         "
                       >
-                        多图参考 ({{ selectedImagesForVideo.length }}/{{
+                        {{ $t("professionalEditor.referenceModeTitles.multiple") }}
+                        ({{ selectedImagesForVideo.length }}/{{
                           currentModelCapability?.maxImages || 6
                         }})
                       </div>
@@ -1485,7 +1527,11 @@
                     "
                     @click="generateVideo"
                   >
-                    {{ generatingVideo ? "生成中..." : "生成视频" }}
+                    {{
+                      generatingVideo
+                        ? $t("video.generating")
+                        : $t("video.generateVideo")
+                    }}
                   </el-button>
                 </div>
 
@@ -1574,7 +1620,7 @@
                 </div>
               </div>
             </div>
-            <el-empty v-else description="未选择镜头" />
+            <el-empty v-else :description="$t('editor.noShotSelected')" />
           </el-tab-pane>
 
           <!-- 音效与配乐标签 -->
@@ -1646,12 +1692,12 @@
                         >
                           {{
                             merge.status === "pending"
-                              ? "等待中"
+                              ? $t("common.queuing")
                               : merge.status === "processing"
-                                ? "合成中"
+                                ? $t("common.processing")
                                 : merge.status === "completed"
-                                  ? "已完成"
-                                  : "失败"
+                                  ? $t("common.success")
+                                  : $t("common.failed")
                           }}
                         </el-tag>
                       </div>
@@ -1685,7 +1731,7 @@
                             </el-icon>
                           </div>
                           <div class="detail-content">
-                            <div class="detail-label">创建时间</div>
+                            <div class="detail-label">Created At</div>
                             <div class="detail-value">
                               {{ formatDateTime(merge.created_at) }}
                             </div>
@@ -1698,7 +1744,7 @@
                             </el-icon>
                           </div>
                           <div class="detail-content">
-                            <div class="detail-label">完成时间</div>
+                            <div class="detail-label">Completed At</div>
                             <div class="detail-value">
                               {{ formatDateTime(merge.completed_at) }}
                             </div>
@@ -1735,14 +1781,14 @@
                             "
                             round
                           >
-                            下载视频
+                            {{ $t("professionalEditor.downloadVideo") }}
                           </el-button>
                           <el-button
                             :icon="View"
                             @click="previewMergedVideo(merge.merged_url)"
                             round
                           >
-                            在线预览
+                            Preview
                           </el-button>
                         </template>
                         <el-button
@@ -1751,7 +1797,7 @@
                           @click="deleteMerge(merge.id)"
                           round
                         >
-                          删除
+                          {{ $t("common.delete") }}
                         </el-button>
                       </div>
                     </div>
@@ -1776,7 +1822,7 @@
           :src="getImageUrl(previewCharacter)"
           :alt="previewCharacter.name"
         />
-        <el-empty v-else description="暂无图片" />
+        <el-empty v-else :description="$t('professionalEditor.noImagesYet')" />
       </div>
       <!-- ... -->
     </el-dialog>
@@ -1787,7 +1833,7 @@
       :title="
         currentStoryboard?.background
           ? `${currentStoryboard.background.location} · ${currentStoryboard.background.time}`
-          : '场景预览'
+          : 'Scene Preview'
       "
       width="800px"
     >
@@ -1795,14 +1841,17 @@
         class="scene-image-preview"
         v-if="currentStoryboard?.background?.image_url"
       >
-        <img :src="currentStoryboard.background.image_url" alt="场景" />
+        <img
+          :src="currentStoryboard.background.image_url"
+          :alt="$t('professionalEditor.sceneAlt')"
+        />
       </div>
     </el-dialog>
 
     <!-- 角色选择对话框 -->
     <el-dialog
       v-model="showCharacterSelector"
-      title="添加角色到镜头"
+      :title="$t('professionalEditor.addCharacterToShotTitle')"
       width="800px"
     >
       <div class="character-selector-grid">
@@ -1823,7 +1872,9 @@
           </div>
           <div class="character-info">
             <div class="character-name">{{ char.name }}</div>
-            <div class="character-role">{{ char.role || "角色" }}</div>
+            <div class="character-role">
+              {{ char.role || $t("professionalEditor.characterFallback") }}
+            </div>
           </div>
           <div class="character-check" v-if="isCharacterInCurrentShot(char.id)">
             <el-icon color="#409eff" :size="24">
@@ -1832,11 +1883,13 @@
           </div>
         </div>
         <div v-if="availableCharacters.length === 0" class="empty-characters">
-          <el-empty description="暂无角色，请先在剧集中创建角色" />
+          <el-empty :description="$t('professionalEditor.noCharactersHint')" />
         </div>
       </div>
       <template #footer>
-        <el-button @click="showCharacterSelector = false">关闭</el-button>
+        <el-button @click="showCharacterSelector = false">{{
+          $t("common.close")
+        }}</el-button>
       </template>
     </el-dialog>
 
@@ -1888,7 +1941,11 @@
     </el-dialog>
 
     <!-- 场景选择对话框 -->
-    <el-dialog v-model="showSceneSelector" title="选择场景背景" width="800px">
+    <el-dialog
+      v-model="showSceneSelector"
+      :title="$t('professionalEditor.selectSceneBackgroundTitle')"
+      width="800px"
+    >
       <div class="scene-selector-grid">
         <div
           v-for="scene in availableScenes"
@@ -1913,7 +1970,7 @@
           </div>
         </div>
         <div v-if="availableScenes.length === 0" class="empty-scenes">
-          <el-empty description="暂无可用场景" />
+          <el-empty :description="$t('professionalEditor.noScenesYet')" />
         </div>
       </div>
     </el-dialog>
@@ -1921,7 +1978,7 @@
     <!-- 视频预览对话框 -->
     <el-dialog
       v-model="showVideoPreview"
-      title="视频预览"
+      :title="$t('professionalEditor.videoPreviewTitle')"
       width="800px"
       :close-on-click-modal="true"
       destroy-on-close
@@ -1944,7 +2001,9 @@
           <el-icon :size="48" color="#ccc">
             <VideoCamera />
           </el-icon>
-          <p style="margin-top: 16px; color: #909399">视频生成中...</p>
+          <p style="margin-top: 16px; color: #909399">
+            {{ $t("video.generating") }}...
+          </p>
         </div>
         <div class="video-meta">
           <div
@@ -2361,8 +2420,8 @@ const loadVideoModels = async () => {
       },
     );
   } catch (error: any) {
-    console.error("加载视频模型配置失败:", error);
-    ElMessage.error("加载视频模型失败");
+    console.error($t("professionalEditor.loadVideoModelConfigFailed"), error);
+    ElMessage.error($t("professionalEditor.loadVideoModelsFailed"));
   }
 };
 
@@ -2379,7 +2438,7 @@ const loadVideoAssets = async () => {
     // 检查数据结构并正确赋值
     videoAssets.value = result.items || [];
   } catch (error: any) {
-    console.error("加载视频素材库失败:", error);
+    console.error($t("professionalEditor.loadVideoAssetsFailed"), error);
   }
 };
 
@@ -2399,27 +2458,33 @@ const availableReferenceModes = computed(() => {
     [];
 
   if (capability.supportTextOnly) {
-    modes.push({ value: "none", label: "纯文本", description: "不使用参考图" });
+    modes.push({
+      value: "none",
+      label: $t("professionalEditor.referenceModes.none"),
+      description: $t("professionalEditor.referenceModeDescriptions.none"),
+    });
   }
   if (capability.supportSingleImage) {
     modes.push({
       value: "single",
-      label: "单图",
-      description: "使用单张参考图",
+      label: $t("professionalEditor.referenceModes.single"),
+      description: $t("professionalEditor.referenceModeDescriptions.single"),
     });
   }
   if (capability.supportFirstLastFrame) {
     modes.push({
       value: "first_last",
-      label: "首尾帧",
-      description: "使用首帧和尾帧",
+      label: $t("professionalEditor.referenceModes.firstLast"),
+      description: $t("professionalEditor.referenceModeDescriptions.firstLast"),
     });
   }
   if (capability.supportMultipleImages) {
     modes.push({
       value: "multiple",
-      label: "多图",
-      description: `最多${capability.maxImages}张`,
+      label: $t("professionalEditor.referenceModes.multiple"),
+      description: $t("professionalEditor.referenceModeDescriptions.multiple", {
+        max: capability.maxImages,
+      }),
     });
   }
 
@@ -2488,7 +2553,7 @@ const loadPreviousStoryboardLastFrame = async () => {
       (img: any) => img.status === "completed" && img.image_url,
     );
   } catch (error) {
-    console.error("加载上一镜头尾帧失败:", error);
+    console.error($t("professionalEditor.loadPreviousLastFramesFailed"), error);
     previousStoryboardLastFrames.value = [];
   }
 };
@@ -2499,7 +2564,7 @@ const selectPreviousLastFrame = (img: any) => {
   const currentIndex = selectedImagesForVideo.value.indexOf(img.id);
   if (currentIndex > -1) {
     selectedImagesForVideo.value.splice(currentIndex, 1);
-    ElMessage.success("已取消首帧参考");
+    ElMessage.success($t("professionalEditor.removedFirstFrameReference"));
     return;
   }
 
@@ -2520,12 +2585,14 @@ const selectPreviousLastFrame = (img: any) => {
       capability &&
       selectedImagesForVideo.value.length >= capability.maxImages
     ) {
-      ElMessage.warning(`最多只能选择${capability.maxImages}张图片`);
+      ElMessage.warning(
+        $t("professionalEditor.maxSelectImages", { max: capability.maxImages }),
+      );
       return;
     }
     selectedImagesForVideo.value.push(img.id);
   }
-  ElMessage.success("已添加为首帧参考");
+  ElMessage.success($t("professionalEditor.addedAsFirstFrameReference"));
 };
 
 // 监听帧类型切换，从存储中加载或清空
@@ -2805,7 +2872,11 @@ const saveStoryboardField = async (fieldName: string) => {
       updateData,
     );
   } catch (error: any) {
-    ElMessage.error("保存失败: " + (error.message || "未知错误"));
+    ElMessage.error(
+      `${$t("professionalEditor.saveFailed")}: ${
+        error.message || $t("professionalEditor.unknownError")
+      }`,
+    );
   }
 };
 
@@ -2879,12 +2950,14 @@ const extractFramePrompt = async () => {
               result = JSON.parse(result);
             } catch (e) {
               console.error("Failed to parse task result", e);
-              throw new Error("解析任务结果失败");
+              throw new Error($t("professionalEditor.parseTaskResultFailed"));
             }
           }
           return result.response;
         } else if (task.status === "failed") {
-          throw new Error(task.message || task.error || "生成失败");
+          throw new Error(
+            task.message || task.error || $t("professionalEditor.generateFailed"),
+          );
         }
         // 等待1秒后继续轮询
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -2925,9 +2998,17 @@ const extractFramePrompt = async () => {
     // 因为切换镜头时会重新读取sessionStorage。
     // 但为了确保如果用户没切走也能看到，上面已经更新了 currentFramePrompt
 
-    ElMessage.success(`${getFrameTypeLabel(targetFrameType)}提示词提取成功`);
+    ElMessage.success(
+      $t("professionalEditor.promptExtractedSuccess", {
+        frameType: getFrameTypeLabel(targetFrameType),
+      }),
+    );
   } catch (error: any) {
-    ElMessage.error("提取失败: " + (error.message || "未知错误"));
+    ElMessage.error(
+      `${$t("professionalEditor.extractFailed")}: ${
+        error.message || $t("professionalEditor.unknownError")
+      }`,
+    );
   } finally {
     // 清除该镜头的生成状态
     const stateKey = `${storyboardId}_${targetFrameType}`;
@@ -2949,10 +3030,11 @@ const isGeneratingPrompt = (
 // 获取帧类型的中文标签
 const getFrameTypeLabel = (frameType: string): string => {
   const labels: Record<string, string> = {
-    key: "关键帧",
-    first: "首帧",
-    last: "尾帧",
-    panel: "分镜版",
+    key: $t("editor.keyFrame"),
+    first: $t("editor.firstFrame"),
+    last: $t("editor.lastFrame"),
+    panel: $t("editor.panelFrame"),
+    action: $t("editor.actionSequence"),
   };
   return labels[frameType] || frameType;
 };
@@ -3092,17 +3174,20 @@ const generateFrameImage = async () => {
 
     generatedImages.value.unshift(result);
 
-    // 提示信息
-    const refMsg =
-      referenceImages.length > 0
-        ? ` (已添加${referenceImages.length}张参考图)`
-        : "";
-    ElMessage.success(`图片生成任务已提交${refMsg}`);
+    ElMessage.success(
+      $t("professionalEditor.imageTaskSubmitted", {
+        refCount: referenceImages.length,
+      }),
+    );
 
     // 启动轮询
     startPolling();
   } catch (error: any) {
-    ElMessage.error("生成失败: " + (error.message || "未知错误"));
+    ElMessage.error(
+      `${$t("professionalEditor.generateFailed")}: ${
+        error.message || $t("professionalEditor.unknownError")
+      }`,
+    );
   } finally {
     generatingImage.value = false;
   }
@@ -3128,7 +3213,7 @@ const playVideo = (video: VideoGeneration) => {
 // 添加视频到素材库
 const addVideoToAssets = async (video: VideoGeneration) => {
   if (video.status !== "completed" || !video.video_url) {
-    ElMessage.warning("只能添加已完成的视频到素材库");
+    ElMessage.warning($t("professionalEditor.onlyCompletedVideoCanBeAdded"));
     return;
   }
 
@@ -3155,7 +3240,7 @@ const addVideoToAssets = async (video: VideoGeneration) => {
 
     // 添加新素材
     await assetAPI.importFromVideo(video.id);
-    ElMessage.success("已添加到素材库");
+    ElMessage.success($t("professionalEditor.addedToAssets"));
 
     // 重新加载素材库列表
     await loadVideoAssets();
@@ -3177,7 +3262,7 @@ const addVideoToAssets = async (video: VideoGeneration) => {
       }
     }
   } catch (error: any) {
-    ElMessage.error(error.message || "添加失败");
+    ElMessage.error(error.message || $t("professionalEditor.addFailed"));
   } finally {
     addingToAssets.value.delete(video.id);
   }
@@ -3189,24 +3274,24 @@ const handleDeleteVideo = async (video: VideoGeneration) => {
 
   try {
     await ElMessageBox.confirm(
-      "确定要删除这个视频吗？删除后无法恢复。",
-      "确认删除",
+      $t("professionalEditor.confirmDeleteVideoBody"),
+      $t("professionalEditor.confirmDeleteTitle"),
       {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        confirmButtonText: $t("common.confirm"),
+        cancelButtonText: $t("common.cancel"),
         type: "warning",
       },
     );
 
     await videoAPI.deleteVideo(video.id);
-    ElMessage.success("删除成功");
+    ElMessage.success($t("professionalEditor.deleteSuccess"));
 
     // 重新加载当前镜头的视频列表
     await loadStoryboardVideos(Number(currentStoryboard.value.id));
   } catch (error: any) {
     if (error !== "cancel") {
-      console.error("删除视频失败:", error);
-      ElMessage.error(error.message || "删除失败");
+      console.error($t("professionalEditor.deleteVideoFailed"), error);
+      ElMessage.error(error.message || $t("professionalEditor.deleteFailed"));
     }
   }
 };
@@ -3214,10 +3299,10 @@ const handleDeleteVideo = async (video: VideoGeneration) => {
 // 获取状态中文文本
 const getStatusText = (status: string) => {
   const statusTextMap: Record<string, string> = {
-    pending: "等待中",
-    processing: "生成中",
-    completed: "已完成",
-    failed: "失败",
+    pending: $t("common.queuing"),
+    processing: $t("common.processing"),
+    completed: $t("common.success"),
+    failed: $t("common.failed"),
   };
   return statusTextMap[status] || status;
 };
@@ -3225,14 +3310,7 @@ const getStatusText = (status: string) => {
 // 获取帧类型中文文本
 const getFrameTypeText = (frameType?: string) => {
   if (!frameType) return "";
-  const frameTypeMap: Record<string, string> = {
-    first: "首帧",
-    key: "关键帧",
-    last: "尾帧",
-    panel: "分镜板",
-    action: "动作序列",
-  };
-  return frameTypeMap[frameType] || frameType;
+  return getFrameTypeLabel(frameType);
 };
 
 // 获取分镜缩略图
@@ -3253,12 +3331,12 @@ const getStoryboardThumbnail = (storyboard: any) => {
 // 处理图片选择（根据模型能力）
 const handleImageSelect = (imageId: number) => {
   if (!selectedReferenceMode.value) {
-    ElMessage.warning("请先选择参考图模式");
+    ElMessage.warning($t("professionalEditor.pleaseSelectReferenceMode"));
     return;
   }
 
   if (!currentModelCapability.value) {
-    ElMessage.warning("请先选择视频生成模型");
+    ElMessage.warning($t("professionalEditor.pleaseSelectVideoModel"));
     return;
   }
 
@@ -3299,21 +3377,25 @@ const handleImageSelect = (imageId: number) => {
         // 尾帧：设置到单独的变量
         selectedLastImageForVideo.value = imageId;
       } else {
-        ElMessage.warning("首尾帧模式下，请选择首帧或尾帧类型的图片");
+        ElMessage.warning(
+          $t("professionalEditor.firstLastSelectFrameTypeWarning"),
+        );
       }
       break;
 
     case "multiple":
       // 多图模式：检查是否超出最大数量
       if (selectedImagesForVideo.value.length >= capability.maxImages) {
-        ElMessage.warning(`最多只能选择${capability.maxImages}张图片`);
+        ElMessage.warning(
+          $t("professionalEditor.maxSelectImages", { max: capability.maxImages }),
+        );
         return;
       }
       selectedImagesForVideo.value.push(imageId);
       break;
 
     default:
-      ElMessage.warning("未知的参考图模式");
+      ElMessage.warning($t("professionalEditor.unknownReferenceMode"));
   }
 };
 
@@ -3379,12 +3461,12 @@ const removeSelectedImage = (imageId: number) => {
 // 生成视频
 const generateVideo = async () => {
   if (!selectedVideoModel.value) {
-    ElMessage.warning("请先选择视频生成模型");
+    ElMessage.warning($t("professionalEditor.pleaseSelectVideoModel"));
     return;
   }
 
   if (!currentStoryboard.value) {
-    ElMessage.warning("请先选择分镜");
+    ElMessage.warning($t("professionalEditor.pleaseSelectStoryboard"));
     return;
   }
 
@@ -3393,7 +3475,7 @@ const generateVideo = async () => {
     selectedReferenceMode.value !== "none" &&
     selectedImagesForVideo.value.length === 0
   ) {
-    ElMessage.warning("请选择参考图片");
+    ElMessage.warning($t("professionalEditor.pleaseSelectReferenceImages"));
     return;
   }
 
@@ -3412,7 +3494,7 @@ const generateVideo = async () => {
         (img) => img.id === selectedImagesForVideo.value[0],
       );
     if (!selectedImage || !selectedImage.image_url) {
-      ElMessage.error("请选择有效的参考图片");
+      ElMessage.error($t("professionalEditor.pleaseSelectValidReferenceImage"));
       return;
     }
   }
@@ -3427,6 +3509,7 @@ const generateVideo = async () => {
       drama_id: dramaId.toString(),
       storyboard_id: currentStoryboard.value.id,
       prompt:
+        currentStoryboard.value.ltx_video_prompt ||
         currentStoryboard.value.video_prompt ||
         currentStoryboard.value.action ||
         currentStoryboard.value.description ||
@@ -3497,12 +3580,16 @@ const generateVideo = async () => {
     const result = await videoAPI.generateVideo(requestParams);
 
     generatedVideos.value.unshift(result);
-    ElMessage.success("视频生成任务已提交");
+    ElMessage.success($t("professionalEditor.videoTaskSubmitted"));
 
     // 启动视频轮询
     startVideoPolling();
   } catch (error: any) {
-    ElMessage.error("生成失败: " + (error.message || "未知错误"));
+    ElMessage.error(
+      `${$t("professionalEditor.generateFailed")}: ${
+        error.message || $t("professionalEditor.unknownError")
+      }`,
+    );
   } finally {
     generatingVideo.value = false;
   }
@@ -3646,12 +3733,20 @@ const toggleCharacterInShot = async (charId: number) => {
     });
 
     if (existIndex > -1) {
-      ElMessage.success(`已移除角色: ${char.name}`);
+      ElMessage.success(
+        $t("professionalEditor.removedCharacter", { name: char.name }),
+      );
     } else {
-      ElMessage.success(`已添加角色: ${char.name}`);
+      ElMessage.success(
+        $t("professionalEditor.addedCharacter", { name: char.name }),
+      );
     }
   } catch (error: any) {
-    ElMessage.error("保存失败: " + (error.message || "未知错误"));
+    ElMessage.error(
+      `${$t("professionalEditor.saveFailed")}: ${
+        error.message || $t("professionalEditor.unknownError")
+      }`,
+    );
     // 回滚操作
     if (existIndex > -1) {
       currentStoryboard.value.characters.push(char);
@@ -3695,9 +3790,15 @@ const removeCharacterFromShot = async (charId: number) => {
       character_ids: characterIds,
     });
 
-    ElMessage.success(`已移除角色: ${char.name}`);
+    ElMessage.success(
+      $t("professionalEditor.removedCharacter", { name: char.name }),
+    );
   } catch (error: any) {
-    ElMessage.error("保存失败: " + (error.message || "未知错误"));
+    ElMessage.error(
+      `${$t("professionalEditor.saveFailed")}: ${
+        error.message || $t("professionalEditor.unknownError")
+      }`,
+    );
     // 回滚操作
     currentStoryboard.value.characters.push(char);
   }
@@ -3714,7 +3815,7 @@ const loadData = async () => {
       (e) => e.episode_number === episodeNumber,
     );
     if (!ep) {
-      ElMessage.error("章节不存在");
+      ElMessage.error($t("professionalEditor.episodeNotFound"));
       router.back();
       return;
     }
@@ -3745,7 +3846,11 @@ const loadData = async () => {
     // 加载视频素材库
     await loadVideoAssets();
   } catch (error: any) {
-    ElMessage.error("加载数据失败: " + (error.message || "未知错误"));
+    ElMessage.error(
+      `${$t("professionalEditor.loadDataFailed")}: ${
+        error.message || $t("professionalEditor.unknownError")
+      }`,
+    );
   }
 };
 
@@ -3761,9 +3866,9 @@ const selectScene = async (sceneId: number) => {
     // 重新加载数据
     await loadData();
     showSceneSelector.value = false;
-    ElMessage.success("场景关联成功");
+    ElMessage.success($t("professionalEditor.sceneLinkedSuccess"));
   } catch (error: any) {
-    ElMessage.error(error.message || "场景关联失败");
+    ElMessage.error(error.message || $t("professionalEditor.sceneLinkFailed"));
   }
 };
 
@@ -3790,26 +3895,26 @@ const formatTime = (seconds: number) => {
 };
 
 const zoomIn = () => {
-  ElMessage.info("时间线缩放功能开发中");
+  ElMessage.info($t("professionalEditor.timelineZoomInDevelopment"));
 };
 
 const zoomOut = () => {
-  ElMessage.info("时间线缩放功能开发中");
+  ElMessage.info($t("professionalEditor.timelineZoomInDevelopment"));
 };
 
 const generateImage = async () => {
   if (!currentStoryboard.value) return;
 
   try {
-    ElMessage.info("图片生成功能开发中");
+    ElMessage.info($t("professionalEditor.imageGenerationInDevelopment"));
   } catch (error: any) {
-    ElMessage.error(error.message || "生成失败");
+    ElMessage.error(error.message || $t("professionalEditor.generateFailed"));
   }
 };
 
 const uploadImage = () => {
   if (!currentStoryboard.value) {
-    ElMessage.warning("请先选择镜头");
+    ElMessage.warning($t("professionalEditor.pleaseSelectShot"));
     return;
   }
 
@@ -3824,7 +3929,7 @@ const uploadImage = () => {
 
     // 验证文件大小 (10MB)
     if (file.size > 10 * 1024 * 1024) {
-      ElMessage.error("图片大小不能超过 10MB");
+      ElMessage.error($t("professionalEditor.imageTooLarge10MB"));
       return;
     }
 
@@ -3840,7 +3945,7 @@ const uploadImage = () => {
       });
 
       if (!response.ok) {
-        throw new Error("上传失败");
+        throw new Error($t("professionalEditor.uploadFailed"));
       }
 
       const result = await response.json();
@@ -3853,7 +3958,7 @@ const uploadImage = () => {
           drama_id: parseInt(dramaId),
           frame_type: selectedFrameType.value || "first",
           image_url: imageUrl,
-          prompt: currentFramePrompt.value || "用户上传图片",
+          prompt: currentFramePrompt.value || $t("professionalEditor.userUploadedImage"),
         });
 
         // 刷新图片列表
@@ -3862,11 +3967,11 @@ const uploadImage = () => {
           selectedFrameType.value,
         );
 
-        ElMessage.success("图片上传成功");
+        ElMessage.success($t("professionalEditor.uploadSuccess"));
       }
     } catch (error: any) {
-      console.error("上传图片失败:", error);
-      ElMessage.error(error.message || "上传失败");
+      console.error($t("professionalEditor.uploadImageFailed"), error);
+      ElMessage.error(error.message || $t("professionalEditor.uploadFailed"));
     }
   };
   input.click();
@@ -3877,14 +3982,18 @@ const handleDeleteImage = async (img: ImageGeneration) => {
   if (!currentStoryboard.value) return;
 
   try {
-    await ElMessageBox.confirm("确定要删除这张图片吗？", "确认删除", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
+    await ElMessageBox.confirm(
+      $t("professionalEditor.confirmDeleteImageBody"),
+      $t("professionalEditor.confirmDeleteTitle"),
+      {
+        confirmButtonText: $t("common.confirm"),
+        cancelButtonText: $t("common.cancel"),
       type: "warning",
-    });
+      },
+    );
 
     await imageAPI.deleteImage(img.id);
-    ElMessage.success("删除成功");
+    ElMessage.success($t("professionalEditor.deleteSuccess"));
 
     // 重新加载当前帧类型的图片列表
     await loadStoryboardImages(
@@ -3893,8 +4002,8 @@ const handleDeleteImage = async (img: ImageGeneration) => {
     );
   } catch (error: any) {
     if (error !== "cancel") {
-      console.error("删除图片失败:", error);
-      ElMessage.error(error.message || "删除失败");
+      console.error($t("professionalEditor.deleteImageFailed"), error);
+      ElMessage.error(error.message || $t("professionalEditor.deleteFailed"));
     }
   }
 };
@@ -3962,7 +4071,7 @@ const handleCropSave = async (images: { blob: Blob; frameType: string }[]) => {
       });
     }
 
-    ElMessage.success("裁剪图片保存成功");
+    ElMessage.success($t("professionalEditor.saveCroppedImageSuccess"));
 
     // 刷新图片列表 - 刷新所有帧类型的图片，确保新裁剪的图片能在视频生成tab中被选择到
     if (currentStoryboard.value) {
@@ -3973,7 +4082,7 @@ const handleCropSave = async (images: { blob: Blob; frameType: string }[]) => {
     }
   } catch (error) {
     console.error("Failed to save cropped images:", error);
-    ElMessage.error("保存裁剪图片失败");
+    ElMessage.error($t("professionalEditor.saveCroppedImageFailed"));
   }
 };
 
@@ -3996,9 +4105,9 @@ const handleAddStoryboard = async () => {
     await dramaAPI.createStoryboard({
       episode_id: parseInt(episodeId.value),
       storyboard_number: nextShotNumber,
-      title: `镜头 ${nextShotNumber}`,
-      description: "新镜头描述",
-      action: "动作描述",
+      title: $t("professionalEditor.shotTitle", { shotNumber: nextShotNumber }),
+      description: $t("professionalEditor.newShotDescription"),
+      action: $t("professionalEditor.newShotAction"),
       dialogue: "",
       duration: 5,
       scene_id:
@@ -4007,7 +4116,7 @@ const handleAddStoryboard = async () => {
           : undefined,
     });
 
-    ElMessage.success("添加分镜成功");
+    ElMessage.success($t("professionalEditor.addStoryboardSuccess"));
     await loadData(); // Refresh list
 
     // Select the new storyboard (the last one)
@@ -4015,25 +4124,27 @@ const handleAddStoryboard = async () => {
       selectStoryboard(storyboards.value[storyboards.value.length - 1].id);
     }
   } catch (error: any) {
-    console.error("添加分镜失败:", error);
-    ElMessage.error(error.message || "添加分镜失败");
+    console.error($t("professionalEditor.addStoryboardFailed"), error);
+    ElMessage.error(error.message || $t("professionalEditor.addStoryboardFailed"));
   }
 };
 
 const handleDeleteStoryboard = async (storyboard: any) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除镜头 ${storyboard.storyboard_number} 吗？此操作不可恢复。`,
-      "删除确认",
+      $t("professionalEditor.confirmDeleteShotBody", {
+        shotNumber: storyboard.storyboard_number,
+      }),
+      $t("professionalEditor.confirmDeleteTitle"),
       {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        confirmButtonText: $t("common.confirm"),
+        cancelButtonText: $t("common.cancel"),
         type: "warning",
       },
     );
 
     await dramaAPI.deleteStoryboard(storyboard.id);
-    ElMessage.success("删除分镜成功");
+    ElMessage.success($t("professionalEditor.deleteStoryboardSuccess"));
 
     // If deleted current storyboard, clear selection or select another
     if (currentStoryboardId.value === storyboard.id) {
@@ -4044,8 +4155,8 @@ const handleDeleteStoryboard = async (storyboard: any) => {
     await loadData();
   } catch (error: any) {
     if (error !== "cancel") {
-      console.error("删除分镜失败:", error);
-      ElMessage.error(error.message || "删除分镜失败");
+      console.error($t("professionalEditor.deleteStoryboardFailed"), error);
+      ElMessage.error(error.message || $t("professionalEditor.deleteStoryboardFailed"));
     }
   }
 };
@@ -4075,8 +4186,8 @@ const loadVideoMerges = async () => {
       stopMergePolling();
     }
   } catch (error: any) {
-    console.error("加载视频合成列表失败:", error);
-    ElMessage.error("加载视频合成列表失败");
+    console.error($t("professionalEditor.loadVideoMergesFailed"), error);
+    ElMessage.error($t("professionalEditor.loadVideoMergesFailed"));
   } finally {
     loadingMerges.value = false;
   }
@@ -4164,10 +4275,10 @@ const downloadVideo = async (url: string, title: string) => {
     }, 100);
 
     loadingMsg.close();
-    ElMessage.success("视频下载已开始");
+    ElMessage.success($t("professionalEditor.videoDownloadStarted"));
   } catch (error) {
-    console.error("下载视频失败:", error);
-    ElMessage.error("视频下载失败，请稍后重试");
+    console.error($t("professionalEditor.downloadVideoFailed"), error);
+    ElMessage.error($t("professionalEditor.videoDownloadFailedTryLater"));
   }
 };
 
@@ -4182,28 +4293,30 @@ const previewMergedVideo = (url: string) => {
 const deleteMerge = async (mergeId: number) => {
   try {
     await ElMessageBox.confirm(
-      "确定要删除此合成记录吗？此操作不可恢复。",
-      "删除确认",
+      $t("professionalEditor.confirmDeleteMergeBody"),
+      $t("professionalEditor.confirmDeleteTitle"),
       {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        confirmButtonText: $t("common.confirm"),
+        cancelButtonText: $t("common.cancel"),
         type: "warning",
       },
     );
 
     await videoMergeAPI.deleteMerge(mergeId);
-    ElMessage.success("删除成功");
+    ElMessage.success($t("professionalEditor.deleteSuccess"));
     // 刷新列表
     await loadVideoMerges();
   } catch (error: any) {
     if (error !== "cancel") {
-      console.error("删除失败:", error);
-      ElMessage.error(error.response?.data?.message || "删除失败");
+      console.error($t("professionalEditor.deleteFailed"), error);
+      ElMessage.error(
+        error.response?.data?.message || $t("professionalEditor.deleteFailed"),
+      );
     }
   }
 };
 
-// 格式化日期时间
+// Format relative date time in English
 const formatDateTime = (dateStr: string) => {
   const date = new Date(dateStr);
   const now = new Date();
@@ -4212,10 +4325,10 @@ const formatDateTime = (dateStr: string) => {
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (minutes < 1) return "刚刚";
-  if (minutes < 60) return `${minutes}分钟前`;
-  if (hours < 24) return `${hours}小时前`;
-  if (days < 7) return `${days}天前`;
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes} min ago`;
+  if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  if (days < 7) return `${days} day${days > 1 ? "s" : ""} ago`;
 
   // 超过7天显示完整日期
   const month = String(date.getMonth() + 1).padStart(2, "0");

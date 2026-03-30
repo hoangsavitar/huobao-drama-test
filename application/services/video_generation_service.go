@@ -319,14 +319,9 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 		}
 	}
 
-	constraintPrompt := s.promptI18n.GetVideoConstraintPrompt(referenceMode)
-	if constraintPrompt != "" {
-		prompt = constraintPrompt + "\n\n" + prompt
-		s.log.Infow("Added constraint prompt to video generation",
-			"id", videoGenID,
-			"reference_mode", referenceMode,
-			"constraint_prompt_length", len(constraintPrompt))
-	}
+	// Explicit product decision: send raw user/LTX prompt only for video generation.
+	// Do not prepend any generic constraint prompt.
+	constraintPrompt := ""
 
 	// Log complete prompt information
 	s.log.Infow("Video generation prompts",

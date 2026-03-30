@@ -546,6 +546,28 @@
                     </span>
                   </el-button>
                   <el-button
+                    type="warning"
+                    :loading="batchGeneratingLtxVideoPrompts"
+                    :disabled="selectedStoryboardIds.length === 0"
+                    @click="batchGenerateLtxVideoPrompts"
+                  >
+                    {{ $t("workflow.batchGenerateLtxVideoPrompt") }}
+                    <span v-if="selectedStoryboardIds.length > 0">
+                      ({{ selectedStoryboardIds.length }})
+                    </span>
+                  </el-button>
+                  <el-button
+                    type="danger"
+                    :loading="batchGeneratingVideos"
+                    :disabled="selectedStoryboardIds.length === 0"
+                    @click="batchGenerateVideos"
+                  >
+                    {{ $t("workflow.batchGenerateVideo") }}
+                    <span v-if="selectedStoryboardIds.length > 0">
+                      ({{ selectedStoryboardIds.length }})
+                    </span>
+                  </el-button>
+                  <el-button
                     type="success"
                     :loading="batchGeneratingStoryboardImages"
                     :disabled="selectedStoryboardIds.length === 0"
@@ -557,10 +579,11 @@
                     </span>
                   </el-button>
                   <el-button
-                    :icon="Document"
-                    @click="exportVideoPrompts"
+                    :icon="Film"
+                    :loading="exportingFullVideo"
+                    @click="exportFullEpisodeVideo"
                   >
-                    {{ $t("workflow.exportVideoPrompts") }}
+                    {{ $t("workflow.exportFullVideo") }}
                   </el-button>
                   <el-button
                     :icon="Picture"
@@ -678,6 +701,79 @@
                       size="small"
                     >
                       {{ $t("workflow.firstFramePrompted") }}
+                    </el-tag>
+                    <el-tag v-else type="info" size="small" effect="plain">
+                      -
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  :label="$t('workflow.ltxVideoPromptStatus')"
+                  width="120"
+                >
+                  <template #default="{ row }">
+                    <el-tag
+                      v-if="row.ltx_video_prompt"
+                      type="success"
+                      size="small"
+                    >
+                      {{ $t("workflow.ltxVideoPromptReady") }}
+                    </el-tag>
+                    <el-tag
+                      v-else-if="ltxVideoPromptGeneratingShots[Number(row.id)]"
+                      type="warning"
+                      size="small"
+                    >
+                      {{ $t("workflow.ltxVideoPromptGenerating") }}
+                    </el-tag>
+                    <el-tag v-else type="info" size="small" effect="plain">
+                      -
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  :label="$t('workflow.videoGenStatus')"
+                  width="120"
+                >
+                  <template #default="{ row }">
+                    <el-tag
+                      v-if="videoBatchSubmittingShots[Number(row.id)]"
+                      type="warning"
+                      size="small"
+                    >
+                      {{ $t("workflow.videoGenSubmitting") }}
+                    </el-tag>
+                    <el-tag
+                      v-else-if="
+                        latestVideoByStoryboard[Number(row.id)]?.status ===
+                        'completed'
+                      "
+                      type="success"
+                      size="small"
+                    >
+                      {{ $t("workflow.videoGenReady") }}
+                    </el-tag>
+                    <el-tag
+                      v-else-if="
+                        latestVideoByStoryboard[Number(row.id)]?.status ===
+                          'pending' ||
+                        latestVideoByStoryboard[Number(row.id)]?.status ===
+                          'processing'
+                      "
+                      type="warning"
+                      size="small"
+                    >
+                      {{ $t("workflow.videoGenProcessing") }}
+                    </el-tag>
+                    <el-tag
+                      v-else-if="
+                        latestVideoByStoryboard[Number(row.id)]?.status ===
+                        'failed'
+                      "
+                      type="danger"
+                      size="small"
+                    >
+                      {{ $t("workflow.videoGenFailed") }}
                     </el-tag>
                     <el-tag v-else type="info" size="small" effect="plain">
                       -
@@ -1156,6 +1252,25 @@
               {{ $t("workflow.modelConfigTip") }}
             </div>
           </el-form-item>
+
+          <el-form-item :label="$t('workflow.videoGenModel')">
+            <el-select
+              v-model="selectedVideoModel"
+              :placeholder="$t('workflow.selectVideoModel')"
+              style="width: 100%"
+              clearable
+            >
+              <el-option
+                v-for="model in videoModels"
+                :key="model.modelName"
+                :label="model.modelName"
+                :value="model.modelName"
+              />
+            </el-select>
+            <div class="model-tip">
+              {{ $t("workflow.videoModelTip") }}
+            </div>
+          </el-form-item>
         </el-form>
 
         <template #footer>
@@ -1326,11 +1441,15 @@ import { characterLibraryAPI } from "@/api/character-library";
 import { aiAPI } from "@/api/ai";
 import type { AIServiceConfig } from "@/types/ai";
 import { imageAPI } from "@/api/image";
+import { ltxVideoPromptAPI } from "@/api/ltx-video-prompt";
+import { videoAPI } from "@/api/video";
 import type { ImageGeneration } from "@/types/image";
+import type { VideoGeneration } from "@/types/video";
 import type { Drama } from "@/types/drama";
 import { buildShotImagesZip } from "@/utils/exportShotImagesZip";
+import { videoMerger } from "@/utils/videoMerger";
 import { AppHeader } from "@/components/common";
-import { getImageUrl, hasImage } from "@/utils/image";
+import { getImageUrl, getVideoUrl, hasImage } from "@/utils/image";
 import {
   generateFirstFrame,
   getEpisodeFramePrompts,
@@ -1374,7 +1493,13 @@ const selectedStoryboardIds = ref<number[]>([]);
 const selectAllStoryboards = ref(false);
 const batchGeneratingFramePrompts = ref(false);
 const batchGeneratingStoryboardImages = ref(false);
+const batchGeneratingLtxVideoPrompts = ref(false);
+const ltxVideoPromptGeneratingShots = ref<Record<number, boolean>>({});
+const batchGeneratingVideos = ref(false);
+const videoBatchSubmittingShots = ref<Record<number, boolean>>({});
+const latestVideoByStoryboard = ref<Record<number, VideoGeneration>>({});
 const exportingShotImages = ref(false);
+const exportingFullVideo = ref(false);
 const episodeFramePrompts = ref<Record<string, FramePromptRecord[]>>({});
 
 // 对话框状态
@@ -1414,8 +1539,10 @@ interface ModelOption {
 
 const textModels = ref<ModelOption[]>([]);
 const imageModels = ref<ModelOption[]>([]);
+const videoModels = ref<ModelOption[]>([]);
 const selectedTextModel = ref<string>("");
 const selectedImageModel = ref<string>("");
+const selectedVideoModel = ref<string>("");
 
 const hasScript = computed(() => {
   const currentEp = currentEpisode.value;
@@ -1474,14 +1601,16 @@ const goBack = () => {
 // 加载AI模型配置
 const loadAIConfigs = async () => {
   try {
-    const [textList, imageList] = await Promise.all([
+    const [textList, imageList, videoList] = await Promise.all([
       aiAPI.list("text"),
       aiAPI.list("image"),
+      aiAPI.list("video"),
     ]);
 
     // 只使用激活的配置
     const activeTextList = textList.filter((c) => c.is_active);
     const activeImageList = imageList.filter((c) => c.is_active);
+    const activeVideoList = videoList.filter((c) => c.is_active);
 
     // 展开模型列表并去重（保留优先级最高的）
     const allTextModels = activeTextList
@@ -1530,6 +1659,28 @@ const loadAIConfigs = async () => {
     });
     imageModels.value = Array.from(imageModelMap.values());
 
+    const allVideoModels = activeVideoList
+      .flatMap((config) => {
+        const models = Array.isArray(config.model)
+          ? config.model
+          : [config.model];
+        return models.map((modelName) => ({
+          modelName,
+          configName: config.name,
+          configId: config.id,
+          priority: config.priority || 0,
+        }));
+      })
+      .sort((a, b) => b.priority - a.priority);
+
+    const videoModelMap = new Map<string, ModelOption>();
+    allVideoModels.forEach((model) => {
+      if (!videoModelMap.has(model.modelName)) {
+        videoModelMap.set(model.modelName, model);
+      }
+    });
+    videoModels.value = Array.from(videoModelMap.values());
+
     // 设置默认选择（优先级最高的）
     if (textModels.value.length > 0 && !selectedTextModel.value) {
       selectedTextModel.value = textModels.value[0].modelName;
@@ -1543,10 +1694,14 @@ const loadAIConfigs = async () => {
         ? nanoModel.modelName
         : imageModels.value[0].modelName;
     }
+    if (videoModels.value.length > 0 && !selectedVideoModel.value) {
+      selectedVideoModel.value = videoModels.value[0].modelName;
+    }
 
     // 验证已选择的模型是否还在可用列表中，如果不在则重置为默认值
     const availableTextModelNames = textModels.value.map((m) => m.modelName);
     const availableImageModelNames = imageModels.value.map((m) => m.modelName);
+    const availableVideoModelNames = videoModels.value.map((m) => m.modelName);
 
     if (
       selectedTextModel.value &&
@@ -1591,6 +1746,20 @@ const loadAIConfigs = async () => {
         );
       }
     }
+
+    if (
+      selectedVideoModel.value &&
+      availableVideoModelNames.length > 0 &&
+      !availableVideoModelNames.includes(selectedVideoModel.value)
+    ) {
+      selectedVideoModel.value = videoModels.value[0]?.modelName || "";
+      if (selectedVideoModel.value) {
+        localStorage.setItem(
+          `ai_video_model_${dramaId}`,
+          selectedVideoModel.value,
+        );
+      }
+    }
   } catch (error: any) {
     console.error("Failed to load AI configs:", error);
   }
@@ -1612,6 +1781,11 @@ const saveModelConfig = () => {
   // 保存模型名称到localStorage
   localStorage.setItem(`ai_text_model_${dramaId}`, selectedTextModel.value);
   localStorage.setItem(`ai_image_model_${dramaId}`, selectedImageModel.value);
+  if (selectedVideoModel.value) {
+    localStorage.setItem(`ai_video_model_${dramaId}`, selectedVideoModel.value);
+  } else {
+    localStorage.removeItem(`ai_video_model_${dramaId}`);
+  }
 
   ElMessage.success($t("workflow.modelConfigSaved"));
   modelConfigDialogVisible.value = false;
@@ -1633,12 +1807,16 @@ const prevStep = () => {
 const loadSavedModelConfig = () => {
   const savedTextModel = localStorage.getItem(`ai_text_model_${dramaId}`);
   const savedImageModel = localStorage.getItem(`ai_image_model_${dramaId}`);
+  const savedVideoModel = localStorage.getItem(`ai_video_model_${dramaId}`);
 
   if (savedTextModel) {
     selectedTextModel.value = savedTextModel;
   }
   if (savedImageModel) {
     selectedImageModel.value = savedImageModel;
+  }
+  if (savedVideoModel) {
+    selectedVideoModel.value = savedVideoModel;
   }
 };
 
@@ -1662,6 +1840,8 @@ const loadDramaData = async () => {
 
     // Load frame prompts now that episode data is available
     await loadEpisodeFramePrompts();
+
+    await loadEpisodeVideos();
   } catch (error: any) {
     ElMessage.error(error.message || "Failed to load project data");
   }
@@ -1688,6 +1868,7 @@ const enrichStoryboardCharacters = async () => {
           ...sb,
           characters: en?.characters ?? sb.characters ?? [],
           background: en?.background ?? sb.background,
+          ltx_video_prompt: en?.ltx_video_prompt ?? sb.ltx_video_prompt,
           composed_image: en?.composed_image ?? sb.composed_image,
           image_generation_id: en?.image_generation_id ?? sb.image_generation_id,
           image_generation_status:
@@ -2605,6 +2786,91 @@ const loadEpisodeFramePrompts = async () => {
   }
 };
 
+/** Latest video generation per storyboard (for workflow table status). */
+const loadEpisodeVideos = async () => {
+  try {
+    const ep = currentEpisode.value;
+    const targetStoryboardIds = new Set<number>(
+      (ep?.storyboards || [])
+        .map((s: any) => Number(s?.id))
+        .filter((id: number) => !Number.isNaN(id)),
+    );
+
+    const allItems: VideoGeneration[] = [];
+    let page = 1;
+    const pageSize = 100;
+    const maxPages = 80;
+    let totalPages = 1;
+
+    // Scan pages until we either read all pages or already have video data
+    // for every storyboard in the current episode.
+    do {
+      const res = await videoAPI.listVideos({
+        drama_id: dramaId,
+        page,
+        page_size: pageSize,
+      });
+      const items = res.items || [];
+      allItems.push(...items);
+      totalPages = Math.max(1, res.pagination?.total_pages ?? 1);
+
+      if (targetStoryboardIds.size > 0) {
+        const covered = new Set<number>();
+        for (const v of allItems) {
+          const sid = Number(v?.storyboard_id);
+          if (!Number.isNaN(sid) && targetStoryboardIds.has(sid)) {
+            covered.add(sid);
+          }
+        }
+        if (covered.size >= targetStoryboardIds.size) break;
+      }
+
+      page++;
+    } while (page <= totalPages && page <= maxPages);
+
+    const sorted = [...allItems].sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    );
+    const map: Record<number, VideoGeneration> = {};
+    const seen = new Set<number>();
+    for (const v of sorted) {
+      const sid = Number(v?.storyboard_id);
+      if (Number.isNaN(sid) || seen.has(sid)) continue;
+      seen.add(sid);
+      map[sid] = v;
+    }
+    latestVideoByStoryboard.value = map;
+  } catch (e) {
+    console.warn("Failed to load episode videos:", e);
+  }
+};
+
+const extractProviderFromModel = (modelName: string): string => {
+  if (modelName.startsWith("doubao-") || modelName.startsWith("seedance")) {
+    return "doubao";
+  }
+  if (modelName.startsWith("runway")) return "runway";
+  if (modelName.startsWith("pika")) return "pika";
+  if (
+    modelName.startsWith("MiniMax-") ||
+    modelName.toLowerCase().startsWith("minimax") ||
+    modelName.startsWith("hailuo")
+  ) {
+    return "minimax";
+  }
+  if (modelName.startsWith("sora")) return "openai";
+  if (modelName.startsWith("kling")) return "kling";
+  return "doubao";
+};
+
+const storyboardVideoPrompt = (sb: any): string => {
+  const ltx = sb?.ltx_video_prompt?.trim?.() ?? "";
+  const vp = sb?.video_prompt?.trim?.() ?? "";
+  const act = sb?.action?.trim?.() ?? "";
+  return (ltx || vp || act || "").trim();
+};
+
 const hasFirstFramePrompt = (storyboardId: number | string): boolean => {
   const prompts = episodeFramePrompts.value[String(storyboardId)] || [];
   return prompts.some((p) => p.frame_type === "first");
@@ -2749,6 +3015,164 @@ const batchGenerateFirstFramePrompts = async () => {
   }
 };
 
+// ── Batch Generate LTX video prompts ────────────────────────────────────────
+const batchGenerateLtxVideoPrompts = async () => {
+  if (selectedStoryboardIds.value.length === 0) return;
+
+  batchGeneratingLtxVideoPrompts.value = true;
+  selectedStoryboardIds.value.forEach((id) => {
+    const sid = Number(id);
+    if (!Number.isNaN(sid)) ltxVideoPromptGeneratingShots.value[sid] = true;
+  });
+
+  try {
+    const ep = currentEpisode.value;
+    if (!ep?.id) {
+      ElMessage.error("Episode not found");
+      return;
+    }
+
+    const res: any = await ltxVideoPromptAPI.batchGenerateLtxVideoPrompts(
+      ep.id,
+      selectedStoryboardIds.value,
+      selectedTextModel.value || undefined,
+    );
+
+    const taskId = res?.task_id;
+    if (!taskId) {
+      ElMessage.error("Missing task_id from response");
+      return;
+    }
+
+    ElMessage.success(
+      $t("workflow.batchLtxVideoPromptSubmitted"),
+    );
+
+    await pollTaskUntilDone(taskId);
+
+    // Reload to show per-shot ready status
+    await loadDramaData();
+    ElMessage.success($t("workflow.batchLtxVideoPromptDone"));
+  } catch (error: any) {
+    ElMessage.error(error.message || $t("workflow.batchLtxVideoPromptFailed"));
+  } finally {
+    batchGeneratingLtxVideoPrompts.value = false;
+    ltxVideoPromptGeneratingShots.value = {};
+  }
+};
+
+// ── Batch generate videos (first-frame + LTX/video prompt, same as Professional Editor defaults) ──
+const batchGenerateVideos = async () => {
+  if (selectedStoryboardIds.value.length === 0) return;
+  if (!selectedVideoModel.value) {
+    ElMessage.warning($t("workflow.pleaseSelectVideoModel"));
+    return;
+  }
+
+  batchGeneratingVideos.value = true;
+  const ids = [...selectedStoryboardIds.value];
+  ids.forEach((id) => {
+    const sid = Number(id);
+    if (!Number.isNaN(sid)) videoBatchSubmittingShots.value[sid] = true;
+  });
+
+  let done = 0;
+  let failed = 0;
+
+  try {
+    const ep = currentEpisode.value;
+    if (!ep?.storyboards?.length) {
+      ElMessage.error($t("workflow.batchVideoNoEpisode"));
+      return;
+    }
+
+    const byId = new Map<number, any>(
+      ep.storyboards.map((s: any) => [Number(s.id), s]),
+    );
+
+    for (const rawId of ids) {
+      const storyboardId = Number(rawId);
+      const sb = byId.get(storyboardId);
+      const prompt = sb ? storyboardVideoPrompt(sb) : "";
+      if (!prompt || prompt.length < 5) {
+        failed++;
+        videoBatchSubmittingShots.value[storyboardId] = false;
+        continue;
+      }
+
+      let first: ImageGeneration | undefined;
+      try {
+        const imgRes = await imageAPI.listImages({
+          storyboard_id: storyboardId,
+          frame_type: "first",
+          page: 1,
+          page_size: 30,
+        });
+        first = imgRes.items?.find(
+          (i) =>
+            i.status === "completed" && (i.image_url || i.local_path),
+        );
+      } catch {
+        first = undefined;
+      }
+
+      if (!first) {
+        failed++;
+        videoBatchSubmittingShots.value[storyboardId] = false;
+        continue;
+      }
+
+      const duration = Math.min(
+        10,
+        Math.max(4, Math.round(Number(sb?.duration) || 5)),
+      );
+
+      const requestParams: Record<string, unknown> = {
+        drama_id: dramaId,
+        storyboard_id: storyboardId,
+        prompt,
+        duration,
+        provider: extractProviderFromModel(selectedVideoModel.value),
+        model: selectedVideoModel.value,
+        reference_mode: "single",
+        aspect_ratio: drama.value?.aspect_ratio || "16:9",
+        image_gen_id: first.id,
+      };
+      if (first.local_path) {
+        requestParams.image_local_path = first.local_path;
+      } else if (first.image_url) {
+        requestParams.image_url = first.image_url;
+      }
+
+      try {
+        await videoAPI.generateVideo(requestParams as any);
+        done++;
+      } catch {
+        failed++;
+      } finally {
+        videoBatchSubmittingShots.value[storyboardId] = false;
+      }
+    }
+
+    ElMessage.success($t("workflow.batchVideoSubmitted", { done, failed }));
+    await loadEpisodeVideos();
+    await loadDramaData();
+
+    let checkCount = 0;
+    const maxChecks = 40;
+    const iv = setInterval(async () => {
+      checkCount++;
+      await loadEpisodeVideos();
+      if (checkCount >= maxChecks) clearInterval(iv);
+    }, 3000);
+  } catch (error: any) {
+    ElMessage.error(error.message || $t("workflow.batchVideoFailed"));
+  } finally {
+    batchGeneratingVideos.value = false;
+    videoBatchSubmittingShots.value = {};
+  }
+};
+
 // ── Export shot images (zip: Ep…/drama/shot_…/) ───────────────────────────────
 
 const sanitizeZipBaseName = (s: string) =>
@@ -2827,33 +3251,118 @@ const exportShotImagesZip = async () => {
   }
 };
 
-// ── Export video prompts ──────────────────────────────────────────────────────
+// ── Export full episode video (client-side FFmpeg merge, same as timeline flow) ──
 
-const exportVideoPrompts = () => {
-  const storyboards = currentEpisode.value?.storyboards || [];
-  if (storyboards.length === 0) {
-    ElMessage.warning("No storyboards to export");
+const exportFullEpisodeVideo = async () => {
+  const ep = currentEpisode.value;
+  if (!ep?.id || !ep.storyboards?.length) {
+    ElMessage.warning($t("workflow.exportFullVideoNoStoryboards"));
     return;
   }
 
-  const lines = storyboards.map((sb: any, i: number) => {
-    const shotNum = sb.storyboard_number || i + 1;
-    const title = sb.title ? ` - ${sb.title}` : "";
-    const prompt = sb.video_prompt || $t("workflow.noVideoPrompt");
-    return `Shot ${shotNum}${title}\n${prompt}`;
-  });
+  exportingFullVideo.value = true;
+  try {
+    await loadEpisodeVideos();
 
-  const content = lines.join("\n\n---\n\n");
-  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `episode_${episodeNumber}_video_prompts.txt`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  ElMessage.success($t("workflow.exportSuccess"));
+    const ordered = [...ep.storyboards].sort(
+      (a: any, b: any) =>
+        Number(a?.storyboard_number || 0) - Number(b?.storyboard_number || 0),
+    );
+
+    const clips = ordered
+      .map((sb: any) => {
+        const sid = Number(sb?.id);
+        const latest = latestVideoByStoryboard.value[sid];
+        const videoUrl = getVideoUrl(latest);
+        if (!latest || latest.status !== "completed" || !videoUrl) return null;
+
+        const duration = Math.max(
+          1,
+          Number(latest?.duration) || Number(sb?.duration) || 5,
+        );
+        return {
+          url: videoUrl,
+          startTime: 0,
+          endTime: duration,
+          duration,
+          transition: { type: "none" as const, duration: 0 },
+        };
+      })
+      .filter(Boolean) as Array<{
+      url: string;
+      startTime: number;
+      endTime: number;
+      duration: number;
+      transition: { type: string; duration: number };
+    }>;
+
+    if (clips.length === 0) {
+      ElMessage.warning($t("workflow.exportFullVideoNoVideos"));
+      return;
+    }
+
+    ElMessage.info($t("workflow.exportFullVideoSubmitted"));
+
+    const mergedBlob = await videoMerger.mergeVideos(clips);
+    const url = URL.createObjectURL(mergedBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `episode_${episodeNumber}_full.mp4`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    ElMessage.success($t("workflow.exportFullVideoDone"));
+  } catch (e: any) {
+    // If browser-side merge fails, fallback to backend merge path.
+    try {
+      const epId = String(ep.id);
+      const ordered = [...ep.storyboards].sort(
+        (a: any, b: any) =>
+          Number(a?.storyboard_number || 0) - Number(b?.storyboard_number || 0),
+      );
+      const fallbackClips = ordered
+        .map((sb: any, index: number) => {
+          const sid = Number(sb?.id);
+          const latest = latestVideoByStoryboard.value[sid];
+          const videoUrl = getVideoUrl(latest);
+          if (!latest || latest.status !== "completed" || !videoUrl) return null;
+          const duration = Math.max(
+            1,
+            Number(latest?.duration) || Number(sb?.duration) || 5,
+          );
+          return {
+            storyboard_id: String(sid),
+            order: index,
+            start_time: 0,
+            end_time: duration,
+            duration,
+            transition: { type: "none", duration: 0 },
+          };
+        })
+        .filter(Boolean);
+      const result: any = await dramaAPI.finalizeEpisode(epId, {
+        episode_id: epId,
+        clips: fallbackClips,
+      });
+      if (result?.video_url) {
+        const link = document.createElement("a");
+        link.href = getVideoUrl({ video_url: result.video_url });
+        link.download = `episode_${episodeNumber}_full.mp4`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        ElMessage.success($t("workflow.exportFullVideoDone"));
+        return;
+      }
+      ElMessage.error(e?.message || $t("workflow.exportFullVideoFailed"));
+    } catch {
+      ElMessage.error(e?.message || $t("workflow.exportFullVideoFailed"));
+    }
+  } finally {
+    exportingFullVideo.value = false;
+  }
 };
 
 // 监听步骤变化，保存到 localStorage
