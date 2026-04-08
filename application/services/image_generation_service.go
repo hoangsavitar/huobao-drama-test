@@ -96,7 +96,8 @@ type GenerateImageRequest struct {
 func aspectRatioToSize(ratio string) string {
 	switch ratio {
 	case "9:16":
-		return "1440x2560"
+		// return "1440x2560" // 2K dọc
+		return "720x1280" // Đổi thành 1K dọc
 	default:
 		return "2560x1440"
 	}
