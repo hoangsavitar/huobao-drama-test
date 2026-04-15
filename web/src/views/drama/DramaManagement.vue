@@ -292,19 +292,25 @@
             title="Auto production"
             width="560px"
             :close-on-click-modal="false"
+            class="auto-pipeline-dialog"
           >
-            <el-alert
+            <div
               v-if="autoPipelineQueueStatus !== 'idle'"
-              :type="autoPipelineQueueStatus === 'completed' ? 'success' : autoPipelineQueueStatus === 'failed' || autoPipelineQueueStatus === 'cancelled' ? 'warning' : 'info'"
-              :closable="false"
-              style="margin-bottom: 12px"
+              class="auto-pipeline-status-bar"
+              :data-state="autoPipelineQueueStatus"
             >
-              <template #title>
-                {{ autoPipelineStatusLine }}
-              </template>
-            </el-alert>
+              <span class="auto-pipeline-status-text">{{
+                autoPipelineStatusLine
+              }}</span>
+              <span
+                v-if="autoPipelineRunning"
+                class="auto-pipeline-pct"
+                >{{ autoPipelineProgressPct }}%</span
+              >
+            </div>
             <el-progress
               v-if="autoPipelineRunning"
+              class="auto-pipeline-progress"
               :percentage="autoPipelineProgressPct"
               :indeterminate="autoPipelineProgressPct === 0"
             />
@@ -1123,9 +1129,11 @@ const startAutoPipeline = async () => {
       models,
       signal: autoPipelineAbort.signal,
       onStep: (e) => {
-        autoPipelineLogLines.value.push(
-          `[${e.step}] ${e.status}${e.message ? ": " + e.message : ""}`,
-        );
+        const detail =
+          e.message && e.message.toLowerCase() !== e.status
+            ? e.message
+            : e.status;
+        autoPipelineLogLines.value.push(`[${e.step}] ${detail}`);
       },
     });
 
@@ -2102,19 +2110,64 @@ onMounted(() => {
   margin-top: 12px;
 }
 
+.auto-pipeline-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-primary, var(--el-border-color));
+  background: var(--bg-secondary, var(--el-fill-color-light));
+  position: relative;
+  z-index: 1;
+}
+
+.auto-pipeline-status-text {
+  font-size: 13px;
+  color: var(--text-primary, var(--el-text-color-primary));
+  line-height: 1.4;
+}
+
+.auto-pipeline-pct {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted, var(--el-text-color-secondary));
+  flex-shrink: 0;
+}
+
+.auto-pipeline-progress {
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.auto-pipeline-dialog :deep(.el-dialog__body) {
+  padding-top: 12px;
+}
+
 .auto-pipeline-log {
   max-height: 240px;
   overflow: auto;
   font-size: 12px;
+  line-height: 1.45;
   font-family: ui-monospace, monospace;
-  background: var(--el-fill-color-lighter);
+  background: var(--bg-secondary, var(--el-fill-color-lighter));
+  color: var(--text-primary, var(--el-text-color-primary));
   padding: 10px;
   border-radius: 6px;
-  margin-top: 12px;
+  margin-top: 0;
+  border: 1px solid var(--border-primary, var(--el-border-color-lighter));
+  position: relative;
+  z-index: 0;
+  clear: both;
 }
 
 .auto-pipeline-log .log-line {
-  margin: 2px 0;
-  word-break: break-all;
+  margin: 4px 0;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 </style>

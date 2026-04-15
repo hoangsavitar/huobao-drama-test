@@ -54,6 +54,7 @@ type Storyboard struct {
 	SoundEffect string `json:"sound_effect"` // Sound effect description
 	Characters  []uint `json:"characters"`   // List of involved character IDs
 	IsPrimary   bool   `json:"is_primary"`   // Whether this is a primary shot
+	DramaStyle  string `json:"-"`            // Drama style (internal use)
 }
 
 type GenerateStoryboardResult struct {
@@ -391,10 +392,10 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 	// 2. Object format: {"storyboards": [{...}, {...}]}
 	var result GenerateStoryboardResult
 
-	// Try parsing as array format first
-	var storyboards []Storyboard
-	if err := utils.SafeParseAIJSON(text, &storyboards); err == nil {
 		// Successfully parsed as array, wrap as object
+		for i := range storyboards {
+			storyboards[i].DramaStyle = episode.DramaStyle
+		}
 		result.Storyboards = storyboards
 		result.Total = len(storyboards)
 		s.log.Infow("Parsed storyboard as array format", "count", len(storyboards), "task_id", taskID)
@@ -406,6 +407,9 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 				s.log.Errorw("Failed to update task error", "error", updateErr, "task_id", taskID)
 			}
 			return
+		}
+		for i := range result.Storyboards {
+			result.Storyboards[i].DramaStyle = episode.DramaStyle
 		}
 		result.Total = len(result.Storyboards)
 		s.log.Infow("Parsed storyboard as object format", "count", len(result.Storyboards), "task_id", taskID)
@@ -499,8 +503,12 @@ func (s *StoryboardService) generateImagePrompt(sb Storyboard) string {
 		parts = append(parts, sb.Emotion)
 	}
 
-	// 4. Anime style
-	parts = append(parts, "anime style, first frame")
+	// 4. Style
+	style := sb.DramaStyle
+	if style == "" || style == "realistic" {
+		style = "photorealistic"
+	}
+	parts = append(parts, style+" style, first frame")
 
 	if len(parts) > 0 {
 		return strings.Join(parts, ", ")
@@ -890,7 +898,12 @@ type CreateStoryboardRequest struct {
 }
 
 // CreateStoryboard creates a single storyboard shot
-func (s *StoryboardService) CreateStoryboard(req *CreateStoryboardRequest) (*models.Storyboard, error) {
+	// Get episode and drama to get style
+	var episode models.Episode
+	if err := s.db.Preload("Drama").Where("id = ?", req.EpisodeID).First(&episode).Error; err != nil {
+		s.log.Warnw("Failed to load episode for style", "episode_id", req.EpisodeID, "error", err)
+	}
+
 	// Build Storyboard object
 	sb := Storyboard{
 		ShotNumber:  req.StoryboardNumber,
@@ -909,6 +922,7 @@ func (s *StoryboardService) CreateStoryboard(req *CreateStoryboardRequest) (*mod
 		BgmPrompt:   getString(req.BgmPrompt),
 		SoundEffect: getString(req.SoundEffect),
 		Characters:  req.Characters,
+		DramaStyle:  episode.DramaStyle,
 	}
 	if req.Title != nil {
 		sb.Title = *req.Title

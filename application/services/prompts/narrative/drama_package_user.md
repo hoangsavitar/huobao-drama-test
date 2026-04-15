@@ -1,8 +1,12 @@
+**CRITICAL — OUTPUT LANGUAGE:** The JSON you return must use **English only** for every string: `title`, every `script_content`, every `choices[].label`, and all dialogue. Even if `user_idea` or `drama_title` below is in another language, **do not** mirror that language in the screenplay — write the narrative in English.
+
 Generate the JSON drama package **now** for this project. Apply the full creative stack from the system prompt (Architect + Builder + Designer in one model pass): strong **story hook**, **factions**, protagonist **empathy | flaw | blind spot**, **fast viral pacing**, **Context Anchor** at every episode start, **rich** SCENE/CHARACTER INTRO/ACTION/DIALOGUE, and **22–38 beats** per non-terminal episode so scripts are not thin.
 
 Mandatory output constraints for this project:
 - Write everything in **English only**.
 - Character names must match the target setting/style (for Korean-drama style, mostly Korean names and Korean social context).
+- Keep one canonical full name for each recurring character across all episodes (no shortened/alternate speaker names for the same person).
+- If a main character changes identity, treat it as alias of the same person (keep canonical name + alias annotation), and preserve the same core face.
 - Keep people, styling, and environments geographically consistent with the story location.
 - Scene/shot writing must contain location-specific visual cues so generated images fit the setting.
 

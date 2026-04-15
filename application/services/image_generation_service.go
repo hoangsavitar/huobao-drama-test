@@ -302,8 +302,13 @@ func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 
 	// If there are reference images, append a consistency instruction to the prompt
 	if len(referenceImages) > 0 {
-		prompt += "\n\nImportant: strictly follow reference image elements and keep scene/character consistency."
-		s.log.Infow("Added reference image consistency instruction to prompt",
+		// Differentiate between character and background references if possible 
+		// For now, we use a more sophisticated prompt segments
+		prompt += "\n\n### Character & Scene Consistency Requirements:"
+		prompt += "\n- [Character Identity]: Strictly maintain the hair, facial features, and clothing of the characters from the provided reference images."
+		prompt += "\n- [Environmental Setting]: Use the background reference as a guide for architectural style, lighting, and color palette. Maintain spatial logic while allowing for the specific shot's camera perspective (depth of field, angle)."
+		
+		s.log.Infow("Added nuanced consistency instructions",
 			"id", imageGenID,
 			"reference_count", len(referenceImages))
 	}
