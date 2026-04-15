@@ -1,3 +1,4 @@
+# Go backend only; narrative graph is generated in-process (Text AI + embedded prompts).
 services:
   huobao-drama:
     # image: huobao-drama:latest
@@ -25,9 +26,8 @@ services:
       # Example: - ./data:/app/data (requires chmod 777 ./data)
     environment:
       - TZ=Asia/Shanghai
-      # Access host services from container:
-      # Use host.docker.internal instead of 127.0.0.1
-      # Example: http://host.docker.internal:11434 (Ollama)
+      # optional: NARRATIVE_FALLBACK_STUB=true for offline 7-node template when LLM fails
+      # Access host Text AI from container: http://host.docker.internal:11434 etc.
     extra_hosts:
       - "host.docker.internal:host-gateway"  # Cross-platform host gateway
     restart: unless-stopped
@@ -37,13 +37,7 @@ services:
       timeout: 3s
       retries: 3
       start_period: 10s
-    networks:
-      - huobao-network
 
 volumes:
   huobao-data:
     driver: local
-
-networks:
-  huobao-network:
-    driver: bridge

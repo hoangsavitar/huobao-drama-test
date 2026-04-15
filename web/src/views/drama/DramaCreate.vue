@@ -49,6 +49,33 @@
             />
           </el-form-item>
 
+          <el-form-item label="Art style" prop="style" required>
+            <el-select
+              v-model="form.style"
+              placeholder="Select style"
+              size="large"
+              style="width: 100%"
+            >
+              <el-option label="Ghibli" value="ghibli" />
+              <el-option label="Guoman" value="guoman" />
+              <el-option label="Wasteland" value="wasteland" />
+              <el-option label="Nostalgia" value="nostalgia" />
+              <el-option label="Pixel" value="pixel" />
+              <el-option label="Voxel" value="voxel" />
+              <el-option label="Urban" value="urban" />
+              <el-option label="Guoman 3D" value="guoman3d" />
+              <el-option label="Chibi 3D" value="chibi3d" />
+              <el-option label="K-drama" value="kdrama" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="Aspect ratio" prop="aspect_ratio" required>
+            <el-radio-group v-model="form.aspect_ratio" size="large">
+              <el-radio-button value="16:9">16:9 Landscape</el-radio-button>
+              <el-radio-button value="9:16">9:16 Portrait</el-radio-button>
+            </el-radio-group>
+          </el-form-item>
+
           <div class="form-actions">
             <el-button size="large" @click="goBack">Cancel</el-button>
             <el-button 
@@ -82,14 +109,18 @@ const loading = ref(false)
 
 const form = reactive<CreateDramaRequest>({
   title: '',
-  description: ''
+  description: '',
+  style: 'ghibli',
+  aspect_ratio: '16:9',
 })
 
 const rules: FormRules = {
   title: [
     { required: true, message: 'Please enter project title', trigger: 'blur' },
     { min: 1, max: 100, message: 'Title length must be 1 to 100 characters', trigger: 'blur' }
-  ]
+  ],
+  style: [{ required: true, message: 'Please select style', trigger: 'change' }],
+  aspect_ratio: [{ required: true, message: 'Please select aspect ratio', trigger: 'change' }],
 }
 
 // Submit form / 提交表单

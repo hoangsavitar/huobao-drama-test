@@ -65,19 +65,22 @@ func (c *Character) TableName() string {
 }
 
 type Episode struct {
-	ID            uint           `gorm:"primaryKey;autoIncrement" json:"id"`
-	DramaID       uint           `gorm:"not null;index" json:"drama_id"`
-	EpisodeNum    int            `gorm:"column:episode_number;not null" json:"episode_number"`
-	Title         string         `gorm:"type:varchar(200);not null" json:"title"`
-	ScriptContent *string        `gorm:"type:longtext" json:"script_content"`
-	Description   *string        `gorm:"type:text" json:"description"`
-	Duration      int            `gorm:"default:0" json:"duration"` // 总时长（秒）
-	Status        string         `gorm:"type:varchar(20);default:'draft'" json:"status"`
-	VideoURL      *string        `gorm:"type:varchar(500)" json:"video_url"`
-	Thumbnail     *string        `gorm:"type:varchar(500)" json:"thumbnail"`
-	CreatedAt     time.Time      `gorm:"not null;autoCreateTime" json:"created_at"`
-	UpdatedAt     time.Time      `gorm:"not null;autoUpdateTime" json:"updated_at"`
-	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
+	ID                uint            `gorm:"primaryKey;autoIncrement" json:"id"`
+	DramaID           uint            `gorm:"not null;index;uniqueIndex:idx_episodes_drama_narrative_node" json:"drama_id"`
+	EpisodeNum        int             `gorm:"column:episode_number;not null" json:"episode_number"`
+	Title             string          `gorm:"type:varchar(200);not null" json:"title"`
+	NarrativeNodeID   *string         `gorm:"size:64;uniqueIndex:idx_episodes_drama_narrative_node" json:"narrative_node_id,omitempty"`
+	Choices           datatypes.JSON  `gorm:"type:json" json:"choices,omitempty"`
+	IsEntry           bool            `gorm:"default:false" json:"is_entry"`
+	ScriptContent     *string         `gorm:"type:longtext" json:"script_content"`
+	Description       *string         `gorm:"type:text" json:"description"`
+	Duration          int             `gorm:"default:0" json:"duration"` // 总时长（秒）
+	Status            string          `gorm:"type:varchar(20);default:'draft'" json:"status"`
+	VideoURL          *string         `gorm:"type:varchar(500)" json:"video_url"`
+	Thumbnail         *string         `gorm:"type:varchar(500)" json:"thumbnail"`
+	CreatedAt         time.Time       `gorm:"not null;autoCreateTime" json:"created_at"`
+	UpdatedAt         time.Time       `gorm:"not null;autoUpdateTime" json:"updated_at"`
+	DeletedAt         gorm.DeletedAt  `gorm:"index" json:"-"`
 
 	// 关联
 	Drama       Drama        `gorm:"foreignKey:DramaID" json:"drama,omitempty"`

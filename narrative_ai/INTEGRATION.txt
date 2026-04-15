@@ -1,0 +1,18 @@
+Narrative / branching episodes (Huobao)
+
+1) Sinh đồ thị tập (Generate episodes)
+   - API: POST /api/v1/dramas/:id/narrative/generate  body: { "user_idea": "..." }  (user_idea có thể rỗng → dùng title drama)
+   - Luôn chạy trong Go: NarrativePackageService → Text AI (AI Config, provider "text") + prompt nhúng
+   - Prompt: application/services/prompts/narrative/*.md (go:embed)
+   - Cấu hình: configs/config.yaml → narrative.fallback_stub
+     - false: lỗi LLM/parse trả về API (khuyến nghị)
+     - true: khi lỗi dùng template DAG 7 node
+
+2) Text AI
+   - Settings → AI Config: cần ít nhất một config loại text (default_text_provider trong config.yaml trỏ đúng provider).
+
+3) Repo narrative_AI (Python)
+   - Không còn được backend Huobao gọi cho drama-package.
+   - Có thể dùng độc lập nếu bạn tự host thử nghiệm; không bắt buộc cho luồng Drama Management.
+
+Checklist QA: docs/NARRATIVE_AND_AUTO_PIPELINE_TEST.md

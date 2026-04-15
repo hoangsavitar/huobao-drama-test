@@ -75,6 +75,7 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 			dramas.GET("/:id/characters", dramaHandler.GetCharacters)
 			dramas.PUT("/:id/characters", dramaHandler.SaveCharacters)
 			dramas.PUT("/:id/episodes", dramaHandler.SaveEpisodes)
+			dramas.POST("/:id/narrative/generate", dramaHandler.GenerateNarrativeEpisodes)
 			dramas.PUT("/:id/progress", dramaHandler.SaveProgress)
 			dramas.GET("/:id/props", propHandler.ListProps) // Added prop list route
 		}
@@ -133,15 +134,15 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 		// Storyboard routes
 		episodes := api.Group("/episodes")
 		{
-		// Storyboards
-		episodes.POST("/:episode_id/storyboards", storyboardHandler.GenerateStoryboard)
-		episodes.POST("/:episode_id/props/extract", propHandler.ExtractProps)
-		episodes.POST("/:episode_id/characters/extract", characterLibraryHandler.ExtractCharacters)
-		episodes.GET("/:episode_id/storyboards", sceneHandler.GetStoryboardsForEpisode)
-		episodes.GET("/:episode_id/frame-prompts", handlers2.GetEpisodeFramePrompts(db, log))
-		episodes.POST("/:episode_id/ltx-video-prompts/batch", ltxVideoPromptHandler.BatchGenerateLtxVideoPrompts)
-		episodes.POST("/:episode_id/finalize", dramaHandler.FinalizeEpisode)
-		episodes.GET("/:episode_id/download", dramaHandler.DownloadEpisodeVideo)
+			// Storyboards
+			episodes.POST("/:episode_id/storyboards", storyboardHandler.GenerateStoryboard)
+			episodes.POST("/:episode_id/props/extract", propHandler.ExtractProps)
+			episodes.POST("/:episode_id/characters/extract", characterLibraryHandler.ExtractCharacters)
+			episodes.GET("/:episode_id/storyboards", sceneHandler.GetStoryboardsForEpisode)
+			episodes.GET("/:episode_id/frame-prompts", handlers2.GetEpisodeFramePrompts(db, log))
+			episodes.POST("/:episode_id/ltx-video-prompts/batch", ltxVideoPromptHandler.BatchGenerateLtxVideoPrompts)
+			episodes.POST("/:episode_id/finalize", dramaHandler.FinalizeEpisode)
+			episodes.GET("/:episode_id/download", dramaHandler.DownloadEpisodeVideo)
 		}
 
 		// Task routes

@@ -18,6 +18,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/drama/DramaManagement.vue')
   },
   {
+    path: '/dramas/:id/play',
+    name: 'InteractivePlay',
+    component: () => import('../views/drama/InteractivePlay.vue')
+  },
+  {
     path: '/dramas/:id/episode/:episodeNumber',
     name: 'EpisodeWorkflowNew',
     component: () => import('../views/drama/EpisodeWorkflow.vue')

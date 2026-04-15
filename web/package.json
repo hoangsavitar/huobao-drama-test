@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:check": "vue-tsc --noEmit --skipLibCheck && vite build",
-    "build:skip": "vite build",
-    "preview": "vite preview",
+    "dev": "npx vite",
+    "build": "npx vite build",
+    "build:check": "vue-tsc --noEmit --skipLibCheck && npx vite build",
+    "build:skip": "npx vite build",
+    "preview": "npx vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
@@ -21,6 +21,7 @@
     "element-plus": "^2.5.0",
     "jszip": "^3.10.1",
     "lodash-es": "^4.17.22",
+    "mermaid": "^11.14.0",
     "pinia": "^2.1.0",
     "vue": "^3.4.0",
     "vue-i18n": "^9.14.5",

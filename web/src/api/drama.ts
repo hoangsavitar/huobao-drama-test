@@ -63,6 +63,11 @@ export const dramaAPI = {
     return request.put(`/dramas/${id}/episodes`, { episodes: data })
   },
 
+  /** Branching narrative: Huobao text AI + embedded prompts (handled in Go only). */
+  generateNarrativeEpisodes(id: string, data: { user_idea: string }) {
+    return request.post<{ message: string }>(`/dramas/${id}/narrative/generate`, data)
+  },
+
   saveProgress(id: string, data: { current_step: string; step_data?: any }) {
     return request.put(`/dramas/${id}/progress`, data)
   },

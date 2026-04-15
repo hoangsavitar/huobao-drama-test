@@ -44,4 +44,10 @@ request.interceptors.response.use(
   }
 )
 
+/** Backend JSON error shape: { success, error?: { message } } */
+export function getApiErrorMessage(err: unknown, fallback = 'Request failed'): string {
+  const e = err as AxiosError<{ error?: { message?: string }; message?: string }>
+  return e?.response?.data?.error?.message ?? e?.response?.data?.message ?? e?.message ?? fallback
+}
+
 export default request

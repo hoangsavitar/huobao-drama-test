@@ -116,6 +116,42 @@
                 </el-descriptions-item>
               </el-descriptions>
             </el-card>
+
+            <el-card shadow="never" class="project-info-card" style="margin-top: 20px">
+              <template #header>
+                <div class="card-header">
+                  <h3 class="card-title">Story generator</h3>
+                  <el-tag size="small" type="info">Narrative → episodes</el-tag>
+                </div>
+              </template>
+              <p style="margin: 0 0 12px; color: var(--el-text-color-secondary); font-size: 13px">
+                Sinh đồ thị episode + <code>script_content</code> qua <strong>AI Config (text)</strong> trong Huobao
+                (prompt <code>application/services/prompts/narrative/*.md</code>).
+                Template 7-node chỉ khi <code>narrative.fallback_stub: true</code> và LLM lỗi.
+              </p>
+              <el-input
+                v-model="narrativeIdea"
+                type="textarea"
+                :rows="4"
+                placeholder="Ý tưởng / hook (có thể ngắn)."
+              />
+              <div style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px">
+                <el-button
+                  type="primary"
+                  :loading="narrativeLoading"
+                  :disabled="!narrativeIdea.trim()"
+                  @click="runNarrativeGenerate"
+                >
+                  Generate episodes
+                </el-button>
+                <el-button
+                  v-if="episodesCount > 0"
+                  @click="$router.push(`/dramas/${route.params.id}/play`)"
+                >
+                  Play interactive
+                </el-button>
+              </div>
+            </el-card>
           </el-tab-pane>
 
           <!-- 章节管理 -->
@@ -144,13 +180,46 @@
               </el-button>
             </el-empty>
 
-            <el-table
-              v-else
-              :data="sortedEpisodes"
-              border
-              stripe
-              style="margin-top: 16px"
-            >
+            <template v-else>
+              <NarrativeStoryGraph
+                :source="narrativeMermaidSource"
+                title="Story graph"
+                emptyText="No branching data"
+              />
+
+              <div class="episode-batch-toolbar">
+                <el-checkbox
+                  v-model="episodeSelectAll"
+                  @change="onEpisodeSelectAllChange"
+                >
+                  Select all
+                </el-checkbox>
+                <el-button
+                  type="primary"
+                  :loading="autoPipelineRunning"
+                  :disabled="selectedEpisodesRows.length === 0"
+                  @click="startAutoPipeline"
+                >
+                  Full auto production
+                </el-button>
+                <el-button
+                  :disabled="!autoPipelineRunning"
+                  @click="cancelAutoPipeline"
+                >
+                  Stop
+                </el-button>
+              </div>
+
+              <el-table
+                ref="episodeTableRef"
+                :data="sortedEpisodes"
+                border
+                stripe
+                row-key="id"
+                style="margin-top: 12px"
+                @selection-change="onEpisodeSelectionChange"
+              >
+                <el-table-column type="selection" width="48" reserve-selection />
               <el-table-column
                 type="index"
                 :label="$t('storyboard.table.number')"
@@ -161,6 +230,20 @@
                 :label="$t('drama.management.episodeList')"
                 min-width="200"
               />
+              <el-table-column label="Node" width="88">
+                <template #default="{ row }">
+                  <span v-if="row.narrative_node_id">{{ row.narrative_node_id }}</span>
+                  <span v-else>—</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="Branch" width="88">
+                <template #default="{ row }">
+                  <el-tag v-if="episodeChoiceCount(row)" type="warning" size="small">
+                    {{ episodeChoiceCount(row) }}
+                  </el-tag>
+                  <span v-else>—</span>
+                </template>
+              </el-table-column>
               <el-table-column :label="$t('common.status')" width="120">
                 <template #default="{ row }">
                   <el-tag :type="getEpisodeStatusType(row)">{{
@@ -180,7 +263,7 @@
               </el-table-column>
               <el-table-column
                 :label="$t('storyboard.table.operations')"
-                width="220"
+                width="240"
                 fixed="right"
               >
                 <template #default="{ row }">
@@ -201,7 +284,52 @@
                 </template>
               </el-table-column>
             </el-table>
+            </template>
           </el-tab-pane>
+
+          <el-dialog
+            v-model="autoPipelineDialogVisible"
+            title="Auto production"
+            width="560px"
+            :close-on-click-modal="false"
+          >
+            <el-alert
+              v-if="autoPipelineQueueStatus !== 'idle'"
+              :type="autoPipelineQueueStatus === 'completed' ? 'success' : autoPipelineQueueStatus === 'failed' || autoPipelineQueueStatus === 'cancelled' ? 'warning' : 'info'"
+              :closable="false"
+              style="margin-bottom: 12px"
+            >
+              <template #title>
+                {{ autoPipelineStatusLine }}
+              </template>
+            </el-alert>
+            <el-progress
+              v-if="autoPipelineRunning"
+              :percentage="autoPipelineProgressPct"
+              :indeterminate="autoPipelineProgressPct === 0"
+            />
+            <div class="auto-pipeline-log">
+              <div
+                v-for="(line, idx) in autoPipelineLogLines"
+                :key="idx"
+                class="log-line"
+              >
+                {{ line }}
+              </div>
+            </div>
+            <template #footer>
+              <el-button @click="autoPipelineDialogVisible = false"
+                >Close</el-button
+              >
+              <el-button
+                v-if="autoPipelineLastFailure"
+                type="primary"
+                @click="openFailedEpisodeWorkflow"
+              >
+                Open episode to fix
+              </el-button>
+            </template>
+          </el-dialog>
 
           <!-- 角色管理 -->
           <el-tab-pane
@@ -768,7 +896,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
@@ -790,6 +918,14 @@ import {
   ImagePreview,
 } from "@/components/common";
 import { getImageUrl, hasImage } from "@/utils/image";
+import { getApiErrorMessage } from "@/utils/request";
+import { buildNarrativeMermaidSource } from "@/utils/narrativeGraph";
+import NarrativeStoryGraph from "@/components/drama/NarrativeStoryGraph.vue";
+import {
+  runFullEpisodePipeline,
+  getPipelineModelsFromStorage,
+  type PipelineStep,
+} from "@/composables/useEpisodeFullProduction";
 
 const router = useRouter();
 const route = useRoute();
@@ -811,6 +947,43 @@ const editingCharacter = ref<any>(null);
 const editingScene = ref<any>(null);
 const editingProp = ref<any>(null);
 const selectedExtractEpisodeId = ref<number | null>(null);
+
+const narrativeIdea = ref("");
+const narrativeLoading = ref(false);
+
+const episodeChoiceCount = (row: any): number => {
+  const c = row?.choices;
+  if (!c) return 0;
+  if (Array.isArray(c)) return c.length;
+  if (typeof c === "string") {
+    try {
+      const p = JSON.parse(c);
+      return Array.isArray(p) ? p.length : 0;
+    } catch {
+      return 0;
+    }
+  }
+  return 0;
+};
+
+const runNarrativeGenerate = async () => {
+  const id = route.params.id as string;
+  narrativeLoading.value = true;
+  try {
+    await dramaAPI.generateNarrativeEpisodes(id, {
+      user_idea: narrativeIdea.value.trim(),
+    });
+    await loadDramaData();
+    const n = drama.value?.episodes?.length ?? 0;
+    ElMessage.success(
+      n ? `Đã sinh đồ thị: ${n} node (episode)` : "Đã sinh xong — tải lại danh sách",
+    );
+  } catch (e: unknown) {
+    ElMessage.error(getApiErrorMessage(e, "Generate failed"));
+  } finally {
+    narrativeLoading.value = false;
+  }
+};
 
 const newCharacter = ref({
   name: "",
@@ -850,6 +1023,155 @@ const sortedEpisodes = computed(() => {
   );
 });
 
+const narrativeMermaidSource = computed(() =>
+  buildNarrativeMermaidSource(sortedEpisodes.value as any),
+);
+
+const episodeTableRef = ref<any>(null);
+const selectedEpisodesRows = ref<any[]>([]);
+const episodeSelectAll = ref(false);
+
+const onEpisodeSelectionChange = (rows: any[]) => {
+  selectedEpisodesRows.value = rows;
+  const total = sortedEpisodes.value.length;
+  episodeSelectAll.value = total > 0 && rows.length === total;
+};
+
+const onEpisodeSelectAllChange = (val: boolean | string | number) => {
+  const t = episodeTableRef.value;
+  if (!t) return;
+  const on = val === true;
+  if (on) {
+    sortedEpisodes.value.forEach((row: any) => {
+      t.toggleRowSelection(row, true);
+    });
+  } else {
+    t.clearSelection();
+  }
+};
+
+const autoPipelineDialogVisible = ref(false);
+const autoPipelineRunning = ref(false);
+const autoPipelineLogLines = ref<string[]>([]);
+const autoPipelineQueueStatus = ref<
+  "idle" | "running" | "completed" | "failed" | "cancelled"
+>("idle");
+const autoPipelineProgressPct = ref(0);
+const autoPipelineLastFailure = ref<{
+  episodeNumber?: number;
+  failedStep?: PipelineStep;
+  message?: string;
+} | null>(null);
+let autoPipelineAbort: AbortController | null = null;
+
+const autoPipelineStatusLine = computed(() => {
+  switch (autoPipelineQueueStatus.value) {
+    case "running":
+      return "Running…";
+    case "completed":
+      return "All selected episodes finished.";
+    case "failed":
+      return `Stopped: ${autoPipelineLastFailure.value?.message || "error"}`;
+    case "cancelled":
+      return "Stopped by user.";
+    default:
+      return "";
+  }
+});
+
+const cancelAutoPipeline = () => {
+  autoPipelineAbort?.abort();
+};
+
+const startAutoPipeline = async () => {
+  const dramaId = route.params.id as string;
+  const snapshot = [...selectedEpisodesRows.value].sort(
+    (a, b) => a.episode_number - b.episode_number,
+  );
+  if (!snapshot.length) return;
+  const models = getPipelineModelsFromStorage(dramaId);
+  autoPipelineLogLines.value = [];
+  autoPipelineLastFailure.value = null;
+  autoPipelineQueueStatus.value = "running";
+  autoPipelineRunning.value = true;
+  autoPipelineDialogVisible.value = true;
+  autoPipelineProgressPct.value = 5;
+  autoPipelineAbort = new AbortController();
+  const total = snapshot.length;
+  let stopped = false;
+
+  for (let i = 0; i < snapshot.length; i++) {
+    const ep = snapshot[i];
+    const fresh = await dramaAPI.get(dramaId);
+    const stillThere = fresh.episodes?.some(
+      (e: any) => String(e.id) === String(ep.id),
+    );
+    if (!stillThere) {
+      autoPipelineLogLines.value.push(
+        `Skip episode ${ep.episode_number} — removed from project.`,
+      );
+      continue;
+    }
+
+    autoPipelineLogLines.value.push(
+      `--- Episode ${ep.episode_number} (id ${ep.id}) ---`,
+    );
+    const res = await runFullEpisodePipeline({
+      dramaId,
+      episodeId: String(ep.id),
+      episodeNumber: ep.episode_number,
+      models,
+      signal: autoPipelineAbort.signal,
+      onStep: (e) => {
+        autoPipelineLogLines.value.push(
+          `[${e.step}] ${e.status}${e.message ? ": " + e.message : ""}`,
+        );
+      },
+    });
+
+    autoPipelineProgressPct.value = Math.min(
+      99,
+      Math.round(((i + 1) / total) * 100),
+    );
+
+    if (!res.ok) {
+      stopped = true;
+      autoPipelineLastFailure.value = {
+        episodeNumber: res.episodeNumber,
+        failedStep: res.failedStep,
+        message: res.message,
+      };
+      autoPipelineLogLines.value.push(`FAILED: ${res.message || "unknown"}`);
+      autoPipelineQueueStatus.value =
+        res.message === "Cancelled" ? "cancelled" : "failed";
+      break;
+    }
+    autoPipelineLogLines.value.push(`Episode ${ep.episode_number} OK`);
+    await loadDramaData();
+  }
+
+  if (!stopped) {
+    autoPipelineQueueStatus.value = "completed";
+    autoPipelineProgressPct.value = 100;
+  }
+  autoPipelineRunning.value = false;
+  autoPipelineAbort = null;
+  await loadDramaData();
+};
+
+const openFailedEpisodeWorkflow = () => {
+  const f = autoPipelineLastFailure.value;
+  if (f?.episodeNumber == null) return;
+  router.push({
+    name: "EpisodeWorkflowNew",
+    params: {
+      id: route.params.id,
+      episodeNumber: f.episodeNumber,
+    },
+    query: f.failedStep ? { focusStep: f.failedStep } : {},
+  });
+};
+
 // Helper for polling
 const startPolling = (
   callback: () => Promise<void>,
@@ -869,8 +1191,6 @@ const startPolling = (
   }, interval);
 };
 
-// Clear timer on unmount
-import { onUnmounted } from "vue";
 onUnmounted(() => {
   if (pollingTimer) clearInterval(pollingTimer);
 });
@@ -1772,5 +2092,29 @@ onMounted(() => {
   background: var(--bg-secondary);
   color: var(--text-primary);
   box-shadow: 0 0 0 1px var(--border-primary) inset;
+}
+
+.episode-batch-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.auto-pipeline-log {
+  max-height: 240px;
+  overflow: auto;
+  font-size: 12px;
+  font-family: ui-monospace, monospace;
+  background: var(--el-fill-color-lighter);
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 12px;
+}
+
+.auto-pipeline-log .log-line {
+  margin: 2px 0;
+  word-break: break-all;
 }
 </style>

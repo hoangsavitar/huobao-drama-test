@@ -318,7 +318,7 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string) (
 - Include sensory details: visual, auditory, tactile, olfactory
 - Describe lighting, color, texture, and movement
 - Provide sufficient visual information for the video generation AI to construct the scene
-- Avoid abstract words, use concrete visual descriptions`, systemPrompt, scriptLabel, scriptContent, taskLabel, taskInstruction, charListLabel, characterList, charConstraint, sceneListLabel, sceneList, sceneConstraint)
+- Avoid abstract words, use concrete visual descriptions`, systemPrompt, scriptLabel, scriptContent, taskLabel, taskInstruction, charListLabel, characterList, charConstraint, sceneListLabel, sceneList, sceneConstraint, scriptContent)
 
 	// Create async task
 	task, err := s.taskService.CreateTask("storyboard_generation", episodeID)

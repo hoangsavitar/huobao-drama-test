@@ -25,6 +25,10 @@ type GeminiImageRequest struct {
 	} `json:"contents"`
 	GenerationConfig struct {
 		ResponseModalities []string `json:"responseModalities"`
+		ImageConfig        struct {
+			AspectRatio string `json:"aspectRatio,omitempty"`
+			ImageSize   string `json:"imageSize,omitempty"`
+		} `json:"imageConfig,omitempty"`
 	} `json:"generationConfig"`
 }
 
@@ -92,7 +96,7 @@ func NewGeminiImageClient(baseURL, apiKey, model, endpoint string) *GeminiImageC
 		endpoint = "/v1beta/models/{model}:generateContent"
 	}
 	if model == "" {
-		model = "gemini-3-pro-image-preview"
+		model = "gemini-3.1-flash-image-preview"
 	}
 	return &GeminiImageClient{
 		BaseURL:  baseURL,
@@ -107,7 +111,7 @@ func NewGeminiImageClient(baseURL, apiKey, model, endpoint string) *GeminiImageC
 
 func (c *GeminiImageClient) GenerateImage(prompt string, opts ...ImageOption) (*ImageResult, error) {
 	options := &ImageOptions{
-		Size:    "1920x1920",
+		Size:    "1K",
 		Quality: "standard",
 	}
 
@@ -199,10 +203,15 @@ func (c *GeminiImageClient) GenerateImage(prompt string, opts ...ImageOption) (*
 		},
 		GenerationConfig: struct {
 			ResponseModalities []string `json:"responseModalities"`
+			ImageConfig        struct {
+				AspectRatio string `json:"aspectRatio,omitempty"`
+				ImageSize   string `json:"imageSize,omitempty"`
+			} `json:"imageConfig,omitempty"`
 		}{
 			ResponseModalities: []string{"IMAGE"},
 		},
 	}
+	reqBody.GenerationConfig.ImageConfig.ImageSize = "1K"
 
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {

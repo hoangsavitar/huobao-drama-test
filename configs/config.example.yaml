@@ -27,3 +27,8 @@ ai:
   default_text_provider: "openai"
   default_image_provider: "openai"
   default_video_provider: "doubao"
+
+# Narrative episodes: Huobao Text AI (Settings) + embedded prompts (application/services/prompts/narrative/).
+narrative:
+  # false: LLM errors surface to the API. true: use 7-node template DAG if generation fails.
+  fallback_stub: false

@@ -229,12 +229,13 @@ const providerConfigs: Record<AIServiceType, ProviderConfig[]> = {
     {
       id: "openai",
       name: "OpenAI",
-      models: ["gpt-5.2", "gemini-3-flash-preview"],
+      models: ["gpt-5.2", "gemini-3.1-flash-lite-preview", "gemini-3-flash-preview"],
     },
     {
       id: "chatfire",
       name: "Chatfire",
       models: [
+        "gemini-3.1-flash-lite-preview",
         "gemini-3-flash-preview",
         "claude-sonnet-4-5-20250929",
         "doubao-seed-1-8-251228",
@@ -243,7 +244,7 @@ const providerConfigs: Record<AIServiceType, ProviderConfig[]> = {
     {
       id: "gemini",
       name: "Google Gemini",
-      models: ["gemini-2.5-pro", "gemini-3-flash-preview"],
+      models: ["gemini-3.1-flash-lite-preview", "gemini-2.5-pro", "gemini-3-flash-preview"],
     },
   ],
   image: [
@@ -260,7 +261,7 @@ const providerConfigs: Record<AIServiceType, ProviderConfig[]> = {
     {
       id: "gemini",
       name: "Google Gemini",
-      models: ["gemini-3-pro-image-preview"],
+      models: ["gemini-3.1-flash-image-preview", "gemini-3-pro-image-preview"],
     },
     { id: "openai", name: "OpenAI", models: ["dall-e-3", "dall-e-2"] },
   ],

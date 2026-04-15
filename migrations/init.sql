@@ -33,6 +33,9 @@ CREATE TABLE IF NOT EXISTS episodes (
     drama_id INTEGER NOT NULL,
     episode_number INTEGER NOT NULL,
     title TEXT NOT NULL,
+    narrative_node_id TEXT,
+    choices TEXT, -- JSON: [{"label","next_episode_id","next_narrative_node_id"?}]
+    is_entry INTEGER NOT NULL DEFAULT 0,
     script_content TEXT,
     description TEXT,
     duration INTEGER NOT NULL DEFAULT 0, -- 时长(秒)
@@ -47,6 +50,7 @@ CREATE TABLE IF NOT EXISTS episodes (
 CREATE INDEX IF NOT EXISTS idx_episodes_drama_id ON episodes(drama_id);
 CREATE INDEX IF NOT EXISTS idx_episodes_status ON episodes(status);
 CREATE INDEX IF NOT EXISTS idx_episodes_deleted_at ON episodes(deleted_at);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_episodes_drama_narrative_node ON episodes(drama_id, narrative_node_id);
 
 -- 角色表
 CREATE TABLE IF NOT EXISTS characters (

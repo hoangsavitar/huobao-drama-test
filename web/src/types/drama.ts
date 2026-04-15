@@ -47,6 +47,12 @@ export interface Character {
   updated_at: string
 }
 
+export interface EpisodeChoice {
+  label: string
+  next_episode_id?: number
+  next_narrative_node_id?: string
+}
+
 export interface Episode {
   id: string
   drama_id: string
@@ -54,6 +60,9 @@ export interface Episode {
   title: string
   content: string
   description?: string
+  narrative_node_id?: string
+  choices?: EpisodeChoice[]
+  is_entry?: boolean
   script_content?: string
   duration?: number
   status: string

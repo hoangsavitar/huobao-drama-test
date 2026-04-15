@@ -18,9 +18,17 @@ type GeminiClient struct {
 	HTTPClient *http.Client
 }
 
+// GeminiGenerationConfig maps shared options (e.g. WithMaxTokens) to Gemini REST fields.
+type GeminiGenerationConfig struct {
+	MaxOutputTokens int      `json:"maxOutputTokens,omitempty"`
+	Temperature     *float64 `json:"temperature,omitempty"`
+	TopP            *float64 `json:"topP,omitempty"`
+}
+
 type GeminiTextRequest struct {
-	Contents          []GeminiContent    `json:"contents"`
-	SystemInstruction *GeminiInstruction `json:"systemInstruction,omitempty"`
+	Contents          []GeminiContent         `json:"contents"`
+	SystemInstruction *GeminiInstruction      `json:"systemInstruction,omitempty"`
+	GenerationConfig  *GeminiGenerationConfig `json:"generationConfig,omitempty"`
 }
 
 type GeminiContent struct {
@@ -73,14 +81,20 @@ func NewGeminiClient(baseURL, apiKey, model, endpoint string) *GeminiClient {
 		APIKey:   apiKey,
 		Model:    model,
 		Endpoint: endpoint,
+		// Large JSON drama packages (many episodes × long scripts) can exceed 10m on provider side.
 		HTTPClient: &http.Client{
-			Timeout: 10 * time.Minute,
+			Timeout: 30 * time.Minute,
 		},
 	}
 }
 
 func (c *GeminiClient) GenerateText(prompt string, systemPrompt string, options ...func(*ChatCompletionRequest)) (string, error) {
 	model := c.Model
+
+	optReq := &ChatCompletionRequest{}
+	for _, opt := range options {
+		opt(optReq)
+	}
 
 	// 构建请求体
 	reqBody := GeminiTextRequest{
@@ -97,6 +111,22 @@ func (c *GeminiClient) GenerateText(prompt string, systemPrompt string, options 
 		reqBody.SystemInstruction = &GeminiInstruction{
 			Parts: []GeminiPart{{Text: systemPrompt}},
 		}
+	}
+
+	gen := &GeminiGenerationConfig{}
+	if optReq.MaxTokens != nil && *optReq.MaxTokens > 0 {
+		gen.MaxOutputTokens = *optReq.MaxTokens
+	}
+	if optReq.Temperature != 0 {
+		t := optReq.Temperature
+		gen.Temperature = &t
+	}
+	if optReq.TopP != 0 {
+		p := optReq.TopP
+		gen.TopP = &p
+	}
+	if gen.MaxOutputTokens > 0 || gen.Temperature != nil || gen.TopP != nil {
+		reqBody.GenerationConfig = gen
 	}
 
 	jsonData, err := json.Marshal(reqBody)
@@ -127,7 +157,12 @@ func (c *GeminiClient) GenerateText(prompt string, systemPrompt string, options 
 
 	req.Header.Set("Content-Type", "application/json")
 
-	fmt.Printf("Gemini: Executing HTTP request...\n")
+	maxOut := 0
+	if reqBody.GenerationConfig != nil {
+		maxOut = reqBody.GenerationConfig.MaxOutputTokens
+	}
+	fmt.Printf("Gemini: Executing HTTP request (client timeout=%v, maxOutputTokens=%d). Large narrative JSON can take several minutes; no streaming logs until response.\n",
+		c.HTTPClient.Timeout, maxOut)
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
 		fmt.Printf("Gemini: HTTP request failed: %v\n", err)
@@ -178,7 +213,11 @@ func (c *GeminiClient) GenerateText(prompt string, systemPrompt string, options 
 	}
 
 	responseText := result.Candidates[0].Content.Parts[0].Text
-	fmt.Printf("Gemini: Generated text: %s\n", responseText)
+	if len(responseText) > 800 {
+		fmt.Printf("Gemini: Generated text length=%d (preview): %s…\n", len(responseText), responseText[:800])
+	} else {
+		fmt.Printf("Gemini: Generated text: %s\n", responseText)
+	}
 
 	return responseText, nil
 }

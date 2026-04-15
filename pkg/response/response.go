@@ -117,3 +117,7 @@ func NotFound(c *gin.Context, message string) {
 func InternalError(c *gin.Context, message string) {
 	Error(c, http.StatusInternalServerError, "INTERNAL_ERROR", message)
 }
+
+func ServiceUnavailable(c *gin.Context, message string) {
+	Error(c, http.StatusServiceUnavailable, "SERVICE_UNAVAILABLE", message)
+}
