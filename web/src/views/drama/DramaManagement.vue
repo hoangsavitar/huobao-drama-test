@@ -929,7 +929,7 @@ import { buildNarrativeMermaidSource } from "@/utils/narrativeGraph";
 import NarrativeStoryGraph from "@/components/drama/NarrativeStoryGraph.vue";
 import {
   runFullEpisodePipeline,
-  getPipelineModelsFromStorage,
+  getPipelineModelsWithFallback,
   type PipelineStep,
 } from "@/composables/useEpisodeFullProduction";
 
@@ -1095,7 +1095,7 @@ const startAutoPipeline = async () => {
     (a, b) => a.episode_number - b.episode_number,
   );
   if (!snapshot.length) return;
-  const models = getPipelineModelsFromStorage(dramaId);
+  const models = await getPipelineModelsWithFallback(dramaId);
   autoPipelineLogLines.value = [];
   autoPipelineLastFailure.value = null;
   autoPipelineQueueStatus.value = "running";

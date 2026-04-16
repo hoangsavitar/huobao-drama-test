@@ -138,6 +138,7 @@ func (s *DramaService) GetDrama(dramaID string) (*models.Drama, error) {
 		Preload("Episodes.Storyboards", func(db *gorm.DB) *gorm.DB {
 			return db.Order("storyboards.storyboard_number ASC")
 		}).
+		Preload("Episodes.Storyboards.Background"). // Load scene/background linked by scene_id
 		Preload("Episodes.Storyboards.Props").      // Load props associated with storyboards
 		Preload("Episodes.Storyboards.Characters"). // Load characters associated with storyboards
 		First(&drama).Error
@@ -283,6 +284,7 @@ func (s *DramaService) ListDramas(query *DramaListQuery) ([]models.Drama, int64,
 		Preload("Episodes.Storyboards", func(db *gorm.DB) *gorm.DB {
 			return db.Order("storyboards.storyboard_number ASC")
 		}).
+		Preload("Episodes.Storyboards.Background").
 		Find(&dramas).Error
 
 	if err != nil {

@@ -391,11 +391,9 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 	// 1. Array format: [{...}, {...}]
 	// 2. Object format: {"storyboards": [{...}, {...}]}
 	var result GenerateStoryboardResult
-
+	var storyboards []Storyboard
+	if err := utils.SafeParseAIJSON(text, &storyboards); err == nil {
 		// Successfully parsed as array, wrap as object
-		for i := range storyboards {
-			storyboards[i].DramaStyle = episode.DramaStyle
-		}
 		result.Storyboards = storyboards
 		result.Total = len(storyboards)
 		s.log.Infow("Parsed storyboard as array format", "count", len(storyboards), "task_id", taskID)
@@ -407,9 +405,6 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 				s.log.Errorw("Failed to update task error", "error", updateErr, "task_id", taskID)
 			}
 			return
-		}
-		for i := range result.Storyboards {
-			result.Storyboards[i].DramaStyle = episode.DramaStyle
 		}
 		result.Total = len(result.Storyboards)
 		s.log.Infow("Parsed storyboard as object format", "count", len(result.Storyboards), "task_id", taskID)
@@ -898,6 +893,7 @@ type CreateStoryboardRequest struct {
 }
 
 // CreateStoryboard creates a single storyboard shot
+func (s *StoryboardService) CreateStoryboard(req *CreateStoryboardRequest) (*models.Storyboard, error) {
 	// Get episode and drama to get style
 	var episode models.Episode
 	if err := s.db.Preload("Drama").Where("id = ?", req.EpisodeID).First(&episode).Error; err != nil {
@@ -922,7 +918,7 @@ type CreateStoryboardRequest struct {
 		BgmPrompt:   getString(req.BgmPrompt),
 		SoundEffect: getString(req.SoundEffect),
 		Characters:  req.Characters,
-		DramaStyle:  episode.DramaStyle,
+		DramaStyle:  "",
 	}
 	if req.Title != nil {
 		sb.Title = *req.Title

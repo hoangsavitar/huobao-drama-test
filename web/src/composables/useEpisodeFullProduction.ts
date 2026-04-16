@@ -4,6 +4,7 @@ import { characterLibraryAPI } from "@/api/character-library";
 import { imageAPI } from "@/api/image";
 import { ltxVideoPromptAPI } from "@/api/ltx-video-prompt";
 import { videoAPI } from "@/api/video";
+import { aiAPI } from "@/api/ai";
 import {
   generateFirstFrame,
   getStoryboardFramePrompts,
@@ -59,6 +60,41 @@ export function getPipelineModelsFromStorage(dramaId: string): PipelineModels {
     imageModel: localStorage.getItem(`ai_image_model_${dramaId}`) || "",
     videoModel: localStorage.getItem(`ai_video_model_${dramaId}`) || "",
   };
+}
+
+export async function getPipelineModelsWithFallback(
+  dramaId: string,
+): Promise<PipelineModels> {
+  const models = getPipelineModelsFromStorage(dramaId);
+  if (models.videoModel?.trim()) return models;
+
+  try {
+    const configs = await aiAPI.list("video");
+    const activeConfigs = configs.filter((c) => c.is_active);
+    const allModels = activeConfigs
+      .flatMap((config) => {
+        const modelList = Array.isArray(config.model)
+          ? config.model
+          : [config.model];
+        return modelList
+          .filter(Boolean)
+          .map((modelName) => ({
+            modelName,
+            priority: config.priority || 0,
+          }));
+      })
+      .sort((a, b) => b.priority - a.priority);
+
+    const fallbackVideoModel = allModels[0]?.modelName || "";
+    if (fallbackVideoModel) {
+      models.videoModel = fallbackVideoModel;
+      localStorage.setItem(`ai_video_model_${dramaId}`, fallbackVideoModel);
+    }
+  } catch {
+    // Keep storage values if AI config fetch fails.
+  }
+
+  return models;
 }
 
 function sleep(ms: number) {
@@ -527,35 +563,50 @@ export async function runFullEpisodePipeline(
       const byId = new Map<number, Record<string, unknown>>(
         sbAfter.map((s) => [Number(s.id), s as Record<string, unknown>]),
       );
+      let submitted = 0;
+      let skippedNoPrompt = 0;
+      let skippedNoFirstFrame = 0;
       for (const storyboardId of sbIds) {
         throwIfAborted(signal);
         const sb = byId.get(storyboardId);
         const prompt = sb ? storyboardVideoPrompt(sb) : "";
-        if (!prompt || prompt.length < 5) continue;
+        if (!prompt || prompt.length < 5) {
+          skippedNoPrompt++;
+          continue;
+        }
 
         let first: ImageGeneration | undefined;
         try {
-          const imgRes = await imageAPI.listImages({
-            storyboard_id: storyboardId,
-            frame_type: "first",
-            page: 1,
-            page_size: 30,
-          });
-          first = imgRes.items?.find(
-            (i) =>
-              i.status === "completed" && (i.image_url || i.local_path),
-          );
+          // Batch shot images may still be processing. Wait a bit for first-frame completion.
+          const maxChecks = 20; // ~60s
+          for (let check = 0; check < maxChecks; check++) {
+            const imgRes = await imageAPI.listImages({
+              storyboard_id: storyboardId,
+              frame_type: "first",
+              page: 1,
+              page_size: 30,
+            });
+            first = imgRes.items?.find(
+              (i) =>
+                i.status === "completed" && (i.image_url || i.local_path),
+            );
+            if (first) break;
+            await sleep(3000);
+          }
         } catch {
           first = undefined;
         }
-        if (!first) continue;
+        if (!first) {
+          skippedNoFirstFrame++;
+          continue;
+        }
 
         const duration = Math.min(
           10,
           Math.max(4, Math.round(Number(sb?.duration) || 5)),
         );
 
-        const req: GenerateVideoRequest = {
+        const req: GenerateVideoRequest & Record<string, unknown> = {
           drama_id: dramaId,
           storyboard_id: storyboardId,
           prompt,
@@ -566,8 +617,41 @@ export async function runFullEpisodePipeline(
           aspect_ratio: drama.aspect_ratio || "16:9",
           image_gen_id: first.id,
         };
+        if (first.local_path) {
+          req.image_local_path = first.local_path;
+        } else if (first.image_url) {
+          req.image_url = first.image_url;
+        }
         await videoAPI.generateVideo(req);
+        submitted++;
       }
+
+      const summaryMsg = `submitted=${submitted}, skipped_no_prompt=${skippedNoPrompt}, skipped_no_first_frame=${skippedNoFirstFrame}`;
+      if (submitted === 0) {
+        logStep(
+          onStep,
+          {
+            step: "batch_videos",
+            message: `No video API request submitted (${summaryMsg})`,
+          },
+          t8,
+          now(),
+          "fail",
+        );
+        return fail(
+          "batch_videos",
+          `No video API request submitted (${summaryMsg})`,
+        );
+      }
+      logStep(
+        onStep,
+        {
+          step: "batch_videos",
+          message: `OK (${summaryMsg})`,
+        },
+        t8,
+        now(),
+      );
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       logStep(
@@ -579,7 +663,6 @@ export async function runFullEpisodePipeline(
       );
       return fail("batch_videos", msg);
     }
-    logStep(onStep, { step: "batch_videos", message: "OK" }, t8, now());
 
     return { ok: true, episodeId, episodeNumber, message: "Full pipeline submitted." };
   } catch (e: unknown) {
