@@ -527,6 +527,11 @@ func (s *CharacterLibraryService) ExtractCharactersFromScript(episodeID uint) (s
 
 func (s *CharacterLibraryService) processCharacterExtraction(taskID string, episode models.Episode) {
 	s.taskService.UpdateTaskStatus(taskID, "processing", 0, "Analyzing script...")
+	if merged, mergeErr := mergeDuplicateCharactersByIdentity(s.db, s.log, episode.DramaID); mergeErr != nil {
+		s.log.Warnw("Failed to merge duplicate characters before extraction", "drama_id", episode.DramaID, "error", mergeErr, "task_id", taskID)
+	} else if merged > 0 {
+		s.log.Infow("Merged duplicate characters before extraction", "drama_id", episode.DramaID, "merged_count", merged, "task_id", taskID)
+	}
 
 	script := ""
 	if episode.ScriptContent != nil {
@@ -565,17 +570,28 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 	}
 
 	var savedCharacters []models.Character
+	var existingCharacters []models.Character
+	if err := s.db.Where("drama_id = ?", episode.DramaID).Find(&existingCharacters).Error; err != nil {
+		s.log.Errorw("Failed to load existing characters for extraction", "error", err, "episode_id", episode.ID)
+		s.taskService.UpdateTaskError(taskID, err)
+		return
+	}
 	for _, charData := range extractedCharacters {
-		// Check if a character with the same name already exists
-		var existingCharacter models.Character
-		err := s.db.Where("drama_id = ? AND name = ?", episode.DramaID, charData.Name).First(&existingCharacter).Error
+		// Check if a character with same identity already exists.
+		var existingCharacter *models.Character
+		for i := range existingCharacters {
+			if isLikelySameCharacterName(existingCharacters[i].Name, charData.Name) {
+				existingCharacter = &existingCharacters[i]
+				break
+			}
+		}
 
-		if err == nil {
+		if existingCharacter != nil {
 			// If exists, only associate without updating (could update, but skipping for now)
-			if err := s.db.Model(&episode).Association("Characters").Append(&existingCharacter); err != nil {
+			if err := s.db.Model(&episode).Association("Characters").Append(existingCharacter); err != nil {
 				s.log.Warnw("Failed to associate existing character", "error", err)
 			}
-			savedCharacters = append(savedCharacters, existingCharacter)
+			savedCharacters = append(savedCharacters, *existingCharacter)
 		} else {
 			// Create new character
 			newCharacter := models.Character{
@@ -596,6 +612,7 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 				s.log.Warnw("Failed to associate new character", "error", err)
 			}
 			savedCharacters = append(savedCharacters, newCharacter)
+			existingCharacters = append(existingCharacters, newCharacter)
 		}
 	}
 

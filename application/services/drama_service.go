@@ -523,6 +523,12 @@ func (s *DramaService) SaveCharacters(dramaID string, req *SaveCharactersRequest
 		return err
 	}
 
+	if merged, mergeErr := mergeDuplicateCharactersByIdentity(s.db, s.log, dramaIDUint); mergeErr != nil {
+		s.log.Warnw("Failed to pre-merge duplicate characters", "drama_id", dramaIDUint, "error", mergeErr)
+	} else if merged > 0 {
+		s.log.Infow("Pre-merged duplicate characters before save", "drama_id", dramaIDUint, "merged_count", merged)
+	}
+
 	// If EpisodeID is specified, verify episode existence
 	if req.EpisodeID != nil {
 		var episode models.Episode
@@ -541,10 +547,13 @@ func (s *DramaService) SaveCharacters(dramaID string, req *SaveCharactersRequest
 		return err
 	}
 
-	// Create character name to character mapping
+	// Create normalized-name to character mapping
 	existingCharMap := make(map[string]*models.Character)
 	for i := range existingCharacters {
-		existingCharMap[existingCharacters[i].Name] = &existingCharacters[i]
+		key := normalizeCharacterName(existingCharacters[i].Name)
+		if key != "" {
+			existingCharMap[key] = &existingCharacters[i]
+		}
 	}
 
 	// Collect character IDs to associate with episode
@@ -573,10 +582,34 @@ func (s *DramaService) SaveCharacters(dramaID string, req *SaveCharactersRequest
 			}
 		}
 
-		// 2. If no ID but name exists, reuse directly (optional: could also update)
-		if existingChar, exists := existingCharMap[char.Name]; exists {
-			s.log.Infow("Character already exists, reusing", "name", char.Name, "character_id", existingChar.ID)
-			characterIDs = append(characterIDs, existingChar.ID)
+		// 2. If no ID but same identity exists, reuse canonical character.
+		reused := false
+		incomingKey := normalizeCharacterName(char.Name)
+		if incomingKey != "" {
+			if existingChar, exists := existingCharMap[incomingKey]; exists {
+				s.log.Infow("Character deduplicated by normalized name", "incoming_name", char.Name, "canonical_name", existingChar.Name, "character_id", existingChar.ID)
+				characterIDs = append(characterIDs, existingChar.ID)
+				reused = true
+			}
+		}
+		if reused {
+			continue
+		}
+		if incomingKey != "" {
+			for i := range existingCharacters {
+				existingChar := &existingCharacters[i]
+				if isLikelySameCharacterName(existingChar.Name, char.Name) {
+					s.log.Infow("Character deduplicated by fuzzy identity", "incoming_name", char.Name, "canonical_name", existingChar.Name, "character_id", existingChar.ID)
+					characterIDs = append(characterIDs, existingChar.ID)
+					if _, ok := existingCharMap[incomingKey]; !ok {
+						existingCharMap[incomingKey] = existingChar
+					}
+					reused = true
+					break
+				}
+			}
+		}
+		if reused {
 			continue
 		}
 
@@ -598,6 +631,10 @@ func (s *DramaService) SaveCharacters(dramaID string, req *SaveCharactersRequest
 
 		s.log.Infow("New character created", "character_id", character.ID, "name", char.Name)
 		characterIDs = append(characterIDs, character.ID)
+		existingCharacters = append(existingCharacters, character)
+		if incomingKey := normalizeCharacterName(character.Name); incomingKey != "" {
+			existingCharMap[incomingKey] = &character
+		}
 	}
 
 	// If EpisodeID is specified, establish character-episode association

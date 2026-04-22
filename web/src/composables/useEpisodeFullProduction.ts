@@ -209,6 +209,58 @@ async function pollTaskUntilDoneStrict(
   throw new Error("Async task timeout");
 }
 
+async function waitForEpisodeCharacterImagesReady(
+  dramaId: string,
+  episodeId: string,
+  requiredCharacterIds: number[],
+  signal?: AbortSignal,
+): Promise<void> {
+  if (!requiredCharacterIds.length) return;
+  const needed = new Set(requiredCharacterIds.map(Number));
+  const maxChecks = 30; // ~90s
+  for (let i = 0; i < maxChecks; i++) {
+    throwIfAborted(signal);
+    const drama = await dramaAPI.get(dramaId);
+    const ep = drama.episodes?.find((e) => String(e.id) === String(episodeId));
+    const readyCount =
+      ep?.characters?.filter(
+        (c) =>
+          needed.has(Number(c.id)) &&
+          (!!c.local_path?.trim() || !!c.image_url?.trim()),
+      ).length || 0;
+    if (readyCount >= needed.size) return;
+    await sleep(3000);
+  }
+  throw new Error(
+    "Character images not ready in time for full auto production",
+  );
+}
+
+async function waitForEpisodeSceneImagesReady(
+  dramaId: string,
+  episodeId: string,
+  requiredSceneIds: number[],
+  signal?: AbortSignal,
+): Promise<void> {
+  if (!requiredSceneIds.length) return;
+  const needed = new Set(requiredSceneIds.map(Number));
+  const maxChecks = 30; // ~90s
+  for (let i = 0; i < maxChecks; i++) {
+    throwIfAborted(signal);
+    const drama = await dramaAPI.get(dramaId);
+    const ep = drama.episodes?.find((e) => String(e.id) === String(episodeId));
+    const readyCount =
+      ep?.scenes?.filter(
+        (s) =>
+          needed.has(Number(s.id)) &&
+          (!!s.local_path?.trim() || !!s.image_url?.trim()),
+      ).length || 0;
+    if (readyCount >= needed.size) return;
+    await sleep(3000);
+  }
+  throw new Error("Scene images not ready in time for full auto production");
+}
+
 export interface RunEpisodePipelineOptions {
   dramaId: string;
   episodeId: string;
@@ -334,6 +386,12 @@ export async function runFullEpisodePipeline(
           charIds.map(String),
           models.imageModel || undefined,
         );
+        await waitForEpisodeCharacterImagesReady(
+          dramaId,
+          episodeId,
+          charIds.map(Number),
+          signal,
+        );
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
         logStep(
@@ -371,6 +429,12 @@ export async function runFullEpisodePipeline(
               model: models.imageModel || undefined,
             }),
           ),
+        );
+        await waitForEpisodeSceneImagesReady(
+          dramaId,
+          episodeId,
+          sceneIds.map(Number),
+          signal,
         );
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);

@@ -78,6 +78,11 @@ s.log.Errorw("Drama not found during character generation", "error", err, "drama
 s.taskService.UpdateTaskStatus(taskID, "failed", 0, "drama information not found")
 return
 }
+	if merged, mergeErr := mergeDuplicateCharactersByIdentity(s.db, s.log, drama.ID); mergeErr != nil {
+		s.log.Warnw("Failed to merge duplicate characters before generation", "drama_id", drama.ID, "error", mergeErr, "task_id", taskID)
+	} else if merged > 0 {
+		s.log.Infow("Merged duplicate characters before generation", "drama_id", drama.ID, "merged_count", merged, "task_id", taskID)
+	}
 
 systemPrompt := s.promptI18n.GetCharacterExtractionPrompt(drama.Style, drama.AspectRatio)
 
@@ -133,16 +138,26 @@ s.taskService.UpdateTaskStatus(taskID, "failed", 0, "failed to parse AI response
 return
 }
 
-var characters []models.Character
+	var characters []models.Character
+	var existingCharacters []models.Character
+	if err := s.db.Where("drama_id = ?", req.DramaID).Find(&existingCharacters).Error; err != nil {
+		s.log.Errorw("Failed to load existing characters", "error", err, "drama_id", req.DramaID, "task_id", taskID)
+		s.taskService.UpdateTaskStatus(taskID, "failed", 0, "failed to load existing characters")
+		return
+	}
 for _, char := range result {
-// Check if character already exists
-var existingChar models.Character
-err := s.db.Where("drama_id = ? AND name = ?", req.DramaID, char.Name).First(&existingChar).Error
-if err == nil {
-// Character already exists, use existing one without overwriting
-s.log.Infow("Character already exists, skipping", "drama_id", req.DramaID, "name", char.Name, "task_id", taskID)
-characters = append(characters, existingChar)
-continue
+		// Check by exact/fuzzy name identity to prevent cross-episode duplicates.
+		var matched *models.Character
+		for i := range existingCharacters {
+			if isLikelySameCharacterName(existingCharacters[i].Name, char.Name) {
+				matched = &existingCharacters[i]
+				break
+			}
+		}
+		if matched != nil {
+			s.log.Infow("Character deduplicated by identity", "drama_id", req.DramaID, "incoming_name", char.Name, "canonical_name", matched.Name, "task_id", taskID)
+			characters = append(characters, *matched)
+			continue
 }
 
 // Character does not exist, create new character
@@ -163,6 +178,7 @@ continue
 }
 
 characters = append(characters, character)
+		existingCharacters = append(existingCharacters, character)
 }
 
 // If EpisodeID is provided, establish episode_characters association
