@@ -1,0 +1,2710 @@
+=== Episode 1: Episode 1 ===
+
+Shot 1
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Extreme wide shot
+【Movement】Pan
+【Action】The camera pans slowly across the venue, capturing the constant, blinding flashes from a wall of photographers and journalists aiming their cameras at the stage.
+【Dialogue】
+【Result】The scene is established as a high-profile, glamorous media event. The incessant flashing creates a sense of overwhelming success and public attention.
+【Emotion】Excitement ↑↑ (Suspended)
+Scene: Luxurious Launch Ceremony Venue, Evening
+Action: The camera pans slowly across the venue, capturing the constant, blinding flashes from a wall of photographers and journalists aiming their cameras at the stage.
+Result: The scene is established as a high-profile, glamorous media event. The incessant flashing creates a sense of overwhelming success and public attention.
+Atmosphere: Bright, warm tones · Golden and white light dominates, the sound is a cacophony of camera shutters, murmuring crowds, and clinking glasses, creating a lively but intense atmosphere.
+Shot type: Extreme wide shot
+Angle: Eye level
+Movement: Pan
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 2
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Push in
+【Action】The camera slowly pushes in towards the magnificent architectural model of 'The Skyline', its intricate design and glowing lights filling the frame.
+【Dialogue】
+【Result】The visual focus shifts to the object of celebration, symbolizing the peak of achievement and the central theme of the event. It looks perfect and futuristic.
+【Emotion】Awe ↑ (Suspended)
+Scene: Project 'The Skyline' Inauguration Hall, Night
+Action: The camera slowly pushes in towards the magnificent architectural model of 'The Skyline', its intricate design and glowing lights filling the frame.
+Result: The visual focus shifts to the object of celebration, symbolizing the peak of achievement and the central theme of the event. It looks perfect and futuristic.
+Atmosphere: High contrast lighting · The model is brilliantly lit while the surroundings are softer, creating a sense of awe. The ambient crowd noise fades slightly, focusing attention.
+Shot type: Medium shot
+Angle: Low angle
+Movement: Push in
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 3
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Seo-yeon, dressed in an elegant white gown, turns her head slightly towards the audience and breaks into a radiant smile, her eyes shimmering with pride and happiness.
+【Dialogue】
+【Result】Her expression of pure joy and accomplishment introduces her as the genius behind the project. She embodies success and fulfillment.
+【Emotion】Pride ↑↑ (Released)
+Scene: Project 'The Skyline' Inauguration Hall, Night
+Characters: Seo-yeon
+Action: Seo-yeon, dressed in an elegant white gown, turns her head slightly towards the audience and breaks into a radiant smile, her eyes shimmering with pride and happiness.
+Result: Her expression of pure joy and accomplishment introduces her as the genius behind the project. She embodies success and fulfillment.
+Atmosphere: Soft, warm lighting · A dreamlike, almost ethereal quality. The background music is gentle and emotional, underscoring her moment of triumph.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 4
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Jae-hyun, in a refined navy suit, stands close to Seo-yeon. He places his hand gently and possessively on her waist, smiling confidently towards the cameras.
+【Dialogue】
+【Result】Their physical closeness and confident demeanors establish them as a united and successful couple, the center of this glamorous world.
+【Emotion】Confidence ↑↑ (Suspended)
+Scene: Project 'The Skyline' Inauguration Hall, Night
+Characters: Seo-yeon, Jae-hyun
+Action: Jae-hyun, in a refined navy suit, stands close to Seo-yeon. He places his hand gently and possessively on her waist, smiling confidently towards the cameras.
+Result: Their physical closeness and confident demeanors establish them as a united and successful couple, the center of this glamorous world.
+Atmosphere: Bright, celebratory · The flash of cameras continues. The overall mood is one of power, success, and public adoration. The music remains grand.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 5
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Yoon Mi-ra, in a striking burgundy dress, holds a wine glass and watches the couple. She lifts the glass towards her lips, a subtle, unreadable smile playing on her face.
+【Dialogue】
+【Result】Her position and enigmatic expression introduce a note of ambiguity and potential conflict, suggesting hidden feelings or intentions beneath the surface.
+【Emotion】Enigmatic → (Suspended)
+Scene: Project 'The Skyline' Inauguration Hall, Night
+Characters: Seo-yeon, Jae-hyun, Yoon Mi-ra
+Action: Yoon Mi-ra, in a striking burgundy dress, holds a wine glass and watches the couple. She lifts the glass towards her lips, a subtle, unreadable smile playing on her face.
+Result: Her position and enigmatic expression introduce a note of ambiguity and potential conflict, suggesting hidden feelings or intentions beneath the surface.
+Atmosphere: Slightly cooler tones · The lighting on her is less direct, creating subtle shadows. The sound of the crowd feels more distant, creating a sense of her internal world.
+Shot type: Medium shot
+Angle: Side view
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 6
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Jae-hyun confidently steps up to the microphone, adjusts it slightly, and looks out at the audience, his expression projecting charisma and control before he begins to speak.
+【Dialogue】
+【Result】The stage is set for his speech. His posture and the focused lighting establish him as the leader and public face of the company.
+【Emotion】Confidence ↑↑ (Suspended)
+Scene: Project 'The Skyline' Inauguration Hall, Night
+Characters: Jae-hyun
+Action: Jae-hyun confidently steps up to the microphone, adjusts it slightly, and looks out at the audience, his expression projecting charisma and control before he begins to speak.
+Result: The stage is set for his speech. His posture and the focused lighting establish him as the leader and public face of the company.
+Atmosphere: Formal, high-stakes · The crowd hushes in anticipation. The lighting is dramatic and focused. The air is thick with expectation.
+Shot type: Medium shot
+Angle: Low angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 7
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Push in
+【Action】The camera slowly pushes in on Jae-hyun's face as he speaks passionately into the microphone, his eyes scanning the crowd but occasionally flicking towards Seo-yeon.
+【Dialogue】Jae-hyun: “This project is a testament to my wife Seo-yeon’s brilliance, and to the ironclad financial management of Director Yoon Mi-ra.
+【Result】His words publicly credit both women, but the emphasis on 'my wife' and the powerful delivery reinforce his position as the one in control of the narrative.
+【Emotion】Pride ↑↑ (Suspended)
+Scene: Project 'The Skyline' Inauguration Hall, Night
+Characters: Jae-hyun
+Action: The camera slowly pushes in on Jae-hyun's face as he speaks passionately into the microphone, his eyes scanning the crowd but occasionally flicking towards Seo-yeon.
+Result: His words publicly credit both women, but the emphasis on 'my wife' and the powerful delivery reinforce his position as the one in control of the narrative.
+Dialogue: Jae-hyun: “This project is a testament to my wife Seo-yeon’s brilliance, and to the ironclad financial management of Director Yoon Mi-ra.
+Atmosphere: Charismatic, persuasive · His voice resonates through the hall's sound system. The audience is captivated. The atmosphere is charged with his confident energy.
+Shot type: Close-up
+Angle: Eye level
+Movement: Push in
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 8
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Jae-hyun gestures inclusively towards both Seo-yeon and Yoon Mi-ra as he delivers his final, powerful line about their unity.
+【Dialogue】Jae-hyun: Together, we are the inseparable trio of Hanseong Construction!”
+【Result】The audience bursts into applause, buying into the image of a perfect, unbreakable team. Seo-yeon beams with pride, while Mi-ra's smile remains polite and guarded.
+【Emotion】Triumph ↑↑↑ (Released)
+Scene: Project 'The Skyline' Inauguration Hall, Night
+Characters: Seo-yeon, Jae-hyun, Yoon Mi-ra
+Action: Jae-hyun gestures inclusively towards both Seo-yeon and Yoon Mi-ra as he delivers his final, powerful line about their unity.
+Result: The audience bursts into applause, buying into the image of a perfect, unbreakable team. Seo-yeon beams with pride, while Mi-ra's smile remains polite and guarded.
+Dialogue: Jae-hyun: Together, we are the inseparable trio of Hanseong Construction!”
+Atmosphere: Triumphant, unified · The hall erupts in applause. The lighting is bright and celebratory. The image is one of absolute victory.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 9
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Yoon Mi-ra turns her head and whispers to Seo-yeon, her expression a mix of feigned sincerity and subtle envy, her eyes not quite meeting Seo-yeon's.
+【Dialogue】Yoon Mi-ra: “Congratulations, Seo-yeon. You truly have everything now— money, fame… and a perfect husband.”
+【Result】The words, though seemingly complimentary, carry a sharp, bitter undertone that hints at jealousy and hidden resentment, creating a sudden shift in mood.
+【Emotion】Envy ↑ (Suspended)
+Scene: Project 'The Skyline' Inauguration Hall, Night
+Characters: Seo-yeon, Yoon Mi-ra
+Action: Yoon Mi-ra turns her head and whispers to Seo-yeon, her expression a mix of feigned sincerity and subtle envy, her eyes not quite meeting Seo-yeon's.
+Result: The words, though seemingly complimentary, carry a sharp, bitter undertone that hints at jealousy and hidden resentment, creating a sudden shift in mood.
+Dialogue: Yoon Mi-ra: “Congratulations, Seo-yeon. You truly have everything now— money, fame… and a perfect husband.”
+Atmosphere: Intimate, tense · The loud background noise is muffled, focusing on Mi-ra's whisper. The lighting seems to cool slightly, introducing a subtle chill.
+Shot type: Close-up
+Angle: Side view
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 10
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Seo-yeon smiles happily and sincerely, her eyes glowing with genuine gratitude as she looks at both Yoon Mi-ra and Jae-hyun, taking the compliment at face value.
+【Dialogue】Seo-yeon: “I couldn’t have done it without both of you.
+【Result】Her genuine happiness and trust are evident, highlighting her naivete to the undercurrents of jealousy and deceit around her.
+【Emotion】Gratitude ↑ (Released)
+Scene: Project 'The Skyline' Inauguration Hall, Night
+Characters: Seo-yeon, Jae-hyun, Yoon Mi-ra
+Action: Seo-yeon smiles happily and sincerely, her eyes glowing with genuine gratitude as she looks at both Yoon Mi-ra and Jae-hyun, taking the compliment at face value.
+Result: Her genuine happiness and trust are evident, highlighting her naivete to the undercurrents of jealousy and deceit around her.
+Dialogue: Seo-yeon: “I couldn’t have done it without both of you.
+Atmosphere: Warm, sincere · The mood lightens again from Seo-yeon's perspective. The hopeful music swells slightly, reflecting her optimistic worldview.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 11
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Pull out
+【Action】Seo-yeon looks forward with a determined and ambitious expression, her gaze fixed on the future as she makes her final statement of unity.
+【Dialogue】Seo-yeon: Together, we’ll take Hanseong to the global stage.”
+【Result】The camera pulls out to show them as the triumphant trio once more, freezing on this image of peak success before the inevitable fall. This is the 'before' picture.
+【Emotion】Ambition ↑↑ (Released)
+Scene: Project 'The Skyline' Inauguration Hall, Night
+Characters: Seo-yeon, Jae-hyun, Yoon Mi-ra
+Action: Seo-yeon looks forward with a determined and ambitious expression, her gaze fixed on the future as she makes her final statement of unity.
+Result: The camera pulls out to show them as the triumphant trio once more, freezing on this image of peak success before the inevitable fall. This is the 'before' picture.
+Dialogue: Seo-yeon: Together, we’ll take Hanseong to the global stage.”
+Atmosphere: Hopeful, triumphant · The grand music returns for a final, powerful chord. The scene is filled with the promise of a bright future, which makes the coming disaster more tragic.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Pull out
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 12
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】The silence is broken by the rapid, sharp, and aggressive sound of expensive leather shoes striking the marble floor at a fast pace, moving towards the camera.
+【Dialogue】
+【Result】An immediate sense of urgency and dread is created through sound and motion. The polished, orderly world of the office is about to be violently disrupted.
+【Emotion】Tension ↑↑ (Suspended)
+Scene: Chairman's Office, Morning
+Characters: Nhân viên điều tra
+Action: The silence is broken by the rapid, sharp, and aggressive sound of expensive leather shoes striking the marble floor at a fast pace, moving towards the camera.
+Result: An immediate sense of urgency and dread is created through sound and motion. The polished, orderly world of the office is about to be violently disrupted.
+Atmosphere: Cold, sterile · The only sound is the sharp, rhythmic stomping, which echoes in the silent office, creating intense auditory tension. The lighting is cold and unwelcoming.
+Shot type: Close-up
+Angle: Low angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 13
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Long shot
+【Movement】Static shot
+【Action】The office doors are thrown open with such force that they slam against the interior walls, and several investigators in dark suits storm into the room.
+【Dialogue】
+【Result】The sanctity of the chairman's office is violated. The forceful entry signifies a hostile takeover of the space and a sudden loss of control for its occupants.
+【Emotion】Shock ↑↑↑ (Suspended)
+Scene: Chairman's Office, Morning
+Characters: Seo-yeon, Nhân viên điều tra
+Action: The office doors are thrown open with such force that they slam against the interior walls, and several investigators in dark suits storm into the room.
+Result: The sanctity of the chairman's office is violated. The forceful entry signifies a hostile takeover of the space and a sudden loss of control for its occupants.
+Atmosphere: Chaotic, invasive · The loud bang of the doors shatters the morning calm. The sudden influx of people creates a sense of violation and chaos.
+Shot type: Long shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 14
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】The lead investigator, without preamble, holds up the search warrant and makes a formal, loud declaration, his voice cutting through the stunned silence.
+【Dialogue】Investigator: “Search warrant! We’ve uncovered an embezzlement case involving 100 billion won connected to projects led by Architect Seo-yeon.”
+【Result】The accusation hangs in the air, a devastating blow that instantly changes the stakes. The formality of his words makes the threat feel official and inescapable.
+【Emotion】Dread ↑↑↑ (Suspended)
+Scene: Chairman's Office, Morning
+Characters: Nhân viên điều tra
+Action: The lead investigator, without preamble, holds up the search warrant and makes a formal, loud declaration, his voice cutting through the stunned silence.
+Result: The accusation hangs in the air, a devastating blow that instantly changes the stakes. The formality of his words makes the threat feel official and inescapable.
+Dialogue: Investigator: “Search warrant! We’ve uncovered an embezzlement case involving 100 billion won connected to projects led by Architect Seo-yeon.”
+Atmosphere: Cold, authoritative · The investigator's voice is devoid of emotion, making the accusation feel like an unchangeable fact. The air is thick with tension.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 15
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Push in
+【Action】Seo-yeon's eyes widen in absolute shock and disbelief. Her mouth falls slightly open, and the pen in her hand clatters onto the desk as she is rendered motionless.
+【Dialogue】
+【Result】Her perfect world is shattered in an instant. The confident architect from the previous night is replaced by a stunned, vulnerable woman.
+【Emotion】Shock ↑↑↑ (Suspended)
+Scene: Chairman's Office, Morning
+Characters: Seo-yeon
+Action: Seo-yeon's eyes widen in absolute shock and disbelief. Her mouth falls slightly open, and the pen in her hand clatters onto the desk as she is rendered motionless.
+Result: Her perfect world is shattered in an instant. The confident architect from the previous night is replaced by a stunned, vulnerable woman.
+Atmosphere: Shocking, surreal · The sound becomes muffled, focusing on her sharp intake of breath. The visual is tight on her face, capturing the raw moment of impact.
+Shot type: Close-up
+Angle: Eye level
+Movement: Push in
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 16
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Seo-yeon shakes her head vigorously, her voice a mixture of a gasp and a shout as she pushes back against the unbelievable accusation.
+【Dialogue】Seo-yeon: “Embezzlement? 100 billion? That’s impossible! I’m only responsible for design!”
+【Result】Her denial is frantic and immediate, establishing her perspective of innocence but also her powerlessness in the face of the official charge.
+【Emotion】Panic ↑↑↑ (Suspended)
+Scene: Chairman's Office, Morning
+Characters: Seo-yeon
+Action: Seo-yeon shakes her head vigorously, her voice a mixture of a gasp and a shout as she pushes back against the unbelievable accusation.
+Result: Her denial is frantic and immediate, establishing her perspective of innocence but also her powerlessness in the face of the official charge.
+Dialogue: Seo-yeon: “Embezzlement? 100 billion? That’s impossible! I’m only responsible for design!”
+Atmosphere: Panicked, desperate · Her voice is slightly high-pitched with fear. The background is a blur of motion as other investigators begin to search the office.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 17
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Extreme close-up
+【Movement】Static shot
+【Action】The investigator's finger points directly to a signature on the bottom line of a transfer order. The camera is focused tightly on the elegant, familiar curves of Seo-yeon's name.
+【Dialogue】Investigator: “All transfer orders bear your signature, Seo-yeon.
+【Result】Indisputable visual evidence is presented, trapping her completely. The sight of her own signature used against her is a moment of profound betrayal and confusion.
+【Emotion】Confusion ↑↑↑ (Reversed)
+Scene: Chairman's Office, Morning
+Characters: Seo-yeon, Nhân viên điều tra
+Action: The investigator's finger points directly to a signature on the bottom line of a transfer order. The camera is focused tightly on the elegant, familiar curves of Seo-yeon's name.
+Result: Indisputable visual evidence is presented, trapping her completely. The sight of her own signature used against her is a moment of profound betrayal and confusion.
+Dialogue: Investigator: “All transfer orders bear your signature, Seo-yeon.
+Atmosphere: Clinical, damning · The shot is claustrophobic and stark. The only sound is the investigator's cold, factual voice and the rustle of the paper.
+Shot type: Extreme close-up
+Angle: High angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 18
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Follow
+【Action】The camera follows behind Seo-yeon as she is escorted from her office, her posture defeated. Her elegant dress from the night before looks tragically out of place.
+【Dialogue】Investigator: You need to come with us.”
+【Result】The walk of shame begins. She is being removed from her seat of power, her journey from the peak to the abyss now physically underway.
+【Emotion】Despair ↓ (Suspended)
+Scene: Corporate Office Corridor, Morning
+Characters: Seo-yeon, Nhân viên điều tra
+Action: The camera follows behind Seo-yeon as she is escorted from her office, her posture defeated. Her elegant dress from the night before looks tragically out of place.
+Result: The walk of shame begins. She is being removed from her seat of power, her journey from the peak to the abyss now physically underway.
+Dialogue: Investigator: You need to come with us.”
+Atmosphere: Humiliating, somber · The only sounds are the quiet, shuffling footsteps. The long, empty corridor emphasizes her isolation and despair.
+Shot type: Medium shot
+Angle: Back
+Movement: Follow
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 19
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Point of View
+【Movement】Static shot
+【Action】As she is being pulled away, Seo-yeon's eyes dart around the room and lock onto Yoon Mi-ra, who is pressed against a wall, visibly trembling and clutching her arms.
+【Dialogue】
+【Result】The sight of Mi-ra's fear sparks a flicker of suspicion and a desperate hope for an answer in Seo-yeon's mind. She latches onto this as her only lifeline.
+【Emotion】Suspicion ↑ (Suspended)
+Scene: Chairman's Office, Morning
+Characters: Seo-yeon, Yoon Mi-ra, Nhân viên điều tra
+Action: As she is being pulled away, Seo-yeon's eyes dart around the room and lock onto Yoon Mi-ra, who is pressed against a wall, visibly trembling and clutching her arms.
+Result: The sight of Mi-ra's fear sparks a flicker of suspicion and a desperate hope for an answer in Seo-yeon's mind. She latches onto this as her only lifeline.
+Atmosphere: Tense, suspicious · The camera is slightly shaky to represent Seo-yeon's POV. The focus racks sharply from the foreground to Mi-ra in the background.
+Shot type: Point of View
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 20
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Seo-yeon twists her body, her face contorted in a desperate plea as she yells Mi-ra's name, her voice echoing slightly in the hallway.
+【Dialogue】Seo-yeon: “Yoon Mi-ra! You handle the accounts—what is going on?!”
+【Result】Her shout is a desperate cry for help and answers, putting Yoon Mi-ra directly in the spotlight and forcing a confrontation.
+【Emotion】Desperation ↑↑↑ (Suspended)
+Scene: Corporate Office Corridor, Morning
+Characters: Seo-yeon, Nhân viên điều tra
+Action: Seo-yeon twists her body, her face contorted in a desperate plea as she yells Mi-ra's name, her voice echoing slightly in the hallway.
+Result: Her shout is a desperate cry for help and answers, putting Yoon Mi-ra directly in the spotlight and forcing a confrontation.
+Dialogue: Seo-yeon: “Yoon Mi-ra! You handle the accounts—what is going on?!”
+Atmosphere: Frantic, accusatory · Her voice is loud and strained. The investigators' grip tightens, adding to the sense of struggle and powerlessness.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 21
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Yoon Mi-ra flinches at the shout. She starts crying, but her eyes deliberately avoid meeting Seo-yeon's gaze, looking down at the floor as she speaks.
+【Dialogue】Yoon Mi-ra: “Seo-yeon… I… I only signed what Jae-hyun told me to… I didn’t know anything!”
+【Result】Her words are a confession and a deflection of blame, directly implicating Jae-hyun and shattering Seo-yeon's remaining sense of reality. The betrayal is complete.
+【Emotion】Guilt ↑↑ (Reversed)
+Scene: Chairman's Office, Morning
+Characters: Yoon Mi-ra
+Action: Yoon Mi-ra flinches at the shout. She starts crying, but her eyes deliberately avoid meeting Seo-yeon's gaze, looking down at the floor as she speaks.
+Result: Her words are a confession and a deflection of blame, directly implicating Jae-hyun and shattering Seo-yeon's remaining sense of reality. The betrayal is complete.
+Dialogue: Yoon Mi-ra: “Seo-yeon… I… I only signed what Jae-hyun told me to… I didn’t know anything!”
+Atmosphere: Deceitful, cowardly · Her crying seems performative. The refusal to make eye contact is a clear sign of guilt. The air is thick with the poison of her words.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 22
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Tracking
+【Action】Jae-hyun, his normally perfect hair now slightly messy, rushes forward and physically places himself between the officers and the direction they are walking.
+【Dialogue】
+【Result】His sudden, decisive action momentarily halts the process, creating a new focal point of conflict and a sliver of hope for Seo-yeon.
+【Emotion】Urgency ↑↑ (Suspended)
+Scene: Corporate Office Corridor, Morning
+Characters: Seo-yeon, Jae-hyun, Nhân viên điều tra
+Action: Jae-hyun, his normally perfect hair now slightly messy, rushes forward and physically places himself between the officers and the direction they are walking.
+Result: His sudden, decisive action momentarily halts the process, creating a new focal point of conflict and a sliver of hope for Seo-yeon.
+Atmosphere: Chaotic, urgent · The camera tracks his rapid movement, adding to the sense of urgency. The sound of his dress shoes on the floor is sharp and loud.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Tracking
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 23
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Jae-hyun holds up his hands in a placating gesture, looking the lead investigator directly in the eye and speaking in a low, urgent tone.
+【Dialogue】Jae-hyun: “Wait! Give me two minutes with my wife!”
+【Result】His request, seemingly born of love and concern, is granted by the officers. This sets the stage for the crucial, manipulative conversation to come.
+【Emotion】Manipulation ↑↑ (Suspended)
+Scene: Corporate Office Corridor, Morning
+Characters: Jae-hyun, Nhân viên điều tra
+Action: Jae-hyun holds up his hands in a placating gesture, looking the lead investigator directly in the eye and speaking in a low, urgent tone.
+Result: His request, seemingly born of love and concern, is granted by the officers. This sets the stage for the crucial, manipulative conversation to come.
+Dialogue: Jae-hyun: “Wait! Give me two minutes with my wife!”
+Atmosphere: Tense, manipulative · His voice is controlled yet carries an undercurrent of panic. The tight framing excludes everything else, focusing on this high-stakes request.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 24
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Long shot
+【Movement】Static shot
+【Action】After pulling Seo-yeon aside, Jae-hyun does something shocking: he suddenly drops to his knees before her, his expensive suit crumpling on the floor.
+【Dialogue】
+【Result】This extreme act of supplication is deeply shocking to Seo-yeon and the audience, a powerful physical gesture designed to disarm her and gain her complete attention.
+【Emotion】Shock ↑↑↑ (Reversed)
+Scene: Luxury Office Hallway, Morning
+Characters: Seo-yeon, Jae-hyun
+Action: After pulling Seo-yeon aside, Jae-hyun does something shocking: he suddenly drops to his knees before her, his expensive suit crumpling on the floor.
+Result: This extreme act of supplication is deeply shocking to Seo-yeon and the audience, a powerful physical gesture designed to disarm her and gain her complete attention.
+Atmosphere: Shocking, dramatic · A sudden silence falls over the hallway. The visual of a powerful CEO kneeling is jarring and unexpected.
+Shot type: Long shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 25
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Low angle
+【Movement】Push in
+【Action】Jae-hyun looks up, his eyes wide with feigned sincerity, and begins to lay out the terrible, false choice, his voice a conspiratorial whisper.
+【Dialogue】Jae-hyun: “Seo-yeon, listen to me. If Mi-ra gets arrested, your father’s entire financial system will be exposed. The company will collapse instantly.
+【Result】He presents an impossible ultimatum, linking her fate with her father's and the company's survival, effectively trapping her with guilt and a sense of duty.
+【Emotion】Coercion ↑↑↑ (Suspended)
+Scene: Luxury Office Hallway, Morning
+Characters: Seo-yeon, Jae-hyun
+Action: Jae-hyun looks up, his eyes wide with feigned sincerity, and begins to lay out the terrible, false choice, his voice a conspiratorial whisper.
+Result: He presents an impossible ultimatum, linking her fate with her father's and the company's survival, effectively trapping her with guilt and a sense of duty.
+Dialogue: Jae-hyun: “Seo-yeon, listen to me. If Mi-ra gets arrested, your father’s entire financial system will be exposed. The company will collapse instantly.
+Atmosphere: Manipulative, suffocating · His hushed, urgent tone creates a claustrophobic intimacy. The low angle makes him seem like a serpent pleading from the ground.
+Shot type: Low angle
+Angle: Low angle
+Movement: Push in
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 26
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Jae-hyun's expression shifts to one of grim determination, as if he's found the only painful but necessary path forward for them.
+【Dialogue】Jae-hyun: But if you take the blame… as the architect, I can frame it as a technical misjudgment.
+【Result】He offers her a role to play in her own destruction, couching it in terms of plausibility and damage control, making the poison sound like medicine.
+【Emotion】Manipulation ↑↑↑ (Suspended)
+Scene: Luxury Office Hallway, Morning
+Characters: Jae-hyun
+Action: Jae-hyun's expression shifts to one of grim determination, as if he's found the only painful but necessary path forward for them.
+Result: He offers her a role to play in her own destruction, couching it in terms of plausibility and damage control, making the poison sound like medicine.
+Dialogue: Jae-hyun: But if you take the blame… as the architect, I can frame it as a technical misjudgment.
+Atmosphere: Deceptive, persuasive · His tone is calm and rational, a stark contrast to the emotional chaos of the situation, making his argument seem more credible.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 27
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Extreme close-up
+【Movement】Static shot
+【Action】Jae-hyun's voice drops to a near-inaudible, intense whisper, his eyes locked on hers as he makes the solemn, empty promise of her swift release.
+【Dialogue】Jae-hyun: I promise you—I’ll use every connection I have to get you out in a few months.
+【Result】The promise, a complete lie, is delivered with the utmost conviction, designed to be the final piece of persuasion she needs to surrender.
+【Emotion】Deception ↑↑↑ (Suspended)
+Scene: Luxury Office Hallway, Morning
+Characters: Jae-hyun
+Action: Jae-hyun's voice drops to a near-inaudible, intense whisper, his eyes locked on hers as he makes the solemn, empty promise of her swift release.
+Result: The promise, a complete lie, is delivered with the utmost conviction, designed to be the final piece of persuasion she needs to surrender.
+Dialogue: Jae-hyun: I promise you—I’ll use every connection I have to get you out in a few months.
+Atmosphere: Intense, false · The extreme close-up creates a sense of intimacy and pressure. The air is still, focusing entirely on his deceptive words.
+Shot type: Extreme close-up
+Angle: Low angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 28
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】He makes his final plea, his voice cracking with feigned emotion, invoking the future of the company they built together.
+【Dialogue】Jae-hyun: Trust me, Seo-yeon. For Hanseong’s future!”
+【Result】By tying her sacrifice to their shared dream, 'Hanseong', he makes it almost impossible for her to refuse without feeling like she is betraying everything.
+【Emotion】Coercion ↑↑↑ (Suspended)
+Scene: Luxury Office Hallway, Morning
+Characters: Jae-hyun
+Action: He makes his final plea, his voice cracking with feigned emotion, invoking the future of the company they built together.
+Result: By tying her sacrifice to their shared dream, 'Hanseong', he makes it almost impossible for her to refuse without feeling like she is betraying everything.
+Dialogue: Jae-hyun: Trust me, Seo-yeon. For Hanseong’s future!”
+Atmosphere: Desperate, coercive · His final words are a powerful emotional trigger, a last-ditch effort to ensure her compliance.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 29
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Seo-yeon looks down at Jae-hyun, her expression a maelstrom of shock, betrayal, and a desperate desire to believe him. Tears well up and spill over.
+【Dialogue】
+【Result】Her emotional wall is breaking. The combination of shock, fear, and his manipulative performance has brought her to the brink of a decision.
+【Emotion】Conflict ↑↑↑ (Suspended)
+Scene: Luxury Office Hallway, Morning
+Characters: Seo-yeon, Jae-hyun
+Action: Seo-yeon looks down at Jae-hyun, her expression a maelstrom of shock, betrayal, and a desperate desire to believe him. Tears well up and spill over.
+Result: Her emotional wall is breaking. The combination of shock, fear, and his manipulative performance has brought her to the brink of a decision.
+Atmosphere: Heartbreaking, vulnerable · The shot is quiet and intensely emotional. The only sound is her quiet, choked breathing. The world seems to have faded away.
+Shot type: Close-up
+Angle: High angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 30
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Seo-yeon's voice is barely a whisper, trembling with unshed tears and a desperate need for reassurance, as she searches his eyes for the truth.
+【Dialogue】Seo-yeon: “You’re sure… you’ll save me, Jae-hyun?”
+【Result】She places her entire fate in his hands with this question. Her willingness to trust him, despite everything, is her most vulnerable act.
+【Emotion】Hope ↓ (Suspended)
+Scene: Luxury Office Hallway, Morning
+Characters: Seo-yeon
+Action: Seo-yeon's voice is barely a whisper, trembling with unshed tears and a desperate need for reassurance, as she searches his eyes for the truth.
+Result: She places her entire fate in his hands with this question. Her willingness to trust him, despite everything, is her most vulnerable act.
+Dialogue: Seo-yeon: “You’re sure… you’ll save me, Jae-hyun?”
+Atmosphere: Vulnerable, hopeful · The mood is fragile and utterly heartbreaking. It is the last flicker of hope before the darkness.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 31
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Jae-hyun meets her gaze without flinching. His expression is firm, his voice steady and resolute as he delivers the ultimate oath.
+【Dialogue】Jae-hyun: “I swear on my life.”
+【Result】His lie, sworn on his own life, is the final push. It's delivered with such conviction that it obliterates her remaining doubt, sealing her decision.
+【Emotion】Deception ↑↑↑ (Released)
+Scene: Luxury Office Hallway, Morning
+Characters: Jae-hyun
+Action: Jae-hyun meets her gaze without flinching. His expression is firm, his voice steady and resolute as he delivers the ultimate oath.
+Result: His lie, sworn on his own life, is the final push. It's delivered with such conviction that it obliterates her remaining doubt, sealing her decision.
+Dialogue: Jae-hyun: “I swear on my life.”
+Atmosphere: Deceptive, final · The moment is pregnant with the weight of his lie. His words echo in the silence, a profound and terrible vow.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 32
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】After a moment of silence where she processes his vow, Seo-yeon gives a slow, deliberate nod, a silent signal of her acceptance and sacrifice.
+【Dialogue】
+【Result】Her nod confirms she has chosen to trust him and sacrifice herself. It is a moment of quiet, tragic strength.
+【Emotion】Trust → (Suspended)
+Scene: Luxury Office Hallway, Morning
+Characters: Seo-yeon
+Action: After a moment of silence where she processes his vow, Seo-yeon gives a slow, deliberate nod, a silent signal of her acceptance and sacrifice.
+Result: Her nod confirms she has chosen to trust him and sacrifice herself. It is a moment of quiet, tragic strength.
+Atmosphere: Somber, resolute · The mood is heavy with the gravity of her decision. The tragic music underscores her noble but foolish choice.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 33
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Extreme close-up
+【Movement】Static shot
+【Action】Seo-yeon calmly turns and extends both of her hands towards the investigator, palms up, in a gesture of complete surrender.
+【Dialogue】
+【Result】The metallic click of the handcuffs locking into place is a sound of finality. Her freedom is audibly and visibly taken away.
+【Emotion】Resignation ↓ (Released)
+Scene: Luxury Office Hallway, Morning
+Characters: Seo-yeon, Nhân viên điều tra
+Action: Seo-yeon calmly turns and extends both of her hands towards the investigator, palms up, in a gesture of complete surrender.
+Result: The metallic click of the handcuffs locking into place is a sound of finality. Her freedom is audibly and visibly taken away.
+Atmosphere: Cold, final · The visual is stark and brutal. The sound design emphasizes the harsh, metallic click, a point of no return.
+Shot type: Extreme close-up
+Angle: Low angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 34
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Pull out
+【Action】Seo-yeon pauses, her cuffed hands held in front of her, and her eyes lock with Jae-hyun's. Her expression is not one of anger, but of unwavering, tragic trust.
+【Dialogue】Seo-yeon: “I trust you. Don’t let Hanseong fall.”
+【Result】Her final words reaffirm her sacrifice and her love. The camera pulls out, showing the distance growing between them as she is finally led away, leaving him behind.
+【Emotion】Trust → (Reversed)
+Scene: Luxury Office Hallway, Morning
+Characters: Seo-yeon, Jae-hyun, Nhân viên điều tra
+Action: Seo-yeon pauses, her cuffed hands held in front of her, and her eyes lock with Jae-hyun's. Her expression is not one of anger, but of unwavering, tragic trust.
+Result: Her final words reaffirm her sacrifice and her love. The camera pulls out, showing the distance growing between them as she is finally led away, leaving him behind.
+Dialogue: Seo-yeon: “I trust you. Don’t let Hanseong fall.”
+Atmosphere: Tragic, poignant · Her voice is steady, full of misplaced faith. The visual of her walking away in cuffs is heartbreaking. The episode ends on this note of betrayal.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Pull out
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+=== Episode 2: Episode 2 ===
+
+Shot 1
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】A heavy, rusted iron door dominates the frame, its paint peeling. It screeches open slowly, revealing the darkness of the cell beyond.
+【Dialogue】
+【Result】The piercing, grating sound of metal on metal echoes through the corridor, setting a harsh and oppressive tone. The opening reveals the common area.
+【Emotion】Oppression → (Suspended)
+Scene: Prison Common Area, Daytime
+Action: A heavy, rusted iron door dominates the frame, its paint peeling. It screeches open slowly, revealing the darkness of the cell beyond.
+Result: The piercing, grating sound of metal on metal echoes through the corridor, setting a harsh and oppressive tone. The opening reveals the common area.
+Atmosphere: Cold, desaturated tones · Blue-gray color palette, high-contrast lighting creating a sense of confinement. The sound design is sharp and uncomfortable.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 2
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Push in
+【Action】Seo-yeon is revealed. Her face is gaunt, with dark circles under her vacant eyes. Her once-lustrous hair is now crudely cut short and uneven.
+【Dialogue】
+【Result】Her transformation is shocking. The once-vibrant architect is now a shell, clad in a loose, shapeless gray prison uniform. Her posture is defeated.
+【Emotion】Despair → (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: Seo-yeon is revealed. Her face is gaunt, with dark circles under her vacant eyes. Her once-lustrous hair is now crudely cut short and uneven.
+Result: Her transformation is shocking. The once-vibrant architect is now a shell, clad in a loose, shapeless gray prison uniform. Her posture is defeated.
+Atmosphere: Sterile and cold · The lighting is unflattering, the color palette is monochromatic gray, creating a mood of despair and hopelessness.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Push in
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 3
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Kang Eun-ji sits perfectly still, like a statue. Her short silver hair catches the light. Her cold, piercing eyes scan the room, missing nothing.
+【Dialogue】
+【Result】She exudes an aura of immense, coiled power and intelligence. Her stillness is more intimidating than any movement, establishing her as a significant presence.
+【Emotion】Vigilance ↑ (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Kang Eun-ji
+Action: Kang Eun-ji sits perfectly still, like a statue. Her short silver hair catches the light. Her cold, piercing eyes scan the room, missing nothing.
+Result: She exudes an aura of immense, coiled power and intelligence. Her stillness is more intimidating than any movement, establishing her as a significant presence.
+Atmosphere: Intimidating and mysterious · Chiaroscuro lighting creates high contrast on her figure. The silence around her is palpable, creating a tense mood.
+Shot type: Medium shot
+Angle: Low angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 4
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Wide shot
+【Movement】Static shot
+【Action】Seo-yeon is on her hands and knees, methodically scrubbing the floor with a wet rag. Her movements are mechanical, her expression blank and focused on the task.
+【Dialogue】
+【Result】A small, clean patch of floor appears with each circular motion, a stark contrast to the surrounding grime. The repetitive action highlights her numb state of endurance.
+【Emotion】Numbness → (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: Seo-yeon is on her hands and knees, methodically scrubbing the floor with a wet rag. Her movements are mechanical, her expression blank and focused on the task.
+Result: A small, clean patch of floor appears with each circular motion, a stark contrast to the surrounding grime. The repetitive action highlights her numb state of endurance.
+Atmosphere: Bleak and monotonous · The scene is dominated by shades of gray. The sound of the wet rag scraping against the concrete is repetitive and hypnotic.
+Shot type: Wide shot
+Angle: High angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 5
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Long shot
+【Movement】Static shot
+【Action】A large, imposing female inmate walks with a deliberate, heavy gait directly towards the kneeling Seo-yeon, not deviating her path.
+【Dialogue】
+【Result】The inmate's shadow falls over Seo-yeon's hands and the patch of floor she is cleaning, creating a sense of impending threat and confrontation.
+【Emotion】Threat ↑ (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: A large, imposing female inmate walks with a deliberate, heavy gait directly towards the kneeling Seo-yeon, not deviating her path.
+Result: The inmate's shadow falls over Seo-yeon's hands and the patch of floor she is cleaning, creating a sense of impending threat and confrontation.
+Atmosphere: Menacing and tense · The low angle makes the inmate look powerful and threatening. The sudden shadow creates a visual disruption.
+Shot type: Long shot
+Angle: Seo-yeon's point of view (low angle)
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 6
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Extreme close-up
+【Movement】Static shot
+【Action】The inmate's heavy shoe comes down hard and deliberately on Seo-yeon's knuckles, grinding her hand against the cold, rough concrete.
+【Dialogue】
+【Result】Seo-yeon's fingers flinch under the pressure, but she makes no sound. The casual brutality of the act is shocking and visceral.
+【Emotion】Pain ↑↑ (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: The inmate's heavy shoe comes down hard and deliberately on Seo-yeon's knuckles, grinding her hand against the cold, rough concrete.
+Result: Seo-yeon's fingers flinch under the pressure, but she makes no sound. The casual brutality of the act is shocking and visceral.
+Atmosphere: Violent and shocking · The sound is sharp and sickening. The tight framing makes the action feel personal and inescapable.
+Shot type: Extreme close-up
+Angle: High angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 7
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】The inmate looks down, a cruel smirk on her face, and speaks in a low, mocking tone, putting weight on Seo-yeon's hand as she talks.
+【Dialogue】Inmate: “Hey, genius architect… this floor plan of yours looks pretty dirty.”
+【Result】Her words are a deliberate psychological attack, mocking Seo-yeon's past life and rubbing salt in the wound of her current humiliation.
+【Emotion】Humiliation ↑↑ (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: The inmate looks down, a cruel smirk on her face, and speaks in a low, mocking tone, putting weight on Seo-yeon's hand as she talks.
+Result: Her words are a deliberate psychological attack, mocking Seo-yeon's past life and rubbing salt in the wound of her current humiliation.
+Dialogue: Inmate: “Hey, genius architect… this floor plan of yours looks pretty dirty.”
+Atmosphere: Humiliating and cruel · The low angle reinforces the power imbalance. The inmate's voice is dripping with sarcasm and contempt.
+Shot type: Medium shot
+Angle: Low angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 8
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Seo-yeon keeps her head down, her face a mask of blankness. She does not respond or resist, her lips pressed into a thin line.
+【Dialogue】
+【Result】Her silence is a form of passive resistance, a refusal to give her tormentor the satisfaction of a reaction. It shows a deep, buried resilience.
+【Emotion】Suppression ↑↑ (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: Seo-yeon keeps her head down, her face a mask of blankness. She does not respond or resist, her lips pressed into a thin line.
+Result: Her silence is a form of passive resistance, a refusal to give her tormentor the satisfaction of a reaction. It shows a deep, buried resilience.
+Atmosphere: Tense and resilient · Despite the humiliation, there is a sense of immense self-control. The silence is heavy with unspoken emotion.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 9
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Slow push in
+【Action】Seo-yeon's eyes glaze over slightly. Her mind is elsewhere, clinging to the belief that Jae-hyun is coming to rescue her, counting the days.
+【Dialogue】(Narration) She is still counting the days, believing Jae-hyun will come for her.
+【Result】This inner thought reveals the source of her endurance: a desperate, perhaps naive, hope. It makes her current suffering even more poignant.
+【Emotion】Hope → (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: Seo-yeon's eyes glaze over slightly. Her mind is elsewhere, clinging to the belief that Jae-hyun is coming to rescue her, counting the days.
+Result: This inner thought reveals the source of her endurance: a desperate, perhaps naive, hope. It makes her current suffering even more poignant.
+Dialogue: (Narration) She is still counting the days, believing Jae-hyun will come for her.
+Atmosphere: Poignant and fragile · The soft focus and internal monologue create a sense of vulnerability and impending heartbreak.
+Shot type: Close-up
+Angle: Eye level
+Movement: Slow push in
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 10
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Wide shot
+【Movement】Static shot
+【Action】A lawyer in a sharp suit, looking completely out of place, enters the visitor's side of the room and sits down stiffly, placing his briefcase on the counter.
+【Dialogue】
+【Result】The arrival of a stranger instead of Jae-hyun immediately creates a sense of unease and foreboding. The sterile environment feels clinical and cold.
+【Emotion】Anxiety ↑ (Suspended)
+Scene: Prison Visitation Room, Afternoon
+Action: A lawyer in a sharp suit, looking completely out of place, enters the visitor's side of the room and sits down stiffly, placing his briefcase on the counter.
+Result: The arrival of a stranger instead of Jae-hyun immediately creates a sense of unease and foreboding. The sterile environment feels clinical and cold.
+Atmosphere: Cold and sterile · The room is all hard surfaces and muted colors. There is a palpable sense of dread and bad news.
+Shot type: Wide shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 11
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Extreme close-up
+【Movement】Tracking
+【Action】The lawyer's manicured hand pushes a thick sheaf of papers through the narrow slot. The movement is precise, mechanical, and devoid of any warmth.
+【Dialogue】
+【Result】The document slides to a stop in front of Seo-yeon's side. It sits there, an object of immense and terrible power, waiting to detonate.
+【Emotion】Dread ↑↑ (Suspended)
+Scene: Prison Visitation Room, Afternoon
+Action: The lawyer's manicured hand pushes a thick sheaf of papers through the narrow slot. The movement is precise, mechanical, and devoid of any warmth.
+Result: The document slides to a stop in front of Seo-yeon's side. It sits there, an object of immense and terrible power, waiting to detonate.
+Atmosphere: Clinical and impersonal · The focus on the object and the mechanical action strips the scene of humanity, emphasizing the coldness of the transaction.
+Shot type: Extreme close-up
+Angle: Overhead
+Movement: Tracking
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 12
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】The lawyer looks at Seo-yeon without a flicker of empathy, his face a professional mask. He delivers his lines in a flat, monotone voice.
+【Dialogue】Lawyer: “My client, Mr. Jae-hyun, has filed for divorce. You have been stripped of all executive rights, and all assets in Hanseong have been transferred.”
+【Result】Each sentence is a hammer blow, systematically destroying the foundations of Seo-yeon's life and hope. The news is delivered with bureaucratic coldness.
+【Emotion】Shock ↑↑↑ (Suspended)
+Scene: Prison Visitation Room, Afternoon
+Characters: Seo-yeon
+Action: The lawyer looks at Seo-yeon without a flicker of empathy, his face a professional mask. He delivers his lines in a flat, monotone voice.
+Result: Each sentence is a hammer blow, systematically destroying the foundations of Seo-yeon's life and hope. The news is delivered with bureaucratic coldness.
+Dialogue: Lawyer: “My client, Mr. Jae-hyun, has filed for divorce. You have been stripped of all executive rights, and all assets in Hanseong have been transferred.”
+Atmosphere: Cruel and bureaucratic · The lawyer's lack of emotion makes the news even more devastating. The glass between them symbolizes the emotional chasm.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 13
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Push in
+【Action】Seo-yeon's face crumples from shock into raw, unadulterated agony. She lunges forward, her hands slamming against the plexiglass as she screams.
+【Dialogue】Seo-yeon (screaming): “You’re lying! Where is Jae-hyun?
+【Result】The glass shudders from the impact of her fists. Her scream is a primal burst of pain and denial, a desperate refusal to accept the betrayal.
+【Emotion】Agony ↑↑↑ (Peak)
+Scene: Prison Visitation Room, Afternoon
+Characters: Seo-yeon
+Action: Seo-yeon's face crumples from shock into raw, unadulterated agony. She lunges forward, her hands slamming against the plexiglass as she screams.
+Result: The glass shudders from the impact of her fists. Her scream is a primal burst of pain and denial, a desperate refusal to accept the betrayal.
+Dialogue: Seo-yeon (screaming): “You’re lying! Where is Jae-hyun?
+Atmosphere: Desperate and chaotic · The camera pushes in, trapping the viewer in her suffocating despair. Her scream is raw and heart-wrenching.
+Shot type: Close-up
+Angle: Eye level
+Movement: Push in
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 14
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Seo-yeon's expression is one of a terrified, lost child. Her voice cracks with desperation as she clings to her last shred of hope.
+【Dialogue】Seo-yeon: He said he would save me!”
+【Result】Her words hang in the air, a testament to her shattered faith. The statement is so full of past hope that it makes the present reality even more tragic.
+【Emotion】Betrayal ↑↑↑ (Peak)
+Scene: Prison Visitation Room, Afternoon
+Characters: Seo-yeon
+Action: Seo-yeon's expression is one of a terrified, lost child. Her voice cracks with desperation as she clings to her last shred of hope.
+Result: Her words hang in the air, a testament to her shattered faith. The statement is so full of past hope that it makes the present reality even more tragic.
+Dialogue: Seo-yeon: He said he would save me!”
+Atmosphere: Tragic and heartbreaking · The low angle emphasizes her vulnerability. Her broken voice conveys the depth of her betrayal.
+Shot type: Close-up
+Angle: Low angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 15
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】The lawyer calmly adjusts his tie, a small, dismissive gesture. He speaks with an air of detached annoyance, as if discussing the weather.
+【Dialogue】Lawyer (emotionless): “He’s busy… preparing for his wedding with Director Yoon Mi-ra next week.”
+【Result】This final piece of information is the most devastating blow. It's not just a divorce; it's a complete and swift replacement, delivered with casual cruelty.
+【Emotion】Devastation ↑↑↑ (Peak)
+Scene: Prison Visitation Room, Afternoon
+Action: The lawyer calmly adjusts his tie, a small, dismissive gesture. He speaks with an air of detached annoyance, as if discussing the weather.
+Result: This final piece of information is the most devastating blow. It's not just a divorce; it's a complete and swift replacement, delivered with casual cruelty.
+Dialogue: Lawyer (emotionless): “He’s busy… preparing for his wedding with Director Yoon Mi-ra next week.”
+Atmosphere: Ice-cold and brutal · The contrast between Seo-yeon's agony and the lawyer's indifference is jarring. The information is delivered like a final, fatal stab.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 16
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Wide shot
+【Movement】Slow pull out
+【Action】The strength drains from Seo-yeon's body. Her eyes lose focus, and she collapses in a heap on the floor, all energy and hope extinguished.
+【Dialogue】
+【Result】She lies motionless, a broken figure in a sterile room. The lawyer stands, picks up his briefcase, and leaves without a backward glance.
+【Emotion】Annihilation ↓ (Released)
+Scene: Prison Visitation Room, Afternoon
+Characters: Seo-yeon
+Action: The strength drains from Seo-yeon's body. Her eyes lose focus, and she collapses in a heap on the floor, all energy and hope extinguished.
+Result: She lies motionless, a broken figure in a sterile room. The lawyer stands, picks up his briefcase, and leaves without a backward glance.
+Atmosphere: Empty and desolate · The high angle and pull-out make her look utterly powerless. The silence that follows is profound and empty.
+Shot type: Wide shot
+Angle: High angle
+Movement: Slow pull out
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 17
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Seo-yeon's hand, trembling slightly, reaches for a discarded, wrinkled newspaper lying on the floor. Her fingers brush against the cheap, rough paper.
+【Dialogue】
+【Result】The discovery of the newspaper feels like a cruel twist of fate. It’s an ordinary object that is about to become a catalyst for immense rage.
+【Emotion】Numbness → (Suspended)
+Scene: Prison Cell, Night
+Characters: Seo-yeon
+Action: Seo-yeon's hand, trembling slightly, reaches for a discarded, wrinkled newspaper lying on the floor. Her fingers brush against the cheap, rough paper.
+Result: The discovery of the newspaper feels like a cruel twist of fate. It’s an ordinary object that is about to become a catalyst for immense rage.
+Atmosphere: Gloomy and foreboding · The dim, yellow lighting creates a sickly, oppressive mood. The silence is heavy with grief.
+Shot type: Close-up
+Angle: Overhead
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 18
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Extreme close-up
+【Movement】Slow push in
+【Action】Seo-yeon's eyes focus on the main photograph on the front page. The camera pushes into the image, revealing Jae-hyun and Yoon Mi-ra.
+【Dialogue】
+【Result】The image shows them in wedding attire, smiling brightly, looking ecstatic. The visual confirmation of the lawyer's words is a visceral, sickening blow.
+【Emotion】Rage ↑↑↑ (Peak)
+Scene: Prison Cell, Night
+Characters: Seo-yeon, Jae-hyun, Yoon Mi-ra
+Action: Seo-yeon's eyes focus on the main photograph on the front page. The camera pushes into the image, revealing Jae-hyun and Yoon Mi-ra.
+Result: The image shows them in wedding attire, smiling brightly, looking ecstatic. The visual confirmation of the lawyer's words is a visceral, sickening blow.
+Atmosphere: Sickening and cruel · The joyous image is completely at odds with Seo-yeon's reality, making it a form of visual torture. The grainy texture adds to the grime.
+Shot type: Extreme close-up
+Angle: Seo-yeon's point of view
+Movement: Slow push in
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 19
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】A guttural sound escapes Seo-yeon's throat as she tears the newspaper apart with convulsive, raw strength, ripping through their smiling faces.
+【Dialogue】
+【Result】The paper is shredded into tiny, unrecognizable pieces that flutter to the floor like dark confetti. The act is a violent, desperate attempt to destroy the reality she cannot bear.
+【Emotion】Fury ↑↑↑ (Peak)
+Scene: Prison Cell, Night
+Characters: Seo-yeon
+Action: A guttural sound escapes Seo-yeon's throat as she tears the newspaper apart with convulsive, raw strength, ripping through their smiling faces.
+Result: The paper is shredded into tiny, unrecognizable pieces that flutter to the floor like dark confetti. The act is a violent, desperate attempt to destroy the reality she cannot bear.
+Atmosphere: Violent and cathartic · The action is fast and brutal. The sound of tearing paper is amplified, making it sound like ripping flesh.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 20
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Extreme close-up
+【Movement】Static shot
+【Action】Her hands are clenched so tightly that her fingernails, broken from tearing the paper, are bleeding. She doesn't seem to notice the pain.
+【Dialogue】
+【Result】The physical pain is a manifestation of her emotional agony. The sight of her own blood seems to focus her rage into something sharp and cold: vengeance.
+【Emotion】Vengeance ↑↑↑ (Peak)
+Scene: Prison Cell, Night
+Characters: Seo-yeon
+Action: Her hands are clenched so tightly that her fingernails, broken from tearing the paper, are bleeding. She doesn't seem to notice the pain.
+Result: The physical pain is a manifestation of her emotional agony. The sight of her own blood seems to focus her rage into something sharp and cold: vengeance.
+Atmosphere: Visceral and raw · The shot is uncomfortable to look at, emphasizing her self-destructive rage. The red of the blood is the only strong color in the scene.
+Shot type: Extreme close-up
+Angle: Low angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 21
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Slow push in
+【Action】Seo-yeon looks up, her eyes burning with a cold fire. She speaks through clenched teeth, her voice a low, venomous whisper.
+【Dialogue】Seo-yeon (through clenched teeth): “Jae-hyun… Yoon Mi-ra… I will take everything back.”
+【Result】This is not a plea or a cry of pain; it is a declaration of war. A profound transformation has occurred, from victim to avenger.
+【Emotion】Resolve ↑↑↑ (Peak)
+Scene: Prison Cell, Night
+Characters: Seo-yeon
+Action: Seo-yeon looks up, her eyes burning with a cold fire. She speaks through clenched teeth, her voice a low, venomous whisper.
+Result: This is not a plea or a cry of pain; it is a declaration of war. A profound transformation has occurred, from victim to avenger.
+Dialogue: Seo-yeon (through clenched teeth): “Jae-hyun… Yoon Mi-ra… I will take everything back.”
+Atmosphere: Cold and menacing · The lighting emphasizes her change. Her voice is chilling, filled with a promise of future retribution.
+Shot type: Close-up
+Angle: Eye level
+Movement: Slow push in
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 22
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Over the shoulder shot
+【Movement】Static shot
+【Action】As Seo-yeon finishes her vow, a low, husky, and surprisingly calm voice speaks from the shadows behind her, startling her.
+【Dialogue】Kang Eun-ji: “Your screams only scare ants.
+【Result】The sudden voice in the darkness is jarring and mysterious. It immediately establishes the speaker as someone unafraid and observant.
+【Emotion】Surprise ↑ (Reversed)
+Scene: Prison Cell, Night
+Characters: Seo-yeon, Kang Eun-ji
+Action: As Seo-yeon finishes her vow, a low, husky, and surprisingly calm voice speaks from the shadows behind her, startling her.
+Result: The sudden voice in the darkness is jarring and mysterious. It immediately establishes the speaker as someone unafraid and observant.
+Dialogue: Kang Eun-ji: “Your screams only scare ants.
+Atmosphere: Mysterious and startling · The darkness conceals the speaker, making her voice disembodied and powerful. It cuts through Seo-yeon's rage.
+Shot type: Over the shoulder shot
+Angle: Seo-yeon's point of view
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 23
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Kang Eun-ji's eyes are locked on Seo-yeon's back. She delivers her next line with the weight of experience and profound truth.
+【Dialogue】Kang Eun-ji: If you want revenge on those above… you must become the abyss.”
+【Result】Her words are a chilling piece of advice and a philosophical challenge, reframing revenge not as an act of passion, but of transformation.
+【Emotion】Intrigue ↑↑ (Suspended)
+Scene: Prison Cell, Night
+Characters: Kang Eun-ji
+Action: Kang Eun-ji's eyes are locked on Seo-yeon's back. She delivers her next line with the weight of experience and profound truth.
+Result: Her words are a chilling piece of advice and a philosophical challenge, reframing revenge not as an act of passion, but of transformation.
+Dialogue: Kang Eun-ji: If you want revenge on those above… you must become the abyss.”
+Atmosphere: Profound and chilling · The low angle gives her words authority. The shadows on her face suggest a dark, hidden past.
+Shot type: Close-up
+Angle: Low angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 24
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Seo-yeon, startled and intrigued, slowly turns on the floor to face the shadowed corner where the voice originated, her body tense.
+【Dialogue】
+【Result】The movement is the first shift from her internal world of pain to engaging with an external force. It signals a new direction and a pivotal moment.
+【Emotion】Curiosity ↑ (Suspended)
+Scene: Prison Cell, Night
+Characters: Seo-yeon, Kang Eun-ji
+Action: Seo-yeon, startled and intrigued, slowly turns on the floor to face the shadowed corner where the voice originated, her body tense.
+Result: The movement is the first shift from her internal world of pain to engaging with an external force. It signals a new direction and a pivotal moment.
+Atmosphere: Pivotal and tense · The use of silhouette creates suspense about her reaction. The slow movement builds anticipation.
+Shot type: Medium shot
+Angle: Rear view
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 25
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Seo-yeon looks at the figure in the shadows, her brows furrowed. She asks the question with a voice still hoarse from screaming.
+【Dialogue】Seo-yeon: “Who are you?”
+【Result】Her question is simple but loaded. She is not just asking for a name, but for an explanation for the strange wisdom she just heard.
+【Emotion】Hope ↑ (Suspended)
+Scene: Prison Cell, Night
+Characters: Seo-yeon
+Action: Seo-yeon looks at the figure in the shadows, her brows furrowed. She asks the question with a voice still hoarse from screaming.
+Result: Her question is simple but loaded. She is not just asking for a name, but for an explanation for the strange wisdom she just heard.
+Dialogue: Seo-yeon: “Who are you?”
+Atmosphere: Inquisitive and raw · Her face shows the remnants of her earlier breakdown, but with a new, focused intensity. The question hangs in the charged air.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 26
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Kang Eun-ji holds Seo-yeon's gaze, her expression unreadable but intense. She speaks calmly, her words weaving a surprising connection between them.
+【Dialogue】Kang Eun-ji: “The one who built the financial towers you once designed… and the one who was betrayed just like you.”
+【Result】The revelation is stunning. It establishes a deep, unexpected link between the two women, based on both creation and destruction, ambition and betrayal.
+【Emotion】Astonishment ↑↑ (Suspended)
+Scene: Prison Cell, Night
+Characters: Seo-yeon, Kang Eun-ji
+Action: Kang Eun-ji holds Seo-yeon's gaze, her expression unreadable but intense. She speaks calmly, her words weaving a surprising connection between them.
+Result: The revelation is stunning. It establishes a deep, unexpected link between the two women, based on both creation and destruction, ambition and betrayal.
+Dialogue: Kang Eun-ji: “The one who built the financial towers you once designed… and the one who was betrayed just like you.”
+Atmosphere: Revelatory and profound · The quiet confidence in her delivery gives the words immense weight. The shared experience creates an instant, powerful bond.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 27
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Kang Eun-ji looks directly into Seo-yeon’s eyes, her gaze seeming to penetrate through all of Seo-yeon’s defenses, seeing her potential and her pain.
+【Dialogue】
+【Result】This moment of intense, silent communication solidifies their connection. Seo-yeon feels seen and understood for the first time in months.
+【Emotion】Connection ↑↑ (Suspended)
+Scene: Prison Cell, Night
+Characters: Seo-yeon, Kang Eun-ji
+Action: Kang Eun-ji looks directly into Seo-yeon’s eyes, her gaze seeming to penetrate through all of Seo-yeon’s defenses, seeing her potential and her pain.
+Result: This moment of intense, silent communication solidifies their connection. Seo-yeon feels seen and understood for the first time in months.
+Atmosphere: Intense and intimate · Despite the grim setting, this is a moment of profound human connection. The air crackles with intensity.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 28
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Kang Eun-ji calmly diagnoses Seo-yeon's weakness, her voice even and analytical, as if discussing a business strategy.
+【Dialogue】Kang Eun-ji (calmly): “You have a brain. But you don’t have a third face yet.”
+【Result】The cryptic phrase 'a third face' hangs in the air, a puzzle that Seo-yeon—and the audience—must solve. It suggests a level of deception and ruthlessness she does not yet possess.
+【Emotion】Intrigue ↑↑ (Suspended)
+Scene: Prison Cell, Night
+Characters: Kang Eun-ji
+Action: Kang Eun-ji calmly diagnoses Seo-yeon's weakness, her voice even and analytical, as if discussing a business strategy.
+Result: The cryptic phrase 'a third face' hangs in the air, a puzzle that Seo-yeon—and the audience—must solve. It suggests a level of deception and ruthlessness she does not yet possess.
+Dialogue: Kang Eun-ji (calmly): “You have a brain. But you don’t have a third face yet.”
+Atmosphere: Enigmatic and educational · Kang Eun-ji's calm delivery makes her sound like a mentor or a teacher. The line is intriguing and sparks curiosity.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 29
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】A significant pause follows Kang Eun-ji's statement. Seo-yeon processes the words, her expression shifting from confusion to dawning comprehension.
+【Dialogue】
+【Result】The silence allows the weight of Kang Eun-ji's words to sink in. It is a moment of decision for Seo-yeon, a chance to choose a new path.
+【Emotion】Contemplation ↑ (Suspended)
+Scene: Prison Cell, Night
+Characters: Seo-yeon, Kang Eun-ji
+Action: A significant pause follows Kang Eun-ji's statement. Seo-yeon processes the words, her expression shifting from confusion to dawning comprehension.
+Result: The silence allows the weight of Kang Eun-ji's words to sink in. It is a moment of decision for Seo-yeon, a chance to choose a new path.
+Atmosphere: Tense and pregnant · The silence is not empty but full of unspoken questions and possibilities. It's a turning point.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 30
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Kang Eun-ji leans forward slightly, her voice dropping to an inviting, conspiratorial tone as she poses the pivotal question.
+【Dialogue】Kang Eun-ji: “Do you want to learn?”
+【Result】The question is a lifeline. It offers Seo-yeon not just a way to survive, but a way to fight back. It's an invitation to be reborn.
+【Emotion】Hope ↑↑↑ (Peak)
+Scene: Prison Cell, Night
+Characters: Kang Eun-ji
+Action: Kang Eun-ji leans forward slightly, her voice dropping to an inviting, conspiratorial tone as she poses the pivotal question.
+Result: The question is a lifeline. It offers Seo-yeon not just a way to survive, but a way to fight back. It's an invitation to be reborn.
+Dialogue: Kang Eun-ji: “Do you want to learn?”
+Atmosphere: Hopeful and conspiratorial · After so much despair, this question offers a spark of hope, albeit a dark and dangerous one. It feels like the beginning of an alliance.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 31
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Wide shot
+【Movement】Pan
+【Action】The camera pans to follow the large inmate as she stomps across the common area, her expression aggressive and looking for trouble.
+【Dialogue】
+【Result】The sudden shift in location and the return of the bully immediately raises the stakes. Kang Eun-ji's offer is about to be put to an immediate, real-world test.
+【Emotion】Tension ↑↑ (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: The camera pans to follow the large inmate as she stomps across the common area, her expression aggressive and looking for trouble.
+Result: The sudden shift in location and the return of the bully immediately raises the stakes. Kang Eun-ji's offer is about to be put to an immediate, real-world test.
+Atmosphere: Abrupt and threatening · The harsh lighting and the inmate's aggressive posture create an immediate sense of impending conflict.
+Shot type: Wide shot
+Angle: Eye level
+Movement: Pan
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 32
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Without a word, the inmate contemptuously dumps a full tray of slop over the head of the young girl, who flinches and cries out.
+【Dialogue】
+【Result】The food drips down the girl's hair and face. It's a petty, cruel act of dominance designed to intimidate everyone, but aimed indirectly at Seo-yeon.
+【Emotion】Anger ↑ (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: Without a word, the inmate contemptuously dumps a full tray of slop over the head of the young girl, who flinches and cries out.
+Result: The food drips down the girl's hair and face. It's a petty, cruel act of dominance designed to intimidate everyone, but aimed indirectly at Seo-yeon.
+Atmosphere: Ugly and humiliating · The visuals are disgusting, and the act is one of pure bullying. The girl's shock and fear are palpable.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 33
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】The young girl, sobbing and humiliated, turns her pleading eyes to Seo-yeon, her only potential ally in the vicinity.
+【Dialogue】Girl: “Seo-yeon… please help me…”
+【Result】Her plea puts Seo-yeon directly on the spot. It's a choice between her old self, who might have helped, and the new person she might become.
+【Emotion】Dilemma ↑↑↑ (Peak)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: The young girl, sobbing and humiliated, turns her pleading eyes to Seo-yeon, her only potential ally in the vicinity.
+Result: Her plea puts Seo-yeon directly on the spot. It's a choice between her old self, who might have helped, and the new person she might become.
+Dialogue: Girl: “Seo-yeon… please help me…”
+Atmosphere: Desperate and pleading · The girl's vulnerability is heartbreaking. Her words are a direct challenge to Seo-yeon's conscience.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 34
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Seo-yeon looks at the crying girl for a long moment. Her face is a blank mask, betraying no emotion, no sympathy. The old Seo-yeon is gone.
+【Dialogue】
+【Result】Her lack of immediate reaction is chilling. It's the first sign that she is seriously considering Kang Eun-ji's philosophy of becoming the abyss.
+【Emotion】Detachment ↑ (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: Seo-yeon looks at the crying girl for a long moment. Her face is a blank mask, betraying no emotion, no sympathy. The old Seo-yeon is gone.
+Result: Her lack of immediate reaction is chilling. It's the first sign that she is seriously considering Kang Eun-ji's philosophy of becoming the abyss.
+Atmosphere: Chilling and detached · The silence and stillness from Seo-yeon are more powerful than any action. It signifies a profound internal shift.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 35
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Seo-yeon slowly and deliberately stands up. Her movements are no longer defeated but are now imbued with a cold, quiet confidence.
+【Dialogue】
+【Result】The act of standing is symbolic. She is no longer the victim on the floor; she is rising to a new level, leaving her old self behind.
+【Emotion】Resolve ↑↑ (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: Seo-yeon slowly and deliberately stands up. Her movements are no longer defeated but are now imbued with a cold, quiet confidence.
+Result: The act of standing is symbolic. She is no longer the victim on the floor; she is rising to a new level, leaving her old self behind.
+Atmosphere: Decisive and powerful · The low angle empowers Seo-yeon. Her slow, deliberate movement shows that this is a conscious choice.
+Shot type: Medium shot
+Angle: Low angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 36
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Wide shot
+【Movement】Follow
+【Action】Seo-yeon turns her back on the girl's cries and walks with a steady, determined pace towards the corner where Kang Eun-ji is watching.
+【Dialogue】
+【Result】This is a definitive act of choosing a new path. She is literally walking away from compassion and towards a darker form of power.
+【Emotion】Ruthlessness ↑↑ (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon, Kang Eun-ji
+Action: Seo-yeon turns her back on the girl's cries and walks with a steady, determined pace towards the corner where Kang Eun-ji is watching.
+Result: This is a definitive act of choosing a new path. She is literally walking away from compassion and towards a darker form of power.
+Atmosphere: Cold and resolute · The sound of the girl's cries fades as Seo-yeon walks away, emphasizing her emotional detachment. Her straight posture shows her resolve.
+Shot type: Wide shot
+Angle: Rear view
+Movement: Follow
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 37
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Seo-yeon stops in front of Kang Eun-ji and speaks, her voice low and steady, filled with a chilling, newfound logic born of utter despair.
+【Dialogue】Seo-yeon: “I can’t save anyone when I’m already a corpse.
+【Result】Her words articulate her new philosophy. She has accepted her own social 'death' and is now free from the moral obligations that once defined her.
+【Emotion】Transformation ↑↑↑ (Peak)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon, Kang Eun-ji
+Action: Seo-yeon stops in front of Kang Eun-ji and speaks, her voice low and steady, filled with a chilling, newfound logic born of utter despair.
+Result: Her words articulate her new philosophy. She has accepted her own social 'death' and is now free from the moral obligations that once defined her.
+Dialogue: Seo-yeon: “I can’t save anyone when I’m already a corpse.
+Atmosphere: Chilling and logical · There is no emotion in her voice, only the cold, hard logic of survival. It's the voice of the abyss.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 38
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Push in
+【Action】Seo-yeon looks directly into Kang Eun-ji's eyes and makes her request. Her voice is a simple, direct plea for tutelage.
+【Dialogue】Seo-yeon: Teach me, Kang Eun-ji.”
+【Result】The apprenticeship is formally requested. A faint, knowing smile appears on Kang Eun-ji's lips as the camera focuses on her reaction.
+【Emotion】Submission ↑ (Released)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon, Kang Eun-ji
+Action: Seo-yeon looks directly into Kang Eun-ji's eyes and makes her request. Her voice is a simple, direct plea for tutelage.
+Result: The apprenticeship is formally requested. A faint, knowing smile appears on Kang Eun-ji's lips as the camera focuses on her reaction.
+Dialogue: Seo-yeon: Teach me, Kang Eun-ji.”
+Atmosphere: Pivotal and fateful · This is the moment a pact is sealed. The master has found her apprentice, and the journey into darkness begins.
+Shot type: Close-up
+Angle: Eye level
+Movement: Push in
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 39
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Seo-yeon observes the scene, but her posture remains defensive. She does not engage in physical confrontation, her face showing deep thought.
+【Dialogue】
+【Result】This shot establishes that she is choosing a different path from violence or coldness. Her mind is her weapon, and she is preparing to use it.
+【Emotion】Calculation ↑↑ (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: Seo-yeon observes the scene, but her posture remains defensive. She does not engage in physical confrontation, her face showing deep thought.
+Result: This shot establishes that she is choosing a different path from violence or coldness. Her mind is her weapon, and she is preparing to use it.
+Atmosphere: Intelligent and calculating · The audience can see the gears turning in her head. It's a moment of strategic thinking, not emotional reaction.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 40
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Wide shot
+【Movement】Static shot
+【Action】Seo-yeon stands up abruptly and, instead of confronting the bully, she turns and shouts towards a prison guard who has been trying to ignore the situation.
+【Dialogue】Seo-yeon: (Loudly) Guard Kim! Is it true that your son's tuition was paid by a deposit from the prisoner commissary account number 7B-41?
+【Result】Her words are a bombshell. They are specific, targeted, and loud enough for everyone to hear. The bully is forgotten as all eyes turn to the panicked guard.
+【Emotion】Triumph ↑↑↑ (Peak)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: Seo-yeon stands up abruptly and, instead of confronting the bully, she turns and shouts towards a prison guard who has been trying to ignore the situation.
+Result: Her words are a bombshell. They are specific, targeted, and loud enough for everyone to hear. The bully is forgotten as all eyes turn to the panicked guard.
+Dialogue: Seo-yeon: (Loudly) Guard Kim! Is it true that your son's tuition was paid by a deposit from the prisoner commissary account number 7B-41?
+Atmosphere: Shocking and brilliant · The tension shifts instantly from physical to intellectual. It's a masterful move that changes the power dynamics completely.
+Shot type: Wide shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 41
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Follow
+【Action】The accused prison guard, his face pale with fear and anger, quickly intervenes. He shoves the large inmate away and effectively shields Seo-yeon.
+【Dialogue】Guard Kim: (To the bully) Get back to your cell! (To Seo-yeon) Quiet!
+【Result】Seo-yeon's gambit works perfectly. By making herself a bigger problem to the guard than the bully, she has gained a powerful, if unwilling, protector.
+【Emotion】Satisfaction ↑↑ (Released)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon
+Action: The accused prison guard, his face pale with fear and anger, quickly intervenes. He shoves the large inmate away and effectively shields Seo-yeon.
+Result: Seo-yeon's gambit works perfectly. By making herself a bigger problem to the guard than the bully, she has gained a powerful, if unwilling, protector.
+Dialogue: Guard Kim: (To the bully) Get back to your cell! (To Seo-yeon) Quiet!
+Atmosphere: Chaotic and effective · The scene is a flurry of motion as the guard takes control. Seo-yeon remains calm, having orchestrated the entire outcome.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Follow
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 42
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Watching from her corner, a slow, impressed smile spreads across Kang Eun-ji's face. It’s a smile of a master seeing a student exceed expectations.
+【Dialogue】
+【Result】Her smile is the ultimate validation of Seo-yeon's choice. It confirms that using intelligence and secrets is the path to true power in this world.
+【Emotion】Admiration ↑↑ (Suspended)
+Scene: Prison Common Area, Daytime
+Characters: Kang Eun-ji
+Action: Watching from her corner, a slow, impressed smile spreads across Kang Eun-ji's face. It’s a smile of a master seeing a student exceed expectations.
+Result: Her smile is the ultimate validation of Seo-yeon's choice. It confirms that using intelligence and secrets is the path to true power in this world.
+Atmosphere: Approving and satisfying · The smile is a powerful reward, signaling that Seo-yeon has passed the test with flying colors.
+Shot type: Close-up
+Angle: Low angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 43
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Kang Eun-ji speaks, her voice calm but filled with admiration, acknowledging Seo-yeon's clever maneuver and naming the principle behind it.
+【Dialogue】Kang Eun-ji: “Impressive… you’re starting to use secrets as weapons.”
+【Result】Kang Eun-ji articulates the lesson Seo-yeon has just demonstrated, solidifying their new mentor-student relationship based on intellectual warfare.
+【Emotion】Validation ↑↑↑ (Released)
+Scene: Prison Common Area, Daytime
+Characters: Seo-yeon, Kang Eun-ji
+Action: Kang Eun-ji speaks, her voice calm but filled with admiration, acknowledging Seo-yeon's clever maneuver and naming the principle behind it.
+Result: Kang Eun-ji articulates the lesson Seo-yeon has just demonstrated, solidifying their new mentor-student relationship based on intellectual warfare.
+Dialogue: Kang Eun-ji: “Impressive… you’re starting to use secrets as weapons.”
+Atmosphere: Intellectual and promising · The scene ends on a note of mutual respect and the promise of a powerful, dangerous alliance.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+=== Episode 3: Episode 3 ===
+
+Shot 1
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Extreme wide shot
+【Movement】Static shot
+【Action】From a distance, the heavy iron gates of the prison are visible, dominating the frame, conveying a sense of oppression and finality.
+【Dialogue】
+【Result】The scene is established with a somber and melancholic tone, the rain enhancing the feeling of gloom and the beginning of a cold new chapter.
+【Emotion】Oppression → (0) (Suspended)
+Scene: Prison Gate, Drizzling Afternoon
+Action: From a distance, the heavy iron gates of the prison are visible, dominating the frame, conveying a sense of oppression and finality.
+Result: The scene is established with a somber and melancholic tone, the rain enhancing the feeling of gloom and the beginning of a cold new chapter.
+Atmosphere: Cold, desaturated tones · Dominated by grays and dark greens, the sound of drizzling rain and distant city hum, creating a heavy and oppressive mood.
+Shot type: Extreme wide shot
+Angle: High angle 30 degrees
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 2
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】The heavy iron gates begin to slowly swing open, creating a gap to the outside world. The movement is laborious and loud.
+【Dialogue】
+【Result】The opening gate creates a powerful visual metaphor for release, accompanied by a harsh, grating sound that signifies a painful transition.
+【Emotion】Anticipation ↑ (1) (Suspended)
+Scene: Prison Gate, Drizzling Afternoon
+Action: The heavy iron gates begin to slowly swing open, creating a gap to the outside world. The movement is laborious and loud.
+Result: The opening gate creates a powerful visual metaphor for release, accompanied by a harsh, grating sound that signifies a painful transition.
+Atmosphere: Cold tones · The focus is on the metallic texture and the movement, with the sound of grinding metal dominating the audio landscape, creating tension.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 3
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Long shot
+【Movement】Static shot
+【Action】Elena steps out from the prison gate, her posture straight and composed. She carries a small, plain bag in one hand, her only possession from her past life.
+【Dialogue】
+【Result】Her silhouette emerges into the light, a solitary figure against the massive prison structure, signifying her rebirth and isolation.
+【Emotion】Cold Resolve ↑ (1) (Suspended)
+Scene: Prison Gate, Drizzling Afternoon
+Characters: Elena (Seo-yeon)
+Action: Elena steps out from the prison gate, her posture straight and composed. She carries a small, plain bag in one hand, her only possession from her past life.
+Result: Her silhouette emerges into the light, a solitary figure against the massive prison structure, signifying her rebirth and isolation.
+Atmosphere: Desaturated color palette · The air is misty with rain. The focus is on her determined but lonely figure, emphasizing her complete transformation.
+Shot type: Long shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 4
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Elena stops just a few feet from the gate, her body language still and poised, her gaze fixed on the world in front of her.
+【Dialogue】
+【Result】This moment of stillness heightens the drama, allowing the audience to contemplate her mindset and what her next move will be.
+【Emotion】Contemplation → (0) (Suspended)
+Scene: Prison Gate, Drizzling Afternoon
+Characters: Elena (Seo-yeon)
+Action: Elena stops just a few feet from the gate, her body language still and poised, her gaze fixed on the world in front of her.
+Result: This moment of stillness heightens the drama, allowing the audience to contemplate her mindset and what her next move will be.
+Atmosphere: Quiet and contemplative · The only sounds are the rain and her steady breathing. The shot is composed to feel both liberating and heavy with unspoken purpose.
+Shot type: Medium shot
+Angle: Side view
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 5
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Push in
+【Action】Elena lifts her chin slightly, her metal-framed glasses catching the light, and takes a slow, deep breath, her eyes closed for a moment.
+【Dialogue】
+【Result】The camera pushes in as she inhales, emphasizing the significance of this breath—not just of air, but of a new, vengeful purpose.
+【Emotion】Vengeful Resolve ↑↑ (2) (Suspended)
+Scene: Prison Gate, Drizzling Afternoon
+Characters: Elena (Seo-yeon)
+Action: Elena lifts her chin slightly, her metal-framed glasses catching the light, and takes a slow, deep breath, her eyes closed for a moment.
+Result: The camera pushes in as she inhales, emphasizing the significance of this breath—not just of air, but of a new, vengeful purpose.
+Atmosphere: Intimate yet cold · The focus is entirely on her expression, which subtly shifts from release to a hardened resolve. The sound of her breath is amplified.
+Shot type: Close-up
+Angle: Eye level
+Movement: Push in
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 6
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Long shot
+【Movement】Pan
+【Action】The luxury car approaches from down the street and comes to a silent, smooth stop. Its presence is an immediate sign of power and wealth.
+【Dialogue】
+【Result】The arrival of the Bentley signals that Elena is not alone and has powerful allies, shifting the tone from desolation to one of impending action.
+【Emotion】Power Shift ↑ (1) (Released)
+Scene: Prison Gate, Drizzling Afternoon
+Characters: Elena (Seo-yeon)
+Action: The luxury car approaches from down the street and comes to a silent, smooth stop. Its presence is an immediate sign of power and wealth.
+Result: The arrival of the Bentley signals that Elena is not alone and has powerful allies, shifting the tone from desolation to one of impending action.
+Atmosphere: Sleek and powerful · The quiet hum of the high-end engine contrasts with the natural sound of the rain, creating a sense of an external force intervening.
+Shot type: Long shot
+Angle: Low angle
+Movement: Pan
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 7
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】The tinted rear passenger window of the Bentley lowers with a silent, swift mechanical hum, breaking the sleek surface of the car.
+【Dialogue】
+【Result】The lowering window acts as a curtain being raised, building suspense for who is inside and what they represent for Elena's future.
+【Emotion】Mystery ↑ (1) (Suspended)
+Scene: Prison Gate, Drizzling Afternoon
+Characters: Elena (Seo-yeon)
+Action: The tinted rear passenger window of the Bentley lowers with a silent, swift mechanical hum, breaking the sleek surface of the car.
+Result: The lowering window acts as a curtain being raised, building suspense for who is inside and what they represent for Elena's future.
+Atmosphere: Mysterious and sleek · The mechanical sound is precise and quiet, reinforcing the theme of wealth and sophisticated power.
+Shot type: Medium shot
+Angle: Side view
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 8
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】As the window descends, Kang Eun-ji is revealed. She observes Elena with a calm, knowing expression, a faint, unreadable smile on her lips.
+【Dialogue】
+【Result】The identity of Elena's ally is confirmed, a woman who exudes the same aura of control and strategic thinking as Elena now does.
+【Emotion】Alliance Revealed → (0) (Released)
+Scene: Prison Gate, Drizzling Afternoon
+Characters: Kang Eun-ji
+Action: As the window descends, Kang Eun-ji is revealed. She observes Elena with a calm, knowing expression, a faint, unreadable smile on her lips.
+Result: The identity of Elena's ally is confirmed, a woman who exudes the same aura of control and strategic thinking as Elena now does.
+Atmosphere: Confident and controlled · The car's interior is a stark contrast to the bleakness outside. The mood is one of a clandestine, powerful meeting.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 9
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Kang Eun-ji looks directly at Elena, her voice clear and slightly mocking as she speaks her welcoming line to the newly freed woman.
+【Dialogue】Kang Eun-ji: "Welcome back to the world of monsters… Elena."
+【Result】The dialogue immediately establishes the dark, predatory nature of the world they operate in and christens Seo-yeon with her new identity.
+【Emotion】Cynicism ↑ (1) (Suspended)
+Scene: Prison Gate, Drizzling Afternoon
+Characters: Kang Eun-ji, Elena (Seo-yeon)
+Action: Kang Eun-ji looks directly at Elena, her voice clear and slightly mocking as she speaks her welcoming line to the newly freed woman.
+Result: The dialogue immediately establishes the dark, predatory nature of the world they operate in and christens Seo-yeon with her new identity.
+Dialogue: Kang Eun-ji: "Welcome back to the world of monsters… Elena."
+Atmosphere: Ironic and cynical · The line is delivered with a dry wit, setting the tone for their ruthless partnership. The rain continues to fall.
+Shot type: Medium shot
+Angle: Over-the-shoulder (Elena's)
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 10
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Elena's expression remains unchanged, her lips barely moving as she delivers her line in a low, steady voice, negating her past self.
+【Dialogue】Elena: “The name Seo-yeon died in cell 402."
+【Result】Her words are a formal declaration of her transformation, a verbal severing of all ties to her previous, weaker identity.
+【Emotion】Cold Declaration ↑↑ (2) (Suspended)
+Scene: Prison Gate, Drizzling Afternoon
+Characters: Elena (Seo-yeon)
+Action: Elena's expression remains unchanged, her lips barely moving as she delivers her line in a low, steady voice, negating her past self.
+Result: Her words are a formal declaration of her transformation, a verbal severing of all ties to her previous, weaker identity.
+Dialogue: Elena: “The name Seo-yeon died in cell 402."
+Atmosphere: Cold and definitive · The emotional weight of her statement hangs in the air, creating a chilling effect. Her voice is devoid of warmth or sentiment.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 11
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Extreme close-up
+【Movement】Static shot
+【Action】Elena continues speaking, her voice imbued with a newfound power and authority, her gaze unwavering as she completes her statement.
+【Dialogue】Elena: “From now on… there is only Elena of Phoenix Capital.”
+【Result】The name 'Elena' lands with finality, linked to a powerful entity, 'Phoenix Capital', solidifying her new status and mission.
+【Emotion】Rebirth/Power ↑↑↑ (3) (Released)
+Scene: Prison Gate, Drizzling Afternoon
+Characters: Elena (Seo-yeon)
+Action: Elena continues speaking, her voice imbued with a newfound power and authority, her gaze unwavering as she completes her statement.
+Result: The name 'Elena' lands with finality, linked to a powerful entity, 'Phoenix Capital', solidifying her new status and mission.
+Dialogue: Elena: “From now on… there is only Elena of Phoenix Capital.”
+Atmosphere: Powerful and momentous · The tight framing gives her words immense impact. This is the climax of her rebirth.
+Shot type: Extreme close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 12
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Kang Eun-ji gives a curt nod, her eyes glinting with strategic pleasure, before she begins to outline the current situation.
+【Dialogue】Kang Eun-ji: “Good. Phoenix Capital is ready. Hanseong is drowning in debt because of Jae-hyun’s reckless projects.”
+【Result】The conversation immediately pivots to the plan, showing that Elena's return is the final piece in a long-prepared strategy.
+【Emotion】Scheming ↑ (1) (Suspended)
+Scene: Prison Gate, Drizzling Afternoon
+Characters: Kang Eun-ji
+Action: Kang Eun-ji gives a curt nod, her eyes glinting with strategic pleasure, before she begins to outline the current situation.
+Result: The conversation immediately pivots to the plan, showing that Elena's return is the final piece in a long-prepared strategy.
+Dialogue: Kang Eun-ji: “Good. Phoenix Capital is ready. Hanseong is drowning in debt because of Jae-hyun’s reckless projects.”
+Atmosphere: Scheming and strategic · The tone shifts from personal declaration to business warfare. The dialogue is crisp and informational.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 13
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Extreme close-up
+【Movement】Static shot
+【Action】As she speaks of Jae-hyun's downfall, a faint, cold smile of satisfaction appears on Kang Eun-ji's lips, revealing her personal investment.
+【Dialogue】
+【Result】The small, almost imperceptible smile reveals a deep-seated malice and personal pleasure in their enemy's misfortune.
+【Emotion】Malicious Satisfaction ↑↑ (2) (Suspended)
+Scene: Prison Gate, Drizzling Afternoon
+Characters: Kang Eun-ji
+Action: As she speaks of Jae-hyun's downfall, a faint, cold smile of satisfaction appears on Kang Eun-ji's lips, revealing her personal investment.
+Result: The small, almost imperceptible smile reveals a deep-seated malice and personal pleasure in their enemy's misfortune.
+Atmosphere: Subtle and sinister · The tight shot makes the small action feel significant, highlighting the cruel satisfaction driving their plan.
+Shot type: Extreme close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 14
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Kang Eun-ji leans slightly forward, her eyes locking with Elena's, delivering her final line with deliberate, provocative weight.
+【Dialogue】Kang Eun-ji: “This is your moment to enter… as a savior… or an executioner.”
+【Result】The line frames Elena's mission not just as revenge, but as a strategic choice of identity, giving her full agency in the destruction to come.
+【Emotion】Provocation ↑↑ (2) (Released)
+Scene: Prison Gate, Drizzling Afternoon
+Characters: Kang Eun-ji, Elena (Seo-yeon)
+Action: Kang Eun-ji leans slightly forward, her eyes locking with Elena's, delivering her final line with deliberate, provocative weight.
+Result: The line frames Elena's mission not just as revenge, but as a strategic choice of identity, giving her full agency in the destruction to come.
+Dialogue: Kang Eun-ji: “This is your moment to enter… as a savior… or an executioner.”
+Atmosphere: Provocative and tense · The air is thick with unspoken understanding and the promise of impending conflict. The choice is presented as a declaration of war.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 15
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Extreme wide shot
+【Movement】Pull out
+【Action】The camera starts on a chandelier and pulls out to reveal the grand scale of the dinner party, establishing the setting and its atmosphere of luxury.
+【Dialogue】
+【Result】The opulence of the scene is established, creating a stark contrast with the underlying financial ruin and the impending arrival of Elena.
+【Emotion】Superficiality → (0) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun, Yoon Mi-ra
+Action: The camera starts on a chandelier and pulls out to reveal the grand scale of the dinner party, establishing the setting and its atmosphere of luxury.
+Result: The opulence of the scene is established, creating a stark contrast with the underlying financial ruin and the impending arrival of Elena.
+Atmosphere: Opulent but hollow · Rich, warm tones dominate, with the constant, low murmur of polite conversation and clinking glasses. The mood is superficially celebratory.
+Shot type: Extreme wide shot
+Angle: High angle
+Movement: Pull out
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 16
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Tracking
+【Action】The camera tracks with Jae-hyun and Yoon Mi-ra as they move through the crowd, shaking hands and making small talk, their smiles perfectly rehearsed.
+【Dialogue】
+【Result】Despite their glamorous appearance and practiced charm, there is a visible tension in their interaction, hinting at the pressure they are under.
+【Emotion】Feigned Composure → (0) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun, Yoon Mi-ra
+Action: The camera tracks with Jae-hyun and Yoon Mi-ra as they move through the crowd, shaking hands and making small talk, their smiles perfectly rehearsed.
+Result: Despite their glamorous appearance and practiced charm, there is a visible tension in their interaction, hinting at the pressure they are under.
+Atmosphere: Tense and performative · While they look the part, the lighting seems to cast sharp shadows on their faces, highlighting their fatigue.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Tracking
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 17
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】In a fleeting moment when no one is looking, their smiles drop. Jae-hyun subtly rubs his temples, and Yoon Mi-ra's jaw clenches for a second.
+【Dialogue】
+【Result】This quick shot pierces their public facade, revealing the deep exhaustion and desperation caused by their imminent financial collapse.
+【Emotion】Underlying Anxiety ↑ (1) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun, Yoon Mi-ra
+Action: In a fleeting moment when no one is looking, their smiles drop. Jae-hyun subtly rubs his temples, and Yoon Mi-ra's jaw clenches for a second.
+Result: This quick shot pierces their public facade, revealing the deep exhaustion and desperation caused by their imminent financial collapse.
+Atmosphere: Revealing and intimate · The background noise of the party fades slightly, focusing on their silent, shared anxiety. The mood becomes heavy.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 18
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Long shot
+【Movement】Static shot
+【Action】Elena enters the ballroom. She doesn't walk; she makes an entrance. Her tailored black suit is a stark contrast to the colorful gowns and tuxedos.
+【Dialogue】
+【Result】Her arrival immediately disrupts the party's atmosphere. Her powerful presence commands attention without a single word.
+【Emotion】Dramatic Entrance ↑↑ (2) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Elena (Seo-yeon)
+Action: Elena enters the ballroom. She doesn't walk; she makes an entrance. Her tailored black suit is a stark contrast to the colorful gowns and tuxedos.
+Result: Her arrival immediately disrupts the party's atmosphere. Her powerful presence commands attention without a single word.
+Atmosphere: Dramatic and imposing · The lighting seems to dim slightly around the room, focusing all attention on her. The air becomes charged with tension.
+Shot type: Long shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 19
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Wide shot
+【Movement】Pan
+【Action】The camera pans slowly across the room, showing how the lively party has come to a complete standstill. Glasses are held mid-sip, sentences left unfinished.
+【Dialogue】
+【Result】The collective reaction of the room solidifies the immense, almost palpable power of Elena's presence. The silence is deafening.
+【Emotion】Collective Surprise ↑ (1) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Action: The camera pans slowly across the room, showing how the lively party has come to a complete standstill. Glasses are held mid-sip, sentences left unfinished.
+Result: The collective reaction of the room solidifies the immense, almost palpable power of Elena's presence. The silence is deafening.
+Atmosphere: Tense and silent · The only sound is the faint, new BGM. The warm, golden light of the party now feels like a spotlight on an empty stage.
+Shot type: Wide shot
+Angle: Eye level
+Movement: Pan
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 20
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Push in
+【Action】Jae-hyun freezes completely. His mouth is slightly agape, and his eyes widen as he stares at the woman at the door, a flicker of recognition warring with disbelief.
+【Dialogue】
+【Result】His visceral reaction shows that some part of him recognizes Seo-yeon, creating a moment of intense psychological shock and confusion.
+【Emotion】Shock/Confusion ↑↑ (2) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun
+Action: Jae-hyun freezes completely. His mouth is slightly agape, and his eyes widen as he stares at the woman at the door, a flicker of recognition warring with disbelief.
+Result: His visceral reaction shows that some part of him recognizes Seo-yeon, creating a moment of intense psychological shock and confusion.
+Atmosphere: Shock and disbelief · The background blurs as the camera pushes in on his face. The sound design focuses on a rising, tense frequency.
+Shot type: Close-up
+Angle: Eye level
+Movement: Push in
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 21
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Jae-hyun squints slightly, tilting his head as if trying to solve a puzzle. He sees a ghost of familiarity in her, but her overwhelming confidence and new look confuse him.
+【Dialogue】
+【Result】His doubt is palpable. He dismisses the familiarity as a coincidence, intimidated by the sheer force of her presence.
+【Emotion】Doubt/Intimidation ↑ (1) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun, Elena (Seo-yeon)
+Action: Jae-hyun squints slightly, tilting his head as if trying to solve a puzzle. He sees a ghost of familiarity in her, but her overwhelming confidence and new look confuse him.
+Result: His doubt is palpable. He dismisses the familiarity as a coincidence, intimidated by the sheer force of her presence.
+Atmosphere: Intimidating and confusing · The depth of field keeps Elena as a powerful but indistinct shape, symbolizing her new, unknowable persona.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 22
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Tracking
+【Action】Jae-hyun forces a confident, professional smile, masking his inner turmoil. He walks purposefully toward Elena and extends a hand in greeting.
+【Dialogue】Jae-hyun: “Welcome. I heard Phoenix Capital is interested in our project. I’m Jae-hyun, CEO of Hanseong.”
+【Result】He attempts to take control of the situation by framing their meeting in a business context, treating her as just another investor.
+【Emotion】Forced Confidence → (0) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun, Elena (Seo-yeon)
+Action: Jae-hyun forces a confident, professional smile, masking his inner turmoil. He walks purposefully toward Elena and extends a hand in greeting.
+Result: He attempts to take control of the situation by framing their meeting in a business context, treating her as just another investor.
+Dialogue: Jae-hyun: “Welcome. I heard Phoenix Capital is interested in our project. I’m Jae-hyun, CEO of Hanseong.”
+Atmosphere: Tense and formal · The air is thick with unspoken history. His attempt at normalcy feels jarring and inadequate against her imposing silence.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Tracking
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 23
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Elena completely ignores his outstretched hand. A chilling, condescending half-smile forms on her lips as she looks at him.
+【Dialogue】Elena: “I’m Elena.”
+【Result】Her simple introduction and refusal to shake his hand is a powerful act of dominance, immediately shattering his attempt at control.
+【Emotion】Contempt/Superiority ↑↑ (2) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun, Elena (Seo-yeon)
+Action: Elena completely ignores his outstretched hand. A chilling, condescending half-smile forms on her lips as she looks at him.
+Result: Her simple introduction and refusal to shake his hand is a powerful act of dominance, immediately shattering his attempt at control.
+Dialogue: Elena: “I’m Elena.”
+Atmosphere: Condescending and powerful · Her smile doesn't reach her cold eyes. The silence that follows her line is heavy and humiliating for Jae-hyun.
+Shot type: Close-up
+Angle: Low angle
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 24
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Elena maintains eye contact, her voice remaining low and steady as she dismisses his life's work with a single sentence.
+【Dialogue】Elena: “I’m not interested in your project, Jae-hyun.”
+【Result】Her words strike him like a physical blow, dismantling his entire premise for their conversation and leaving him exposed and confused.
+【Emotion】Dismissiveness ↑↑ (2) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun, Elena (Seo-yeon)
+Action: Elena maintains eye contact, her voice remaining low and steady as she dismisses his life's work with a single sentence.
+Result: Her words strike him like a physical blow, dismantling his entire premise for their conversation and leaving him exposed and confused.
+Dialogue: Elena: “I’m not interested in your project, Jae-hyun.”
+Atmosphere: Dismissive and tense · The public setting amplifies his humiliation. Her directness is brutal and unexpected.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 25
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Jae-hyun's forced smile completely vanishes. His eyes widen in alarm and confusion, and he retracts his still-unshaken hand.
+【Dialogue】
+【Result】His mask of the confident CEO is shattered, revealing the vulnerable, cornered man underneath. He is completely off-balance.
+【Emotion】Alarm ↑↑ (2) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun
+Action: Jae-hyun's forced smile completely vanishes. His eyes widen in alarm and confusion, and he retracts his still-unshaken hand.
+Result: His mask of the confident CEO is shattered, revealing the vulnerable, cornered man underneath. He is completely off-balance.
+Atmosphere: Humiliating and alarming · The focus on his reaction makes the audience feel his shock and dawning fear. The silence is damning.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 26
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Elena holds his terrified gaze for a few beats longer than is comfortable, her expression unreadable, letting him squirm in the silence.
+【Dialogue】
+【Result】The pause is a power move, a form of psychological torture that asserts her complete control over the situation and him.
+【Emotion】Dominance ↑↑↑ (3) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Elena (Seo-yeon)
+Action: Elena holds his terrified gaze for a few beats longer than is comfortable, her expression unreadable, letting him squirm in the silence.
+Result: The pause is a power move, a form of psychological torture that asserts her complete control over the situation and him.
+Atmosphere: Dominating and cruel · The silence stretches on, becoming unbearable. The shot feels claustrophobic and intense.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 27
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Extreme close-up
+【Movement】Static shot
+【Action】Her lips curve into a predator's smile as she speaks, her voice a low, venomous whisper that carries across the silent room.
+【Dialogue】Elena: “I’m interested in… owning your entire company.”
+【Result】Her true intention is revealed, a declaration of war that is far more terrifying than a simple rejection of a project. It's a threat to his entire existence.
+【Emotion】Declaration of War ↑↑↑ (3) (Released)
+Scene: Mansion Dinner Party, Evening
+Characters: Elena (Seo-yeon)
+Action: Her lips curve into a predator's smile as she speaks, her voice a low, venomous whisper that carries across the silent room.
+Result: Her true intention is revealed, a declaration of war that is far more terrifying than a simple rejection of a project. It's a threat to his entire existence.
+Dialogue: Elena: “I’m interested in… owning your entire company.”
+Atmosphere: Shocking and terrifying · The line lands with the force of a bomb exploding in the quiet room. The mood shifts from tense to overtly hostile.
+Shot type: Extreme close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 28
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Tracking
+【Action】Yoon Mi-ra steps forward from beside Jae-hyun, her expression a mask of professional composure, though her eyes are wary and sharp.
+【Dialogue】
+【Result】Her intervention shows her to be a more resilient and cautious adversary, immediately stepping in to defend their territory.
+【Emotion】Protective/Cautious ↑ (1) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun, Yoon Mi-ra, Elena (Seo-yeon)
+Action: Yoon Mi-ra steps forward from beside Jae-hyun, her expression a mask of professional composure, though her eyes are wary and sharp.
+Result: Her intervention shows her to be a more resilient and cautious adversary, immediately stepping in to defend their territory.
+Atmosphere: Defensive and cautious · The dynamic shifts as a new opponent enters the ring. Her presence adds a new layer of conflict.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Tracking
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 29
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Yoon Mi-ra introduces herself, establishing her authority, and then directly challenges Elena's bold statement with a calm, pointed observation.
+【Dialogue】Yoon Mi-ra: “I’m Yoon Mi-ra, CFO. You seem very confident.”
+【Result】She attempts to reframe Elena's declaration as mere arrogance, a verbal counter-attack designed to test her opponent's resolve.
+【Emotion】Defiance ↑ (1) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Yoon Mi-ra
+Action: Yoon Mi-ra introduces herself, establishing her authority, and then directly challenges Elena's bold statement with a calm, pointed observation.
+Result: She attempts to reframe Elena's declaration as mere arrogance, a verbal counter-attack designed to test her opponent's resolve.
+Dialogue: Yoon Mi-ra: “I’m Yoon Mi-ra, CFO. You seem very confident.”
+Atmosphere: Defiant and controlled · Unlike Jae-hyun, she doesn't show fear. She meets aggression with professional poise, creating a more balanced confrontation.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 30
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Elena slowly shifts her gaze from Jae-hyun to Yoon Mi-ra. Her eyes lock onto her new opponent with a predatory intensity, sizing her up.
+【Dialogue】
+【Result】The shift in focus establishes Yoon Mi-ra as Elena's primary obstacle. The air crackles with the unspoken challenge between them.
+【Emotion】Confrontation ↑↑ (2) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Yoon Mi-ra, Elena (Seo-yeon)
+Action: Elena slowly shifts her gaze from Jae-hyun to Yoon Mi-ra. Her eyes lock onto her new opponent with a predatory intensity, sizing her up.
+Result: The shift in focus establishes Yoon Mi-ra as Elena's primary obstacle. The air crackles with the unspoken challenge between them.
+Atmosphere: Confrontational and intense · The background is completely out of focus. The only thing that matters is the connection between these two powerful women.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 31
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Push in
+【Action】A smirk plays on Elena's lips as she delivers her line, her voice dripping with condescension, directly attacking their most vulnerable point: their finances.
+【Dialogue】Elena: “Confidence is the only thing I have more of… than the money in your accounts.”
+【Result】Her line is a masterstroke, a direct and humiliating confirmation that she knows about their financial ruin, leaving them with no defense.
+【Emotion】Utter Dominance ↑↑↑ (3) (Released)
+Scene: Mansion Dinner Party, Evening
+Characters: Elena (Seo-yeon)
+Action: A smirk plays on Elena's lips as she delivers her line, her voice dripping with condescension, directly attacking their most vulnerable point: their finances.
+Result: Her line is a masterstroke, a direct and humiliating confirmation that she knows about their financial ruin, leaving them with no defense.
+Dialogue: Elena: “Confidence is the only thing I have more of… than the money in your accounts.”
+Atmosphere: Utterly dominant and crushing · The camera pushes in slowly, making her feel inescapable. Her words are the final nail in the coffin of their public image.
+Shot type: Close-up
+Angle: Low angle
+Movement: Push in
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 32
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Elena makes a subtle, seemingly accidental gesture towards her suit cuff. Her fingers fumble, and a single, ornate cufflink is dislodged.
+【Dialogue】
+【Result】The action appears to be a simple mistake, but its deliberate nature is a calculated move to introduce a new element of psychological warfare.
+【Emotion】Calculated Chaos ↑↑ (2) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun, Yoon Mi-ra, Elena (Seo-yeon)
+Action: Elena makes a subtle, seemingly accidental gesture towards her suit cuff. Her fingers fumble, and a single, ornate cufflink is dislodged.
+Result: The action appears to be a simple mistake, but its deliberate nature is a calculated move to introduce a new element of psychological warfare.
+Atmosphere: Calculated and tense · The party's warm lighting now feels accusatory. The air is thick with the promise of more drama.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 33
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Extreme close-up
+【Movement】Follow
+【Action】The camera follows the cufflink—identical to a distinctive one Jae-hyun used to wear—as it falls directly towards Yoon Mi-ra's hand.
+【Dialogue】
+【Result】The slow-motion shot imbues the cufflink with immense importance, turning it from a simple object into a symbol of betrayal and a planted clue.
+【Emotion】Foreshadowing Suspense ↑↑ (2) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Action: The camera follows the cufflink—identical to a distinctive one Jae-hyun used to wear—as it falls directly towards Yoon Mi-ra's hand.
+Result: The slow-motion shot imbues the cufflink with immense importance, turning it from a simple object into a symbol of betrayal and a planted clue.
+Atmosphere: Suspenseful and fateful · The sound design focuses on the almost inaudible whoosh of the cufflink through the air, heightening the tension.
+Shot type: Extreme close-up
+Angle: High angle
+Movement: Follow
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 34
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Yoon Mi-ra, reacting on instinct, catches the cufflink. She looks down at her palm, her brow furrowing in confusion at the object.
+【Dialogue】
+【Result】The evidence is now literally in her hands. The 'accident' has successfully transferred the object of suspicion to the intended target.
+【Emotion】Dawning Realization ↑ (1) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Yoon Mi-ra
+Action: Yoon Mi-ra, reacting on instinct, catches the cufflink. She looks down at her palm, her brow furrowing in confusion at the object.
+Result: The evidence is now literally in her hands. The 'accident' has successfully transferred the object of suspicion to the intended target.
+Atmosphere: Confusing and ominous · The lighting highlights the intricate design of the cufflink in her palm. The mood is one of dawning dread.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 35
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Rack focus
+【Action】Yoon Mi-ra's eyes widen in recognition. The camera racks focus from the cufflink to her eyes, then to Jae-hyun, whose face is a mask of horror.
+【Dialogue】
+【Result】The connection is made. Yoon Mi-ra's mind is instantly filled with suspicion of a secret affair between Jae-hyun and this mysterious woman.
+【Emotion】Suspicion/Distrust ↑↑↑ (3) (Released)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun, Yoon Mi-ra
+Action: Yoon Mi-ra's eyes widen in recognition. The camera racks focus from the cufflink to her eyes, then to Jae-hyun, whose face is a mask of horror.
+Result: The connection is made. Yoon Mi-ra's mind is instantly filled with suspicion of a secret affair between Jae-hyun and this mysterious woman.
+Atmosphere: Poisonous and destructive · The shot visually links the object, the suspicion, and the accused, creating a triangle of distrust that fractures their alliance.
+Shot type: Close-up
+Angle: Eye level
+Movement: Rack focus
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 36
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Elena doesn't even look at her assistant. She takes the case, places it on a nearby table, and opens it with two decisive clicks.
+【Dialogue】
+【Result】This action signals a shift from psychological games to a direct financial assault. It shows she came prepared for an immediate takeover.
+【Emotion】Calculated Power Move ↑↑ (2) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Elena (Seo-yeon)
+Action: Elena doesn't even look at her assistant. She takes the case, places it on a nearby table, and opens it with two decisive clicks.
+Result: This action signals a shift from psychological games to a direct financial assault. It shows she came prepared for an immediate takeover.
+Atmosphere: Clinical and ruthless · Her movements are precise and economical. The mood is that of a surgeon preparing for a critical operation.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 37
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Push in
+【Action】Elena pulls out a single, critical document—a hidden debt contract of Hanseong. She slides it across the table towards Jae-hyun.
+【Dialogue】
+【Result】The document itself is the weapon. Its appearance on the table is the equivalent of a gun being drawn, a tangible threat that cannot be ignored.
+【Emotion】Revelation ↑↑ (2) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun, Elena (Seo-yeon)
+Action: Elena pulls out a single, critical document—a hidden debt contract of Hanseong. She slides it across the table towards Jae-hyun.
+Result: The document itself is the weapon. Its appearance on the table is the equivalent of a gun being drawn, a tangible threat that cannot be ignored.
+Atmosphere: Final and damning · The stark white paper against the dark table looks like a verdict. The air is thick with the smell of defeat.
+Shot type: Close-up
+Angle: High angle
+Movement: Push in
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 38
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Close-up
+【Movement】Static shot
+【Action】Jae-hyun's eyes scan the document. His face drains of all color, his body sags, and his hands tremble as he recognizes the fatal contract he thought was buried.
+【Dialogue】
+【Result】This is the moment of utter checkmate. He realizes she not only knows his weakness but owns it completely. There is no way out.
+【Emotion】Utter Defeat ↑↑↑ (3) (Suspended)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun
+Action: Jae-hyun's eyes scan the document. His face drains of all color, his body sags, and his hands tremble as he recognizes the fatal contract he thought was buried.
+Result: This is the moment of utter checkmate. He realizes she not only knows his weakness but owns it completely. There is no way out.
+Atmosphere: Hopeless and devastating · The background party noise seems to fade into a dull roar, all focus is on his internal world collapsing.
+Shot type: Close-up
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+
+
+Shot 39
+User Prompt:
+
+Shot information:
+Shot description: 【Shot Type】Medium shot
+【Movement】Static shot
+【Action】Elena places an expensive fountain pen next to the contract, her expression cold and unyielding. It's not a request, it's a command.
+【Dialogue】
+【Result】Trapped and publicly humiliated, Jae-hyun slowly reaches for the pen, his trembling hand a clear sign of his forced surrender. He is about to sign his empire away.
+【Emotion】Forced Surrender ↑↑↑ (3) (Released)
+Scene: Mansion Dinner Party, Evening
+Characters: Jae-hyun, Elena (Seo-yeon)
+Action: Elena places an expensive fountain pen next to the contract, her expression cold and unyielding. It's not a request, it's a command.
+Result: Trapped and publicly humiliated, Jae-hyun slowly reaches for the pen, his trembling hand a clear sign of his forced surrender. He is about to sign his empire away.
+Atmosphere: Humiliating and final · The act of signing is his ultimate defeat, performed in front of his peers. Elena's victory is absolute and brutal.
+Shot type: Medium shot
+Angle: Eye level
+Movement: Static shot
+
+Please directly generate the image prompt for the first frame without any explanation:
+
+

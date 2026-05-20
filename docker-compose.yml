@@ -1,0 +1,43 @@
+# Go backend only; narrative graph is generated in-process (Text AI + embedded prompts).
+services:
+  huobao-drama:
+    # image: huobao-drama:latest
+    container_name: huobao-drama
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Docker Hub mirror (keep trailing slash)
+        DOCKER_REGISTRY: ${DOCKER_REGISTRY:-}
+        # npm mirror
+        NPM_REGISTRY: ${NPM_REGISTRY:-}
+        # Go proxy
+        GO_PROXY: ${GO_PROXY:-}
+        # Alpine apk mirror
+        ALPINE_MIRROR: ${ALPINE_MIRROR:-}
+    ports:
+      - "5678:5678"
+    volumes:
+      # Persistent data directory (named volume, container runs as root)
+      - huobao-data:/app/data
+      # Mount config file (optional, uncomment to customize)
+      # - ./configs/config.yaml:/app/configs/config.yaml:ro
+      # If using local directory mounts, ensure permissions are correct
+      # Example: - ./data:/app/data (requires chmod 777 ./data)
+    environment:
+      - TZ=Asia/Shanghai
+      # optional: NARRATIVE_FALLBACK_STUB=true for offline 7-node template when LLM fails
+      # Access host Text AI from container: http://host.docker.internal:11434 etc.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Cross-platform host gateway
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  huobao-data:
+    driver: local

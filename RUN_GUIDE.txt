@@ -1,0 +1,82 @@
+# 🎬 Huobao Drama - Run Guide
+
+## 1. Prerequisites
+- Go 1.23+
+- Node.js 18+ & npm 9+
+- FFmpeg (Required for video processing)
+
+## 2. Setup & Installation
+```bash
+# Clone the project (if not already done)
+# git clone https://github.com/chatfire-AI/huobao-drama.git
+# cd huobao-drama
+
+# Install Backend dependencies
+go mod download
+
+# Install Frontend dependencies
+cd web
+npm install
+cd ..
+
+# Initialize Configuration
+cp configs/config.example.yaml configs/config.yaml
+```
+
+## 3. Development Mode (Hot Reload)
+Run these in two separate terminals:
+
+**Terminal 1 (Backend):**
+```bash
+go run main.go
+```
+*Runs on: http://localhost:5678*
+
+If using Vertex AI, set the required Google Cloud env vars before this command.
+They must be set in the same terminal session, or set permanently with `setx`
+and then used from a newly opened terminal:
+
+```powershell
+$env:GOOGLE_CLOUD_PROJECT="project-93aa7ef8-3fc1-4aa6-868"
+$env:GOOGLE_CLOUD_LOCATION="global"
+go run main.go
+```
+
+See `docs/VERTEX_AI_SETUP.md` for CMD, PowerShell, conda, and permanent setup notes.
+
+**Terminal 2 (Frontend):**
+```bash
+cd web
+npm run dev
+```
+*Runs on: http://localhost:3012*
+
+## 4. Single Service Mode (Production Build)
+Backend serves both API and frontend static files.
+
+```bash
+# 1. Build frontend
+cd web
+npm run build
+cd ..
+
+# 2. Start service
+go run main.go
+```
+*Access via: http://localhost:5678*
+
+## 5. Docker Deployment (Recommended)
+```bash
+# Start with Docker Compose
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+```
+
+## 6. Important Notes
+- Ensure FFmpeg is in your system PATH.
+- Database (SQLite) is auto-created on the first run at `./data/drama_generator.db`.
+- API keys for AI providers are configured via the Web UI settings.
+- Vertex AI does not use an API key in the UI. It uses Google ADC plus
+  `GOOGLE_CLOUD_PROJECT` and `GOOGLE_CLOUD_LOCATION` from the backend process env.

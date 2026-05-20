@@ -1,0 +1,211 @@
+<template>
+  <!-- Drama Create Page / 创建短剧页面 -->
+  <div class="page-container">
+    <div class="content-wrapper animate-fade-in">
+      <!-- Header / 头部 -->
+      <AppHeader :fixed="false" :show-logo="false">
+        <template #left>
+          <el-button text @click="goBack" class="back-btn">
+            <el-icon><ArrowLeft /></el-icon>
+            <span>Back</span>
+          </el-button>
+          <div class="page-title">
+            <h1>Create New Project</h1>
+            <span class="subtitle">Fill in basic info to create your drama project</span>
+          </div>
+        </template>
+      </AppHeader>
+
+      <!-- Form Card / 表单卡片 -->
+      <div class="form-card">
+
+        <el-form 
+          ref="formRef" 
+          :model="form" 
+          :rules="rules" 
+          label-position="top"
+          class="create-form"
+          @submit.prevent="handleSubmit"
+        >
+          <el-form-item label="Project Title" prop="title" required>
+            <el-input 
+              v-model="form.title" 
+              placeholder="Give your project a name"
+              size="large"
+              maxlength="100"
+              show-word-limit
+            />
+          </el-form-item>
+
+          <el-form-item label="Project Description" prop="description">
+            <el-input 
+              v-model="form.description" 
+              type="textarea" 
+              :rows="5"
+              placeholder="Briefly describe content, style, or idea (optional)"
+              maxlength="500"
+              show-word-limit
+              resize="none"
+            />
+          </el-form-item>
+
+          <el-form-item label="Art style" prop="style" required>
+            <el-select
+              v-model="form.style"
+              placeholder="Select style"
+              size="large"
+              style="width: 100%"
+            >
+              <el-option label="Ghibli" value="ghibli" />
+              <el-option label="Guoman" value="guoman" />
+              <el-option label="Wasteland" value="wasteland" />
+              <el-option label="Nostalgia" value="nostalgia" />
+              <el-option label="Pixel" value="pixel" />
+              <el-option label="Voxel" value="voxel" />
+              <el-option label="Urban" value="urban" />
+              <el-option label="Guoman 3D" value="guoman3d" />
+              <el-option label="Chibi 3D" value="chibi3d" />
+              <el-option label="K-drama" value="kdrama" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="Aspect ratio" prop="aspect_ratio" required>
+            <el-radio-group v-model="form.aspect_ratio" size="large">
+              <el-radio-button value="16:9">16:9 Landscape</el-radio-button>
+              <el-radio-button value="9:16">9:16 Portrait</el-radio-button>
+            </el-radio-group>
+          </el-form-item>
+
+          <div class="form-actions">
+            <el-button size="large" @click="goBack">Cancel</el-button>
+            <el-button 
+              type="primary" 
+              size="large"
+              :loading="loading"
+              @click="handleSubmit"
+            >
+              <el-icon v-if="!loading"><Plus /></el-icon>
+              Create Project
+            </el-button>
+          </div>
+        </el-form>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ArrowLeft, Plus } from '@element-plus/icons-vue'
+import { dramaAPI } from '@/api/drama'
+import type { CreateDramaRequest } from '@/types/drama'
+import { AppHeader } from '@/components/common'
+
+const router = useRouter()
+const formRef = ref<FormInstance>()
+const loading = ref(false)
+
+const form = reactive<CreateDramaRequest>({
+  title: '',
+  description: '',
+  style: 'ghibli',
+  aspect_ratio: '16:9',
+})
+
+const rules: FormRules = {
+  title: [
+    { required: true, message: 'Please enter project title', trigger: 'blur' },
+    { min: 1, max: 100, message: 'Title length must be 1 to 100 characters', trigger: 'blur' }
+  ],
+  style: [{ required: true, message: 'Please select style', trigger: 'change' }],
+  aspect_ratio: [{ required: true, message: 'Please select aspect ratio', trigger: 'change' }],
+}
+
+// Submit form / 提交表单
+const handleSubmit = async () => {
+  if (!formRef.value) return
+  
+  await formRef.value.validate(async (valid) => {
+    if (valid) {
+      loading.value = true
+      try {
+        const drama = await dramaAPI.create(form)
+        ElMessage.success('Created successfully')
+        router.push(`/dramas/${drama.id}`)
+      } catch (error: any) {
+        ElMessage.error(error.message || 'Create failed')
+      } finally {
+        loading.value = false
+      }
+    }
+  })
+}
+
+// Go back / 返回上一页
+const goBack = () => {
+  router.back()
+}
+</script>
+
+<style scoped>
+/* ========================================
+   Page Layout / 页面布局 - 紧凑边距
+   ======================================== */
+.page-container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  padding: var(--space-2) var(--space-3);
+  transition: background-color var(--transition-normal);
+}
+
+@media (min-width: 768px) {
+  .page-container {
+    padding: var(--space-3) var(--space-4);
+  }
+}
+
+.content-wrapper {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   Form Card / 表单卡片
+   ======================================== */
+.form-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+/* ========================================
+   Form Styles / 表单样式 - 紧凑内边距
+   ======================================== */
+.create-form {
+  padding: var(--space-4);
+}
+
+.create-form :deep(.el-form-item) {
+  margin-bottom: var(--space-4);
+}
+
+/* ========================================
+   Form Actions / 表单操作区
+   ======================================== */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-primary);
+  margin-top: var(--space-2);
+}
+
+.form-actions .el-button {
+  min-width: 100px;
+}
+</style>

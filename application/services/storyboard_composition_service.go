@@ -1,0 +1,616 @@
+package services
+
+import (
+	"encoding/json"
+	"fmt"
+
+	models "github.com/drama-generator/backend/domain/models"
+	"github.com/drama-generator/backend/pkg/logger"
+	"gorm.io/gorm"
+)
+
+type StoryboardCompositionService struct {
+	db       *gorm.DB
+	log      *logger.Logger
+	imageGen *ImageGenerationService
+}
+
+func NewStoryboardCompositionService(db *gorm.DB, log *logger.Logger, imageGen *ImageGenerationService) *StoryboardCompositionService {
+	return &StoryboardCompositionService{
+		db:       db,
+		log:      log,
+		imageGen: imageGen,
+	}
+}
+
+type SceneCharacterInfo struct {
+	ID        uint    `json:"id"`
+	Name      string  `json:"name"`
+	ImageURL  *string `json:"image_url,omitempty"`
+	LocalPath *string `json:"local_path,omitempty"`
+	OutfitID  *uint   `json:"outfit_id,omitempty"`
+}
+
+type SceneOutfitInfo struct {
+	ID          uint    `json:"id"`
+	CharacterID uint    `json:"character_id"`
+	Name        string  `json:"name"`
+	ImageURL    *string `json:"image_url,omitempty"`
+	LocalPath   *string `json:"local_path,omitempty"`
+}
+
+type SceneBackgroundInfo struct {
+	ID        uint    `json:"id"`
+	Location  string  `json:"location"`
+	Time      string  `json:"time"`
+	ImageURL  *string `json:"image_url,omitempty"`
+	LocalPath *string `json:"local_path,omitempty"`
+	Status    string  `json:"status"`
+}
+
+type SceneCompositionInfo struct {
+	ID                    uint                 `json:"id"`
+	StoryboardNumber      int                  `json:"storyboard_number"`
+	Title                 *string              `json:"title"`
+	Description           *string              `json:"description"`
+	ShotType              *string              `json:"shot_type"`
+	Angle                 *string              `json:"angle"`
+	Movement              *string              `json:"movement"`
+	Location              *string              `json:"location"`
+	Time                  *string              `json:"time"`
+	Duration              int                  `json:"duration"`
+	Dialogue              *string              `json:"dialogue"`
+	Narration             *string              `json:"narration"`
+	Action                *string              `json:"action"`
+	Result                *string              `json:"result"`
+	Atmosphere            *string              `json:"atmosphere"`
+	BgmPrompt             *string              `json:"bgm_prompt,omitempty"`
+	SoundEffect           *string              `json:"sound_effect,omitempty"`
+	ImagePrompt           *string              `json:"image_prompt,omitempty"`
+	VideoPrompt           *string              `json:"video_prompt,omitempty"`
+	LtxVideoPrompt        *string              `json:"ltx_video_prompt,omitempty"`
+	Characters            []SceneCharacterInfo `json:"characters"`
+	Outfits               []SceneOutfitInfo    `json:"outfits"`
+	Background            *SceneBackgroundInfo `json:"background"`
+	SceneID               *uint                `json:"scene_id"`
+	ComposedImage         *string              `json:"composed_image,omitempty"`
+	VideoURL              *string              `json:"video_url,omitempty"`
+	ImageGenerationID     *uint                `json:"image_generation_id,omitempty"`
+	ImageGenerationStatus *string              `json:"image_generation_status,omitempty"`
+	VideoGenerationID     *uint                `json:"video_generation_id,omitempty"`
+	VideoGenerationStatus *string              `json:"video_generation_status,omitempty"`
+}
+
+func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]SceneCompositionInfo, error) {
+	// Verify permissions
+	var episode models.Episode
+	err := s.db.Preload("Drama").Where("id = ?", episodeID).First(&episode).Error
+	if err != nil {
+		s.log.Errorw("Episode not found", "episode_id", episodeID, "error", err)
+		return nil, fmt.Errorf("episode not found")
+	}
+
+	s.log.Infow("GetScenesForEpisode auth check",
+		"episode_id", episodeID,
+		"drama_id", episode.DramaID)
+
+	// Get storyboard list
+	var storyboards []models.Storyboard
+	if err := s.db.Where("episode_id = ?", episodeID).
+		Preload("Characters").
+		Order("storyboard_number ASC").
+		Find(&storyboards).Error; err != nil {
+		return nil, fmt.Errorf("failed to load storyboards: %w", err)
+	}
+
+	// Get all characters (for matching character info)
+	var characters []models.Character
+	if err := s.db.Where("drama_id = ?", episode.DramaID).Find(&characters).Error; err != nil {
+		s.log.Warnw("Failed to load characters", "error", err)
+	}
+
+	// Create character ID to character info mapping
+	charIDToInfo := make(map[uint]*models.Character)
+	for i := range characters {
+		charIDToInfo[characters[i].ID] = &characters[i]
+	}
+
+	// Get all scene IDs
+	var sceneIDs []uint
+	for _, storyboard := range storyboards {
+		if storyboard.SceneID != nil {
+			sceneIDs = append(sceneIDs, *storyboard.SceneID)
+		}
+	}
+
+	// Batch fetch scene information
+	var scenes []models.Scene
+	sceneMap := make(map[uint]*models.Scene)
+	if len(sceneIDs) > 0 {
+		if err := s.db.Where("id IN ?", sceneIDs).Find(&scenes).Error; err == nil {
+			for i := range scenes {
+				sceneMap[scenes[i].ID] = &scenes[i]
+			}
+		}
+	}
+
+	// Get composed images for storyboards (from image_generations table)
+	storyboardIDs := make([]uint, len(storyboards))
+	for i, storyboard := range storyboards {
+		storyboardIDs[i] = storyboard.ID
+	}
+
+	imageGenMap := make(map[uint]string)                      // storyboard_id -> image_url
+	imageGenTaskMap := make(map[uint]*models.ImageGeneration) // storyboard_id -> processing task
+	if len(storyboardIDs) > 0 {
+		var imageGens []models.ImageGeneration
+		// Query completed image generation records, keep only the latest one per shot
+		if err := s.db.Where("storyboard_id IN ? AND status = ?", storyboardIDs, models.ImageStatusCompleted).
+			Order("created_at DESC").
+			Find(&imageGens).Error; err == nil {
+			// Keep the latest record for each shot
+			for _, ig := range imageGens {
+				if ig.StoryboardID != nil {
+					if _, exists := imageGenMap[*ig.StoryboardID]; !exists {
+						if ig.ImageURL != nil {
+							imageGenMap[*ig.StoryboardID] = *ig.ImageURL
+						}
+					}
+				}
+			}
+		}
+
+		// Query in-progress image generation tasks
+		var processingImageGens []models.ImageGeneration
+		if err := s.db.Where("storyboard_id IN ? AND status = ?", storyboardIDs, models.ImageStatusProcessing).
+			Order("created_at DESC").
+			Find(&processingImageGens).Error; err == nil {
+			for _, ig := range processingImageGens {
+				if ig.StoryboardID != nil {
+					if _, exists := imageGenTaskMap[*ig.StoryboardID]; !exists {
+						igCopy := ig
+						imageGenTaskMap[*ig.StoryboardID] = &igCopy
+					}
+				}
+			}
+		}
+	}
+
+	// Batch query in-progress video generation tasks
+	videoGenTaskMap := make(map[uint]*models.VideoGeneration) // storyboard_id -> processing task
+	if len(storyboardIDs) > 0 {
+		var processingVideoGens []models.VideoGeneration
+		if err := s.db.Where("scene_id IN ? AND status = ?", storyboardIDs, models.VideoStatusProcessing).
+			Order("created_at DESC").
+			Find(&processingVideoGens).Error; err == nil {
+			for _, vg := range processingVideoGens {
+				if vg.StoryboardID != nil {
+					if _, exists := videoGenTaskMap[*vg.StoryboardID]; !exists {
+						vgCopy := vg
+						videoGenTaskMap[*vg.StoryboardID] = &vgCopy
+					}
+				}
+			}
+		}
+	}
+
+	// Build return result
+	var result []SceneCompositionInfo
+	for _, storyboard := range storyboards {
+		storyboardInfo := SceneCompositionInfo{
+			ID:               storyboard.ID,
+			StoryboardNumber: storyboard.StoryboardNumber,
+			Title:            storyboard.Title,
+			Description:      storyboard.Description,
+			ShotType:         storyboard.ShotType,
+			Angle:            storyboard.Angle,
+			Movement:         storyboard.Movement,
+			Location:         storyboard.Location,
+			Time:             storyboard.Time,
+			Duration:         storyboard.Duration,
+			Action:           storyboard.Action,
+			Dialogue:         storyboard.Dialogue,
+			Narration:        storyboard.Narration,
+			Result:           storyboard.Result,
+			Atmosphere:       storyboard.Atmosphere,
+			BgmPrompt:        storyboard.BgmPrompt,
+			SoundEffect:      storyboard.SoundEffect,
+			ImagePrompt:      storyboard.ImagePrompt,
+			VideoPrompt:      storyboard.VideoPrompt,
+			LtxVideoPrompt:   storyboard.LtxVideoPrompt,
+			SceneID:          storyboard.SceneID,
+		}
+
+		// Query storyboard_characters to get outfit mapping for this storyboard
+		type SBChar struct {
+			CharacterID uint
+			OutfitID    *uint
+		}
+		var sbChars []SBChar
+		s.db.Table("storyboard_characters").Select("character_id, outfit_id").Where("storyboard_id = ?", storyboard.ID).Find(&sbChars)
+		outfitMap := make(map[uint]*uint)
+		for _, sbc := range sbChars {
+			outfitMap[sbc.CharacterID] = sbc.OutfitID
+		}
+
+		// Directly use associated character info
+		if len(storyboard.Characters) > 0 {
+			for _, char := range storyboard.Characters {
+				imageURL := char.ImageURL
+				localPath := char.LocalPath
+
+				// If there's an assigned outfit, use its image instead
+				var outfitID *uint
+				if id, exists := outfitMap[char.ID]; exists {
+					outfitID = id
+				}
+
+				if outfitID != nil {
+					var outfit models.CharacterOutfit
+					if err := s.db.First(&outfit, *outfitID).Error; err == nil {
+						if outfit.ImageURL != nil {
+							imageURL = outfit.ImageURL
+						}
+						if outfit.LocalPath != nil {
+							localPath = outfit.LocalPath
+						}
+					}
+				}
+
+				storyboardChar := SceneCharacterInfo{
+					ID:        char.ID,
+					Name:      char.Name,
+					ImageURL:  imageURL,
+					LocalPath: localPath,
+					OutfitID:  outfitID,
+				}
+				storyboardInfo.Characters = append(storyboardInfo.Characters, storyboardChar)
+
+				// Also add to independent Outfits list if assigned
+				if outfitID != nil {
+					var outfit models.CharacterOutfit
+					if err := s.db.First(&outfit, *outfitID).Error; err == nil {
+						storyboardInfo.Outfits = append(storyboardInfo.Outfits, SceneOutfitInfo{
+							ID:          outfit.ID,
+							CharacterID: char.ID,
+							Name:        outfit.Name,
+							ImageURL:    outfit.ImageURL,
+							LocalPath:   outfit.LocalPath,
+						})
+					}
+				}
+			}
+		}
+
+		// Add scene information
+		if storyboard.SceneID != nil {
+			if scene, ok := sceneMap[*storyboard.SceneID]; ok {
+				storyboardInfo.Background = &SceneBackgroundInfo{
+					ID:        scene.ID,
+					Location:  scene.Location,
+					Time:      scene.Time,
+					ImageURL:  scene.ImageURL,
+					LocalPath: scene.LocalPath,
+					Status:    scene.Status,
+				}
+			}
+		}
+
+		// Add composed image
+		if imageURL, ok := imageGenMap[storyboard.ID]; ok {
+			storyboardInfo.ComposedImage = &imageURL
+		}
+
+		// Add video URL
+		if storyboard.VideoURL != nil {
+			storyboardInfo.VideoURL = storyboard.VideoURL
+		}
+
+		// Add in-progress image generation task info
+		if imageTask, ok := imageGenTaskMap[storyboard.ID]; ok {
+			storyboardInfo.ImageGenerationID = &imageTask.ID
+			statusStr := string(imageTask.Status)
+			storyboardInfo.ImageGenerationStatus = &statusStr
+		}
+
+		// Add in-progress video generation task info
+		if videoTask, ok := videoGenTaskMap[storyboard.ID]; ok {
+			storyboardInfo.VideoGenerationID = &videoTask.ID
+			statusStr := string(videoTask.Status)
+			storyboardInfo.VideoGenerationStatus = &statusStr
+		}
+
+		result = append(result, storyboardInfo)
+	}
+
+	return result, nil
+}
+
+type UpdateSceneRequest struct {
+	SceneID     *uint   `json:"scene_id"`
+	Characters  []uint  `json:"characters"` // Store character ID array
+	Location    *string `json:"location"`
+	Time        *string `json:"time"`
+	Action      *string `json:"action"`
+	Dialogue    *string `json:"dialogue"`
+	Narration   *string `json:"narration"`
+	Description *string `json:"description"`
+	Duration    *int    `json:"duration"`
+	ImageURL    *string `json:"image_url"`
+	LocalPath   *string `json:"local_path"`
+	ImagePrompt *string `json:"image_prompt"`
+	VideoPrompt *string `json:"video_prompt"`
+}
+
+func (s *StoryboardCompositionService) UpdateScene(sceneID string, req *UpdateSceneRequest) error {
+	// Get storyboard and verify permissions
+	var storyboard models.Storyboard
+	err := s.db.Preload("Episode.Drama").Where("id = ?", sceneID).First(&storyboard).Error
+	if err != nil {
+		return fmt.Errorf("scene not found")
+	}
+
+	// Build update data
+	updates := make(map[string]interface{})
+
+	// Update background ID
+	if req.SceneID != nil {
+		updates["scene_id"] = req.SceneID
+	}
+
+	// Update character list (store ID array directly)
+	if req.Characters != nil {
+		charactersJSON, err := json.Marshal(req.Characters)
+		if err != nil {
+			return fmt.Errorf("failed to serialize characters: %w", err)
+		}
+		updates["characters"] = charactersJSON
+	}
+
+	// Update scene info fields
+	if req.Location != nil {
+		updates["location"] = req.Location
+	}
+	if req.Time != nil {
+		updates["time"] = req.Time
+	}
+	if req.Action != nil {
+		updates["action"] = req.Action
+	}
+	if req.Dialogue != nil {
+		updates["dialogue"] = req.Dialogue
+	}
+	if req.Narration != nil {
+		updates["narration"] = req.Narration
+	}
+	if req.Description != nil {
+		updates["description"] = req.Description
+	}
+	if req.Duration != nil {
+		updates["duration"] = *req.Duration
+	}
+	if req.ImageURL != nil {
+		updates["image_url"] = req.ImageURL
+	}
+	if req.LocalPath != nil {
+		updates["local_path"] = req.LocalPath
+	}
+	if req.ImagePrompt != nil {
+		updates["image_prompt"] = req.ImagePrompt
+	}
+	if req.VideoPrompt != nil {
+		updates["video_prompt"] = req.VideoPrompt
+	}
+
+	// Execute update
+	if len(updates) > 0 {
+		if err := s.db.Model(&models.Storyboard{}).Where("id = ?", sceneID).Updates(updates).Error; err != nil {
+			return fmt.Errorf("failed to update scene: %w", err)
+		}
+	}
+
+	s.log.Infow("Scene updated", "scene_id", sceneID, "updates", updates)
+	return nil
+}
+
+type GenerateSceneImageRequest struct {
+	SceneID uint   `json:"scene_id"`
+	Prompt  string `json:"prompt"`
+	Model   string `json:"model"`
+}
+
+func (s *StoryboardCompositionService) GenerateSceneImage(req *GenerateSceneImageRequest) (*models.ImageGeneration, error) {
+	// Get scene and verify permissions
+	var scene models.Scene
+	err := s.db.Where("id = ?", req.SceneID).First(&scene).Error
+	if err != nil {
+		return nil, fmt.Errorf("scene not found")
+	}
+
+	// Verify permissions: query Drama by DramaID
+	var drama models.Drama
+	if err := s.db.Where("id = ? ", scene.DramaID).First(&drama).Error; err != nil {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	// Build scene image generation prompt
+	prompt := req.Prompt
+	if prompt == "" {
+		prompt = scene.Prompt
+		if prompt == "" {
+			prompt = fmt.Sprintf("%s scene, %s", scene.Location, scene.Time)
+		}
+		s.log.Infow("Using scene prompt", "scene_id", req.SceneID, "prompt", prompt)
+	}
+	// Append aspect ratio so the image API frames the scene correctly
+	sceneAspectRatio := drama.AspectRatio
+	if sceneAspectRatio == "" {
+		sceneAspectRatio = "16:9"
+	}
+	prompt = ensureBackgroundOnlyPrompt(prompt + ", " + sceneAspectRatio + " aspect ratio")
+	negativePrompt := "people, person, human, man, woman, child, face, body, hands, crowd, silhouette, character, portrait"
+
+	// Generate directly using imageGen service
+	if s.imageGen != nil {
+		genReq := &GenerateImageRequest{
+			SceneID:        &req.SceneID,
+			DramaID:        fmt.Sprintf("%d", scene.DramaID),
+			ImageType:      string(models.ImageTypeScene),
+			Prompt:         prompt,
+			NegativePrompt: &negativePrompt,
+			Model:          req.Model,
+			Size:           aspectRatioToSize(drama.AspectRatio),
+			Quality:        "standard",
+		}
+		imageGen, err := s.imageGen.GenerateImage(genReq)
+		if err != nil {
+			return nil, fmt.Errorf("failed to generate image: %w", err)
+		}
+
+		// Update scene image_url
+		if imageGen.ImageURL != nil {
+			scene.ImageURL = imageGen.ImageURL
+			scene.Status = "generated"
+			if err := s.db.Save(&scene).Error; err != nil {
+				s.log.Errorw("Failed to update scene image url", "error", err)
+			}
+		}
+
+		s.log.Infow("Scene image generation created", "scene_id", req.SceneID, "image_gen_id", imageGen.ID)
+		return imageGen, nil
+	}
+
+	return nil, fmt.Errorf("image generation service not available")
+}
+
+type UpdateScenePromptRequest struct {
+	Prompt string `json:"prompt"`
+}
+
+func (s *StoryboardCompositionService) UpdateScenePrompt(sceneID string, req *UpdateScenePromptRequest) error {
+	var scene models.Scene
+	if err := s.db.Where("id = ?", sceneID).First(&scene).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("scene not found")
+		}
+		return fmt.Errorf("failed to find scene: %w", err)
+	}
+
+	scene.Prompt = req.Prompt
+	if err := s.db.Save(&scene).Error; err != nil {
+		return fmt.Errorf("failed to update scene prompt: %w", err)
+	}
+
+	s.log.Infow("Scene prompt updated", "scene_id", sceneID, "prompt", req.Prompt)
+	return nil
+}
+
+type UpdateSceneInfoRequest struct {
+	Location    *string `json:"location"`
+	Time        *string `json:"time"`
+	Prompt      *string `json:"prompt"`
+	Description *string `json:"description"`
+	ImageURL    *string `json:"image_url"`
+	LocalPath   *string `json:"local_path"`
+}
+
+func (s *StoryboardCompositionService) UpdateSceneInfo(sceneID string, req *UpdateSceneInfoRequest) error {
+	var scene models.Scene
+	if err := s.db.Where("id = ?", sceneID).First(&scene).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("scene not found")
+		}
+		return fmt.Errorf("failed to find scene: %w", err)
+	}
+
+	updates := make(map[string]interface{})
+	if req.Location != nil {
+		updates["location"] = *req.Location
+	}
+	if req.Time != nil {
+		updates["time"] = *req.Time
+	}
+	if req.Prompt != nil {
+		updates["prompt"] = *req.Prompt
+	}
+	if req.Description != nil {
+		updates["description"] = *req.Description
+	}
+	if req.ImageURL != nil {
+		updates["image_url"] = *req.ImageURL
+	}
+	if req.LocalPath != nil {
+		updates["local_path"] = *req.LocalPath
+	}
+
+	if len(updates) > 0 {
+		if err := s.db.Model(&scene).Updates(updates).Error; err != nil {
+			return fmt.Errorf("failed to update scene: %w", err)
+		}
+	}
+
+	s.log.Infow("Scene info updated", "scene_id", sceneID, "updates", updates)
+	return nil
+}
+
+func (s *StoryboardCompositionService) DeleteScene(sceneID string) error {
+	var scene models.Scene
+	if err := s.db.Where("id = ?", sceneID).First(&scene).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("scene not found")
+		}
+		return fmt.Errorf("failed to find scene: %w", err)
+	}
+
+	// Delete scene
+	if err := s.db.Delete(&scene).Error; err != nil {
+		return fmt.Errorf("failed to delete scene: %w", err)
+	}
+
+	s.log.Infow("Scene deleted successfully", "scene_id", sceneID)
+	return nil
+}
+
+func getStringValue(s *string) string {
+	if s != nil {
+		return *s
+	}
+	return ""
+}
+
+type CreateSceneRequest struct {
+	DramaID     uint   `json:"drama_id"`
+	EpisodeID   *uint  `json:"episode_id"` // Episode ID field
+	Location    string `json:"location"`
+	Time        string `json:"time"`
+	Prompt      string `json:"prompt"`
+	ImageURL    string `json:"image_url"`
+	LocalPath   string `json:"local_path"`
+	Description string `json:"description"`
+}
+
+func (s *StoryboardCompositionService) CreateScene(req *CreateSceneRequest) (*models.Scene, error) {
+	scene := &models.Scene{
+		DramaID:   req.DramaID,
+		EpisodeID: req.EpisodeID, // Set episode ID
+		Location:  req.Location,
+		Time:      req.Time,
+		Prompt:    req.Prompt,
+		Status:    "draft",
+	}
+
+	if req.ImageURL != "" {
+		scene.ImageURL = &req.ImageURL
+		scene.Status = "completed"
+	}
+	if req.LocalPath != "" {
+		scene.LocalPath = &req.LocalPath
+	}
+
+	if err := s.db.Create(scene).Error; err != nil {
+		return nil, fmt.Errorf("failed to create scene: %w", err)
+	}
+
+	s.log.Infow("Scene created successfully", "scene_id", scene.ID, "drama_id", scene.DramaID, "episode_id", req.EpisodeID)
+	return scene, nil
+}

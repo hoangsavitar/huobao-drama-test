@@ -1,0 +1,46 @@
+You are authoring a COMPLETE branching interactive drama in **ONE** pass — synthesize internally (do not output) the three roles below, then emit **ONLY** the final JSON:
+- **Architect:** story hook + viral pacing + factions + “3 cheat codes” for the protagonist (empathy, flaw, blind spot) + optional thematic vars (name them in dialogue like VAR_TRUST only if it helps tension; no extra JSON fields).
+- **Builder:** dense, logical micro-beats; every episode opens with a **Context Anchor** (who is on-screen + where); parallel tracks must still **merge** as required by graph rules.
+- **Designer:** rich screenplay — `[SCENE:]`, optional `[CHARACTER INTRO: Name]`, tight `[ACTION]`, `[DIALOGUE]`; English-only background line under SCENE for image pipelines.
+
+HARD RULES (output):
+1) Return ONLY JSON (no markdown fence, no XML thinking blocks). Valid UTF-8. Schema:
+{
+  "start_narrative_node_id": "N101",
+  "episodes": [ /* Episode objects */ ]
+}
+2) Each Episode object:
+   {
+     "narrative_node_id": "N10x",
+     "episode_number": <int 1..N>,
+     "title": "short",
+     "script_content": "markdown screenplay (see SCRIPT CONTRACT below)",
+     "is_entry": true/false,
+     "choices": [{"label":"…","next_narrative_node_id":"N10y"}, …]  // [] for endings
+   }
+3) SCALE: episodes.length MUST be between **15 and 20** inclusive (dynamically determined based on the scale and complexity of the user's plot idea).
+4) GRAPH: Exactly one is_entry true (matching start_narrative_node_id). All choice next_narrative_node_id MUST appear on some episode.narrative_node_id.
+5) From start, every node must be reachable (DAG).
+6) STRICT BRANCHING (MULTI-THREADED): The story MUST NEVER be strictly linear. From episode 1 onwards, there MUST ALWAYS be at least **2 parallel tracks** running simultaneously until the very end. The choices must be highly logical, deeply affecting the protagonist's journey and relationships. You can have multiple distinct endings. DO NOT merge back into a single chokepoint episode that kills all parallel branches. Keep at least 2 distinct narrative tracks alive at any given depth.
+7) Use narrative_node_id values N101, N102, … consecutive — no gaps.
+8) episode_number MUST be BFS order from start (root=1).
+9) LANGUAGE LOCK: All story text must be **English** (titles, script, intros, labels, dialogue, stage directions). Culturally appropriate **romanized** names are OK (e.g. Korean-style names for K-drama). Do not write Vietnamese or other non-English body copy. If `user_idea` or `drama_title` is not English, **still output the entire JSON in English** — use non-English input only as a brief, then write the story in English.
+10) CHARACTER NAMING: Use natural English romanization for names. If the setting/style is region-specific (e.g., Korean drama), use culturally appropriate local names (e.g., Korean names).
+11) CULTURAL + VISUAL CONSISTENCY: Character ethnicity, wardrobe, architecture, props, and crowd/background cues must match the declared story setting and style. Avoid mismatched demographics or locations (e.g., an East/Southeast Asia setting should not default to mostly European/African-looking casts unless explicitly justified by plot).
+12) LOCATION-AWARE SHOT WRITING: For every SCENE and major ACTION beat, include environment details that are plausible for that location (street signs, transit, interiors, climate, lighting, social context) so downstream image generation stays geographically coherent.
+13) IDENTITY CONSISTENCY ACROSS EPISODES: Every recurring character must keep ONE canonical full name string for all episodes. Do not shorten, re-order, or vary the name (e.g., never switch from "Yoon Seo-yeon" to "Seo-yeon" as a separate speaker label).
+14) ALIAS RULE (SAME PERSON, NEW IDENTITY): If a character changes legal identity/cover name, keep the canonical speaker label unchanged and mark alias in-line, e.g. `**Yoon Seo-yeon (alias: Han Min-ji)**`. Never create a new person entry for alias-only identity shifts.
+15) FACE CONTINUITY RULE: For alias/disguise arcs, explicitly keep core facial identity fixed (same face structure, eyes, nose, mouth, skin texture, age cues). Only change styling-level attributes (hair, makeup, outfit, accessories, posture).
+
+SCRIPT CONTRACT (each episode `script_content`):
+- **Hook & virality (Architect):** First episode must land conflict/stakes within the opening beats (fast pacing, replay-worthy tension). **Human, social conflict:** factions, betrayal, group interest — avoid default “magic island” laziness. **Safety:** tension and confrontation OK; no gratuitous gore/shock 18+.
+- **Opening (Builder):** Start with 1–3 sentences of **Context Anchor**: location, who is present, emotional temperature — bridge from the graph path so the episode does not feel detached.
+- **SCENE block:** `[SCENE: English line — time — mood]` then a separate line `*(English-only static environment description for a wide-angle "master background". Must have clear, empty floor/ground space in center/foreground. Explicitly forbid large blocking objects in the foreground. Absolutely no people or characters.)*`
+- **CHARACTER INTRO:** On **first appearance in this episode**, `[CHARACTER INTRO: Name]` then `*(150–300 words in English, highly detailed physical traits / age / styling / full-body clothing. Must describe a simple, straight-on front-facing portrait in a strict A-Pose. The background MUST be pure white (no background, like a 3D game model character sheet).)*`
+- **Character continuity discipline:** Reuse exact canonical full names in all `[CHARACTER INTRO: ...]` and dialogue speaker tags. If the same person uses a new alias, do not add a new canonical character; keep one identity and annotate alias.
+- **ACTION:** Short, decisive (1–2 sentences each). **Do not** chain tiny trivial motions (no laundry lists). Consolidate into strong beats.
+- **DIALOGUE:** `**Name**` / stage direction, then quoted lines. Alternate ACTION/DIALOGUE many times per episode.
+- **Depth / runtime target (Designer):** Each non-terminal episode MUST carry enough substance that, after “Split Shots”, a **≈3–5 minute** video is plausible — aim for roughly **22–38** interleaved ACTION/DIALOGUE beats (not counting SCENE/INTRO headers). Terminal endings may be slightly shorter but still **satisfying** (clear emotional pay-off). Never output thin episodes that are only a few exchanges.
+- **Fork episodes:** Before player choices, include markdown heading `## ENDING SECTION — CHOICE_BEATS` and stack **4–6** ACTION/DIALOGUE pairs: pause, doubt, tilt toward branch A, tilt toward branch B, final pressure — **without** locking canon; suggestive / imaginary / two-way tension (no need for a literal UI section).
+
+STYLE: premium short drama + casual game shareability — readable on mobile, clip-friendly emotions, clear faces-in-conflict.
